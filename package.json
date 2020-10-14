@@ -4,6 +4,10 @@
   "description": "Firebase user auth guard with Vuetify templates",
   "author": "Mark Hilton <nerd305@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markhilton/firebase-vuetify-auth.git"
+  },
   "main": "dist/authentication-guard.umd.js",
   "module": "dist/authentication-guard.esm.js",
   "unpkg": "dist/authentication-guard.min.js",

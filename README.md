@@ -2,6 +2,9 @@
 
 Firebase Vuetify Auth is a package providing user authentication against Firebase auth API for VUE application using Vuetify Material Design layout.
 
+![Sign In](https://github.com/markhilton/firebase-vuetify-auth/raw/master/src/assets/signin.png)
+![Register](https://github.com/markhilton/firebase-vuetify-auth/raw/master/src/assets/register.png)
+
 **WARNING** this package contains bugs and its still under development.
 
 ## Requirements
