@@ -25,7 +25,7 @@
 
 import FirebaseAuth from "./views/AuthGuard"
 import FirebaseAuthStore from "./store/submodule"
-import FirebaseAuthRoutes from "./routes"
+import FirebaseAuthRoutes from "./router/routes"
 import FirebaseAuthGuard from "./middleware/guard"
 
 export { FirebaseAuth, FirebaseAuthStore, FirebaseAuthRoutes, FirebaseAuthGuard }

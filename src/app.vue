@@ -1,25 +1,45 @@
 <template>
   <v-app>
-    <v-content v-if="authenticated">
-      <v-progress-linear :indeterminate="progress" />
+    <v-app-bar app dark>
+      <v-toolbar-title>
+        <!-- auth status / user display name -->
+        <div v-if="isAuthenticated">
+          User: <v-chip>{{ user.displayName }}</v-chip>
+        </div>
+        <div v-else>User: <v-chip>NOT authenticated</v-chip></div>
+      </v-toolbar-title>
 
+      <v-spacer />
+
+      <!-- sign in / sign out button -->
+      <v-btn v-if="isAuthenticated" outlined @click="signOut()">Sign Out</v-btn>
+      <v-btn v-else outlined link to="/protected">Sign In</v-btn>
+    </v-app-bar>
+
+    <v-main>
       <v-container>
-        User authenticated!
+        <h1>Firebase Vuetify Auth</h1>
+        <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
+        <div class="my-4">
+          <b>Try:</b> <router-link to="/public">Public Route</router-link> |
+          <router-link to="/protected">Protected Route</router-link>
+        </div>
 
-        <v-btn @click.prevent="signoff" color="primary">SignOff</v-btn>
+        <hr />
       </v-container>
-    </v-content>
 
-    <!-- login view for not authenticated users -->
-    <v-content v-else>
+      <!-- v-router view -->
+      <router-view />
+
+      <!-- login / register dialog -->
       <FirebaseAuth />
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
 <script>
-import store from "./store"
-import FirebaseAuth from "./views/AuthGuard"
+import store from "@/store"
+import FirebaseAuth from "@/components/authenticate/FirebaseAuth"
 
 export default {
   name: "App",
@@ -28,28 +48,18 @@ export default {
     FirebaseAuth,
   },
 
-  data: () => ({
-    drawer: true,
-  }),
-
   computed: {
-    appTitle() {
-      return process.env.VUE_APP_TITLE
+    user() {
+      return store.getters["auth/getUser"]
     },
-    progress() {
-      return store.getters["auth/progress"]
-    },
-    authenticated() {
-      return store.getters["auth/authenticated"]
-    },
-    snackbar() {
-      return store.getters["auth/snackbar"]
+    isAuthenticated() {
+      return store.getters["auth/isAuthenticated"]
     },
   },
 
   methods: {
-    signoff() {
-      store.dispatch("auth/signoff")
+    signOut() {
+      store.dispatch("auth/signOut")
     },
   },
 }

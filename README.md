@@ -4,36 +4,36 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 
 _WARNING_ this package contains bugs and its still under development.
 
+### Requirements
+
+This package assumes your project is already integrated with Firebase:
+
+1. `.env` file containing Firebase application environment variables is set up
+2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase SDK
+
 ### Setup
 
-1. add namespace to Vuex store
-2. add routes to Vue-router (TO BE DEPRECATED)
-3. update your main.js to reload VUE app on Firebase auth state change:
+1. Create a Firebase auth guard middleware
 
 ```javascript
-firebase.auth().onAuthStateChanged(user => {
-  store.dispatch("auth/authStateChanged", user)
+import firebase from "./src/middleware/firebase"
 
-  if (!app) {
-    app = new Vue({
-      router,
-      store,
-      vuetify,
-      render: h => h(App),
-    }).\$mount("#app")
-  }
-})
+export default (to, from, next) => {
+  const user = firebase.auth().currentUser
+
+  if (user?.uid) next()
+}
 ```
 
-4. setup `.env` variables for Firebase app:
+2. update your main.js to reload VUE app on Firebase auth state change:
 
-```bash
-VUE_APP_FIREBASE_APP_ID=
-VUE_APP_FIREBASE_APIKEY=
-VUE_APP_FIREBASE_AUTH=
-VUE_APP_FIREBASE_DATABASE=
-VUE_APP_FIREBASE_PROJECT=
-VUE_APP_FIREBASE_STORAGE=
-VUE_APP_FIREBASE_MESSAGING=
-VUE_APP_FIREBASE_MEASUREMENT_ID=
+```javascript
+firebase.auth().onAuthStateChanged(() => {
+  new Vue({
+    router,
+    store,
+    vuetify,
+    render: h => h(App),
+  }).$mount("#app")
+})
 ```

@@ -1,42 +1,34 @@
 <template>
   <v-container>
-    <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="register()">
-        <!-- error alerrts -->
+    <h2>[ protected route view ]</h2>
+    <div>This is a protected page that does require user authentication.</div>
+
+    <h3 class="mt-5 pt-5">Account Management</h3>
+
+    <v-card flat width="350">
+      <v-form ref="form" v-model="valid" @submit.prevent="updateUser()">
+        <!-- error alerts -->
         <v-alert v-if="error" v-model="alert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
-        <!-- application branding -->
-        <branding v-else class="text-center" />
-
-        <!-- registration form -->
+        <!-- user account management form -->
         <v-card-text class="mb-0 pb-0">
           <v-text-field
+            autocomplete="off"
             v-model="form.name"
             required
-            class="mr-2"
-            label="Name"
+            label="User Display Name"
             prepend-icon="person"
             :rules="[rules.name]"
-          />
-
-          <v-text-field
-            v-model="form.email"
-            required
-            class="mr-2"
-            label="Email"
-            prepend-icon="email"
-            :rules="[rules.email]"
           />
 
           <v-text-field
             autocomplete="off"
             v-model="form.password"
             required
-            class="mr-2"
             type="password"
-            label="Password"
+            label="Set New Password"
             prepend-icon="lock"
             :rules="[rules.password]"
           />
@@ -47,15 +39,15 @@
             required
             class="mr-2"
             type="password"
-            label="Confirm password"
+            label="Confirm Password"
             prepend-icon="lock"
             :rules="[rules.confirm]"
           />
         </v-card-text>
 
         <v-card-actions>
-          <v-btn block large color="primary" type="submit" :disabled="progress">
-            Register
+          <v-btn class="mt-2" color="primary" type="submit" :disabled="progress">
+            Update
           </v-btn>
         </v-card-actions>
       </v-form>
@@ -64,18 +56,14 @@
 </template>
 
 <script>
-import Branding from "./Branding"
-import store from "../store/index"
+import store from "@/store"
 
 export default {
-  name: "Register",
-
-  components: { Branding },
+  name: "Protected",
 
   data: () => ({
     form: {
       name: "",
-      email: "",
       password: "",
       confirm: "",
       agree: true,
@@ -84,19 +72,24 @@ export default {
     valid: false,
   }),
 
+  mounted() {
+    this.form.name = this.user.displayName
+  },
+
   computed: {
+    user() {
+      return store.getters["auth/getUser"]
+    },
     error() {
-      return store.getters["auth/error"]
+      return store.getters["auth/getError"]
     },
     progress() {
-      return store.getters["auth/progress"]
+      return store.getters["auth/getProgress"]
     },
     rules() {
       const validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
         password: this.form.password == "" ? "Password cannot be empty" : true,
         name: this.form.name == "" ? "Name cannot be empty" : true,
-        // agree: this.form.agree !== true ? "You must accept Terms of Service to continue" : true,
         confirm: this.form.password !== this.form.confirm ? "Passwords do not match" : true,
       }
 
@@ -113,20 +106,9 @@ export default {
     },
   },
 
-  watch: {
-    alert(value) {
-      if (!value) store.commit("auth/setError", null)
-    },
-    error() {
-      this.alert = Boolean(this.error)
-    },
-  },
-
   methods: {
-    register() {
-      if (this.$refs.form.validate()) {
-        store.dispatch("auth/register", this.form)
-      }
+    updateUser() {
+      store.dispatch("updateUser", this.form)
     },
   },
 }

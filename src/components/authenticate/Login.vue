@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="loginWithEmail()">
+      <v-form ref="form" v-model="valid">
         <!-- error alerrts -->
         <v-alert v-if="error" v-model="alert" type="error" dismissible>
           {{ error.message }}
@@ -18,7 +18,8 @@
           </div>
 
           <v-text-field
-            v-model="form.email"
+            :autofocus="autofocus"
+            v-model="credentials.email"
             required
             class="mr-2"
             label="Email"
@@ -29,7 +30,7 @@
           <v-text-field
             v-if="!forgotPassword"
             autocomplete="off"
-            v-model="form.password"
+            v-model="credentials.password"
             class="mr-2"
             name="password"
             type="password"
@@ -47,24 +48,29 @@
                         />-->
         </v-card-text>
 
-        <div class="text-center pb-4" v-if="!forgotPassword">
-          <v-btn @click.prevent="forgotPassword = true" text x-small color="primary">Forgot Password?</v-btn>
+        <div class="text-center pb-4">
+          <v-btn v-if="!forgotPassword" @click.prevent="forgotPassword = true" text x-small color="primary">
+            Forgot Password?
+          </v-btn>
+          <v-btn v-else @click.prevent="forgotPassword = false" text x-small color="primary">
+            Login with password
+          </v-btn>
         </div>
 
         <v-card-actions v-if="!forgotPassword">
-          <v-btn block large color="primary" type="submit" :disabled="progress">
+          <v-btn block large color="primary" @click.prevent="loginWithPassword()" :disabled="progress">
             Login
           </v-btn>
         </v-card-actions>
 
         <v-card-actions v-if="forgotPassword">
-          <v-btn block large color="primary" type="submit" :disabled="progress">
-            Email Password Reset Link
+          <v-btn block large color="primary" @click.prevent="sendEmailLoginLink()" type="submit" :disabled="progress">
+            Email Auth Link
           </v-btn>
         </v-card-actions>
 
         <v-card-actions>
-          <LoginWith />
+          <LoginWithGoogle />
         </v-card-actions>
       </v-form>
     </v-card>
@@ -72,36 +78,37 @@
 </template>
 
 <script>
-import store from "../store/index"
+import store from "@/store"
+
 import Branding from "./Branding"
-import LoginWith from "./LoginWith"
-import firebase from "../middleware/firebase"
+import LoginWithGoogle from "./LoginWithGoogle"
 
 export default {
-  components: { Branding, LoginWith },
+  components: { Branding, LoginWithGoogle },
 
   data: () => ({
-    form: {
+    credentials: {
       email: "",
       password: "",
       remember: false,
     },
     alert: true,
     valid: false,
+    autofocus: true,
     forgotPassword: false,
   }),
 
   computed: {
     error() {
-      return store.getters["auth/error"]
+      return store.getters["auth/getError"]
     },
     progress() {
-      return store.getters["auth/progress"]
+      return store.getters["auth/getProgress"]
     },
     rules() {
       const validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
-        password: this.form.password == "" ? "Password cannot be empty" : true,
+        email: this.credentials.email == "" ? "Email cannot be empty" : true,
+        password: this.credentials.password == "" ? "Password cannot be empty" : true,
       }
 
       return validation
@@ -110,10 +117,10 @@ export default {
 
   watch: {
     alert(value) {
-      if (!value) store.commit("auth/setError", null)
+      if (!value) store.commit("auth/SET_ERROR", null)
     },
     forgotPassword(value) {
-      if (value) store.commit("auth/setError", null)
+      if (value) store.commit("auth/SET_ERROR", null)
     },
     error() {
       this.alert = Boolean(this.error)
@@ -121,16 +128,12 @@ export default {
   },
 
   methods: {
-    loginWithEmail() {
-      if (this.$refs.form.validate()) {
-        store.commit("auth/setProgress", true)
-
-        firebase
-          .auth()
-          .signInWithEmailAndPassword(this.form.email, this.form.password)
-          .catch(error => store.commit("auth/setError", error))
-          .finally(() => store.commit("auth/setProgress", false))
-      }
+    loginWithPassword() {
+      if (this.$refs.form.validate()) store.dispatch("auth/loginWithPassword", this.credentials)
+    },
+    sendEmailLoginLink() {
+      this.forgotPassword = false
+      if (this.$refs.form.validate()) store.dispatch("auth/sendEmailLoginLink", this.credentials.email)
     },
   },
 }
