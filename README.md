@@ -4,18 +4,20 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 
 **WARNING** this package contains bugs and its still under development.
 
-### Requirements
+## Requirements
 
-This package assumes your project is already integrated with Firebase:
+This package assumes your VUE project is already integrated with Firebase:
 
 1. `.env` file containing Firebase application environment variables is set up
 2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase SDK
 
-### Setup
+## Setup
 
-1. Create a Firebase auth guard middleware interceptor file. Typically in your `./src/middleware/guard.js`.
-   This example assumes your Firebase application initializes in `./src/middleware/firebase` file, therefore
-   first line imports firebase middleware from that location.
+### STEP 1: Create a Firebase auth guard middleware interceptor file
+
+Typically located in your `./src/middleware/guard.js`.
+This example assumes your Firebase application initializes in `./src/middleware/firebase.js` file, therefore
+first line imports firebase middleware from that location.
 
 ```javascript
 import firebase from "./src/middleware/firebase"
@@ -27,22 +29,30 @@ export default (to, from, next) => {
 }
 ```
 
-2. Update your `main.js` app file to reload VUE app when Firebase auth state change.
-   This will provide a way to automatically update user page based on current authentication state.
-   This example assumes that you're using `vue-router` and `vuex` packages with your app.
+### STEP 2: Update your `main.js` app file
+
+Wrap up VUE class initialization into Firebase onAuthStateChanged listener.
+This will auto reload VUE app when Firebase auth state changes (user logs in our signs out of the app).
+It will provide a way to automatically update user page based on current authentication state.
+This example assumes that you're using `vue-router` and `vuex` packages with your app, so we initialize
+VUE class by passing in `router`, `store` & `vuetify` objects.
 
 ```javascript
 firebase.auth().onAuthStateChanged(() => {
+  // add this line at the top of new Vue class
   new Vue({
     router,
     store,
     vuetify,
     render: h => h(App),
   }).$mount("#app")
-})
+}) // close onAuthStateChanged listener wrapper
 ```
 
+### STEP 3: Update main VUE app view
+
 3. In your main `App.vue` implement conditional logic for authenticated and non-authenticated users view.
+   This example illustrates how to pass firebase middleware into the component and capture event when user auth state changes into `isAuthenticated` property.
 
 ```html
 <template>
@@ -96,7 +106,9 @@ firebase.auth().onAuthStateChanged(() => {
 </script>
 ```
 
-4. Protect desired routes:
+### STEP 4: Update vue router to protect desired routes
+
+Example of `router.js` implementation to protect specific route.
 
 ```javascript
 import Vue from "vue"
@@ -128,6 +140,6 @@ const router = new VueRouter({
 export default router
 ```
 
-**Thats it!**
+### Thats it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
