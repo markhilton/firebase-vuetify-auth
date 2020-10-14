@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}));
-}(this, (function (exports) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vuetify/lib')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vuetify/lib'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global['vuetify/lib']));
+}(this, (function (exports, lib) { 'use strict';
 
   //
   //
@@ -25,6 +25,15 @@
   //
 
   var script = {
+    components: {
+      VIcon: lib.VIcon,
+      VListItemTitle: lib.VListItemTitle,
+      VListItemSubtitle: lib.VListItemSubtitle,
+      VListItemContent: lib.VListItemContent,
+      VListItem: lib.VListItem,
+      VList: lib.VList
+    },
+
     computed: {
       appTitle: function appTitle() {
         return process.env.VUE_APP_TITLE
@@ -32,7 +41,7 @@
       appSubTitle: function appSubTitle() {
         return process.env.VUE_APP_SUBTITLE
       },
-    },
+    }
   };
 
   function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
@@ -288,6 +297,20 @@
   //
 
   var script$1 = {
+    components: {
+      VIcon: lib.VIcon,
+      VBtn: lib.VBtn,
+      VTooltip: lib.VTooltip,
+      VContainer: lib.VContainer,
+      VCardTitle: lib.VCardTitle,
+      VTextField: lib.VTextField,
+      VCol: lib.VCol,
+      VRow: lib.VRow,
+      VCardText: lib.VCardText,
+      VCard: lib.VCard,
+      VDialog: lib.VDialog
+    },
+
     props: ["firebase"],
 
     data: function () { return ({
@@ -371,7 +394,7 @@
           .then(function () { return (this$1.step = 1); })
           .catch(function (err) { return alert(err); });
       },
-    },
+    }
   };
 
   /* script */
@@ -763,10 +786,19 @@
       undefined
     );
 
-  //
-
   var script$2 = {
-    components: { Branding: __vue_component__, LoginWith3rdPartyProvider: __vue_component__$1 },
+    components: {
+      Branding: __vue_component__,
+      LoginWith3rdPartyProvider: __vue_component__$1,
+      VAlert: lib.VAlert,
+      VTextField: lib.VTextField,
+      VCardText: lib.VCardText,
+      VBtn: lib.VBtn,
+      VCardActions: lib.VCardActions,
+      VForm: lib.VForm,
+      VCard: lib.VCard,
+      VContainer: lib.VContainer
+    },
 
     props: ["error", "isLoading"],
 
@@ -1031,12 +1063,20 @@
       undefined
     );
 
-  //
-
   var script$3 = {
     name: "Register",
 
-    components: { Branding: __vue_component__ },
+    components: {
+      Branding: __vue_component__,
+      VAlert: lib.VAlert,
+      VTextField: lib.VTextField,
+      VCardText: lib.VCardText,
+      VBtn: lib.VBtn,
+      VCardActions: lib.VCardActions,
+      VForm: lib.VForm,
+      VCard: lib.VCard,
+      VContainer: lib.VContainer
+    },
 
     props: ["error", "isLoading"],
 
@@ -1347,6 +1387,14 @@
   //
 
   var script$4 = {
+    components: {
+      VAlert: lib.VAlert,
+      VBtn: lib.VBtn,
+      VIcon: lib.VIcon,
+      VCard: lib.VCard,
+      VContainer: lib.VContainer
+    },
+
     props: ["error", "isLoading"],
 
     data: function () { return ({
@@ -1361,7 +1409,7 @@
       goToLogin: function goToLogin() {
         this.$emit("signOut");
       },
-    },
+    }
   };
 
   /* script */
@@ -1542,8 +1590,6 @@
       undefined
     );
 
-  //
-
   var script$5 = {
     props: ["firebase"],
 
@@ -1560,6 +1606,13 @@
       Login: __vue_component__$2,
       Register: __vue_component__$3,
       EmailVerification: __vue_component__$4,
+      VProgressLinear: lib.VProgressLinear,
+      VTab: lib.VTab,
+      VTabs: lib.VTabs,
+      VTabItem: lib.VTabItem,
+      VTabsItems: lib.VTabsItems,
+      VCard: lib.VCard,
+      VContainer: lib.VContainer
     },
 
     mounted: function mounted() {

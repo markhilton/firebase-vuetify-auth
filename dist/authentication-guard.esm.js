@@ -1,3 +1,5 @@
+import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VBtn, VTooltip, VContainer, VCardTitle, VTextField, VCol, VRow, VCardText, VCard, VDialog, VAlert, VCardActions, VForm, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
+
 //
 //
 //
@@ -19,6 +21,15 @@
 //
 
 var script = {
+  components: {
+    VIcon: VIcon,
+    VListItemTitle: VListItemTitle,
+    VListItemSubtitle: VListItemSubtitle,
+    VListItemContent: VListItemContent,
+    VListItem: VListItem,
+    VList: VList
+  },
+
   computed: {
     appTitle: function appTitle() {
       return process.env.VUE_APP_TITLE
@@ -26,7 +37,7 @@ var script = {
     appSubTitle: function appSubTitle() {
       return process.env.VUE_APP_SUBTITLE
     },
-  },
+  }
 };
 
 function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
@@ -282,6 +293,20 @@ __vue_render__._withStripped = true;
 //
 
 var script$1 = {
+  components: {
+    VIcon: VIcon,
+    VBtn: VBtn,
+    VTooltip: VTooltip,
+    VContainer: VContainer,
+    VCardTitle: VCardTitle,
+    VTextField: VTextField,
+    VCol: VCol,
+    VRow: VRow,
+    VCardText: VCardText,
+    VCard: VCard,
+    VDialog: VDialog
+  },
+
   props: ["firebase"],
 
   data: function () { return ({
@@ -365,7 +390,7 @@ var script$1 = {
         .then(function () { return (this$1.step = 1); })
         .catch(function (err) { return alert(err); });
     },
-  },
+  }
 };
 
 /* script */
@@ -757,10 +782,19 @@ __vue_render__$1._withStripped = true;
     undefined
   );
 
-//
-
 var script$2 = {
-  components: { Branding: __vue_component__, LoginWith3rdPartyProvider: __vue_component__$1 },
+  components: {
+    Branding: __vue_component__,
+    LoginWith3rdPartyProvider: __vue_component__$1,
+    VAlert: VAlert,
+    VTextField: VTextField,
+    VCardText: VCardText,
+    VBtn: VBtn,
+    VCardActions: VCardActions,
+    VForm: VForm,
+    VCard: VCard,
+    VContainer: VContainer
+  },
 
   props: ["error", "isLoading"],
 
@@ -1025,12 +1059,20 @@ __vue_render__$2._withStripped = true;
     undefined
   );
 
-//
-
 var script$3 = {
   name: "Register",
 
-  components: { Branding: __vue_component__ },
+  components: {
+    Branding: __vue_component__,
+    VAlert: VAlert,
+    VTextField: VTextField,
+    VCardText: VCardText,
+    VBtn: VBtn,
+    VCardActions: VCardActions,
+    VForm: VForm,
+    VCard: VCard,
+    VContainer: VContainer
+  },
 
   props: ["error", "isLoading"],
 
@@ -1341,6 +1383,14 @@ __vue_render__$3._withStripped = true;
 //
 
 var script$4 = {
+  components: {
+    VAlert: VAlert,
+    VBtn: VBtn,
+    VIcon: VIcon,
+    VCard: VCard,
+    VContainer: VContainer
+  },
+
   props: ["error", "isLoading"],
 
   data: function () { return ({
@@ -1355,7 +1405,7 @@ var script$4 = {
     goToLogin: function goToLogin() {
       this.$emit("signOut");
     },
-  },
+  }
 };
 
 /* script */
@@ -1536,8 +1586,6 @@ __vue_render__$4._withStripped = true;
     undefined
   );
 
-//
-
 var script$5 = {
   props: ["firebase"],
 
@@ -1554,6 +1602,13 @@ var script$5 = {
     Login: __vue_component__$2,
     Register: __vue_component__$3,
     EmailVerification: __vue_component__$4,
+    VProgressLinear: VProgressLinear,
+    VTab: VTab,
+    VTabs: VTabs,
+    VTabItem: VTabItem,
+    VTabsItems: VTabsItems,
+    VCard: VCard,
+    VContainer: VContainer
   },
 
   mounted: function mounted() {
