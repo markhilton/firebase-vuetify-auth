@@ -13,7 +13,7 @@ This package assumes your VUE project is already integrated with Firebase:
 
 ## Setup
 
-### STEP 1: Create a Firebase auth guard middleware interceptor file
+#### STEP 1: Create a Firebase auth guard middleware interceptor file
 
 Typically located in your `./src/middleware/guard.js`.
 This example assumes your Firebase application initializes in `./src/middleware/firebase.js` file, therefore
@@ -29,7 +29,7 @@ export default (to, from, next) => {
 }
 ```
 
-### STEP 2: Update your `main.js` app file
+#### STEP 2: Update your `main.js` app file
 
 Wrap up VUE class initialization into Firebase onAuthStateChanged listener.
 This will auto reload VUE app when Firebase auth state changes (user logs in our signs out of the app).
@@ -49,7 +49,7 @@ firebase.auth().onAuthStateChanged(() => {
 }) // close onAuthStateChanged listener wrapper
 ```
 
-### STEP 3: Update main VUE app view
+#### STEP 3: Update main VUE app view
 
 3. In your main `App.vue` implement conditional logic for authenticated and non-authenticated users view.
    This example illustrates how to pass firebase middleware into the component and capture event when user auth state changes into `isAuthenticated` property.
@@ -106,7 +106,7 @@ firebase.auth().onAuthStateChanged(() => {
 </script>
 ```
 
-### STEP 4: Update vue router to protect desired routes
+#### STEP 4: Update vue router to protect desired routes
 
 Example of `router.js` implementation to protect specific route.
 
