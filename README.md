@@ -9,8 +9,8 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 - Email verification for new accounts (required to gain access to the app)
 - 3rd party authentication provider integration (Google, Facebook, Phone text message)
 
-![Sign In](https://github.com/markhilton/firebase-vuetify-auth/raw/master/src/assets/signin.png =400)
-![Register](https://github.com/markhilton/firebase-vuetify-auth/raw/master/src/assets/register.png =400)
+![Sign In](./src/assets/signin.png =400x)
+![Register](./src/assets/register.png =400x)
 
 **WARNING** this package contains bugs and its still under development.
 
