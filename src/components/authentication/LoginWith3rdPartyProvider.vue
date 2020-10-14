@@ -1,39 +1,41 @@
 <template>
-  <v-layout>
-    <v-btn color="red" block large dark @click="loginWith()">
-      Login with...
-    </v-btn>
+  <v-container class="text-center ma-0 pa-0">
+    <div class="caption">or login with</div>
+
+    <v-container>
+      <v-tooltip top>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="#db3236" class="mr-2" v-bind="attrs" v-on="on" fab dark small @click="loginWithGoogle()">
+            <v-icon>mdi-google</v-icon>
+          </v-btn>
+        </template>
+
+        <span>Google Gmail Account</span>
+      </v-tooltip>
+
+      <v-tooltip top>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="#3b5998" class="mr-2" v-bind="attrs" v-on="on" fab dark small @click="loginWithFacebook()">
+            <v-icon>mdi-facebook</v-icon>
+          </v-btn>
+        </template>
+
+        <span>Facebook Account</span>
+      </v-tooltip>
+
+      <v-tooltip top>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn color="primary" v-bind="attrs" v-on="on" fab dark small @click="loginWithPhone()">
+            <v-icon>phone</v-icon>
+          </v-btn>
+        </template>
+
+        <span>Text Message To Your Phone</span>
+      </v-tooltip>
+    </v-container>
 
     <v-dialog v-model="dialog" width="500">
       <div id="recaptcha-container"></div>
-
-      <!-- select authentication provider -->
-      <v-card v-if="step === 1">
-        <v-card-title class="body-1 primary white--text">
-          Select authentication provider
-        </v-card-title>
-
-        <v-card-actions>
-          <v-btn block large color="red" class="white--text" :disabled="progress" @click="loginWithGoogle()">
-            <v-icon class="mr-2">mdi-google</v-icon>
-            Login with Google
-          </v-btn>
-        </v-card-actions>
-
-        <v-card-actions>
-          <v-btn
-            block
-            large
-            color="green text-darken-2"
-            class="white--text"
-            :disabled="progress"
-            @click="loginWithPhone()"
-          >
-            <v-icon class="mr-2">phone</v-icon>
-            Login with Phone
-          </v-btn>
-        </v-card-actions>
-      </v-card>
 
       <!-- phone authentication provider: enter phone number -->
       <v-card v-if="step === 2">
@@ -92,14 +94,13 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-  </v-layout>
+  </v-container>
 </template>
 
 <script>
-import store from "../store"
-import firebase from "@/middleware/firebase"
-
 export default {
+  props: ["firebase"],
+
   data: () => ({
     step: 1,
     alert: true,
@@ -116,19 +117,12 @@ export default {
   }),
 
   mounted() {
-    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
-
-    // render the rapchaVerifier.
-    this.recaptchaVerifier.render().then(widgetId => (this.recaptchaWidgetId = widgetId))
+    // this.recaptchaVerifier = new this.firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
+    // // render the rapchaVerifier.
+    // this.recaptchaVerifier.render().then(widgetId => (this.recaptchaWidgetId = widgetId))
   },
 
   computed: {
-    error() {
-      return store.getters["auth/error"]
-    },
-    progress() {
-      return store.getters["auth/progress"]
-    },
     rules() {
       const validation = {
         email: this.form.email == "" ? "Email cannot be empty" : true,
@@ -140,9 +134,6 @@ export default {
   },
 
   watch: {
-    alert(value) {
-      if (!value) store.commit("setError", ["login", null])
-    },
     error() {
       this.alert = Boolean(this.error)
     },
@@ -155,20 +146,20 @@ export default {
     },
 
     loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider()
-      firebase.auth().signInWithRedirect(provider)
+      const provider = new this.firebase.auth.GoogleAuthProvider()
+      this.firebase.auth().signInWithRedirect(provider)
     },
 
     loginWithPhone() {
       // Turn off phone auth app verification.
-      firebase.auth().settings.appVerificationDisabledForTesting = true
+      this.firebase.auth().settings.appVerificationDisabledForTesting = true
 
       // switch dialog to allow entering mobile phone number
       this.step = 2
     },
 
     sendCode() {
-      firebase
+      this.firebase
         .auth()
         .signInWithPhoneNumber("+1" + this.phoneNumber, this.recaptchaVerifier)
         .then(res => {

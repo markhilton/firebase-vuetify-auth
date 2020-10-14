@@ -65,7 +65,7 @@ export default {
     } else if (this.mode == "verifyEmail") {
       this.$store.dispatch("user/verifyEmail", this.code)
     } else {
-      this.$store.commit("setError", "This link has already been used, its invalid or expired!")
+      this.$store.commit("SET_ERROR", "This link has already been used, its invalid or expired!")
     }
   },
 }

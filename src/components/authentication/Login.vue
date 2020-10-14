@@ -3,7 +3,7 @@
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="loginWithEmail()">
         <!-- error alerrts -->
-        <v-alert v-if="error" v-model="alert" type="error" dismissible>
+        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
@@ -52,19 +52,19 @@
         </div>
 
         <v-card-actions v-if="!forgotPassword">
-          <v-btn block large color="primary" type="submit" :disabled="progress">
+          <v-btn block large color="primary" type="submit" :disabled="isLoading">
             Login
           </v-btn>
         </v-card-actions>
 
         <v-card-actions v-if="forgotPassword">
-          <v-btn block large color="primary" type="submit" :disabled="progress">
+          <v-btn block large color="primary" type="submit" :disabled="isLoading">
             Email Password Reset Link
           </v-btn>
         </v-card-actions>
 
         <v-card-actions>
-          <LoginWith />
+          <LoginWith3rdPartyProvider />
         </v-card-actions>
       </v-form>
     </v-card>
@@ -72,13 +72,13 @@
 </template>
 
 <script>
-import store from "../store/index"
-import Branding from "./Branding"
-import LoginWith from "./LoginWith"
-import firebase from "../middleware/firebase"
+import Branding from "./Branding.vue"
+import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
 
 export default {
-  components: { Branding, LoginWith },
+  components: { Branding, LoginWith3rdPartyProvider },
+
+  props: ["error", "isLoading"],
 
   data: () => ({
     form: {
@@ -86,18 +86,12 @@ export default {
       password: "",
       remember: false,
     },
-    alert: true,
+    alert: false,
     valid: false,
     forgotPassword: false,
   }),
 
   computed: {
-    error() {
-      return store.getters["auth/error"]
-    },
-    progress() {
-      return store.getters["auth/progress"]
-    },
     rules() {
       const validation = {
         email: this.form.email == "" ? "Email cannot be empty" : true,
@@ -109,12 +103,6 @@ export default {
   },
 
   watch: {
-    alert(value) {
-      if (!value) store.commit("auth/setError", null)
-    },
-    forgotPassword(value) {
-      if (value) store.commit("auth/setError", null)
-    },
     error() {
       this.alert = Boolean(this.error)
     },
@@ -123,13 +111,7 @@ export default {
   methods: {
     loginWithEmail() {
       if (this.$refs.form.validate()) {
-        store.commit("auth/setProgress", true)
-
-        firebase
-          .auth()
-          .signInWithEmailAndPassword(this.form.email, this.form.password)
-          .catch(error => store.commit("auth/setError", error))
-          .finally(() => store.commit("auth/setProgress", false))
+        this.$emit("credentials", { email: this.form.email, password: this.form.password })
       }
     },
   },

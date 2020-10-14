@@ -2,8 +2,8 @@
   <v-container>
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="register()">
-        <!-- error alerrts -->
-        <v-alert v-if="error" v-model="alert" type="error" dismissible>
+        <!-- error alerts -->
+        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
@@ -54,7 +54,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn block large color="primary" type="submit" :disabled="progress">
+          <v-btn block large color="primary" type="submit" :disabled="isLoading">
             Register
           </v-btn>
         </v-card-actions>
@@ -64,13 +64,14 @@
 </template>
 
 <script>
-import Branding from "./Branding"
-import store from "../store/index"
+import Branding from "./Branding.vue"
 
 export default {
   name: "Register",
 
   components: { Branding },
+
+  props: ["error", "isLoading"],
 
   data: () => ({
     form: {
@@ -80,17 +81,11 @@ export default {
       confirm: "",
       agree: true,
     },
-    alert: true,
+    alert: false,
     valid: false,
   }),
 
   computed: {
-    error() {
-      return store.getters["auth/error"]
-    },
-    progress() {
-      return store.getters["auth/progress"]
-    },
     rules() {
       const validation = {
         email: this.form.email == "" ? "Email cannot be empty" : true,
@@ -114,9 +109,6 @@ export default {
   },
 
   watch: {
-    alert(value) {
-      if (!value) store.commit("auth/setError", null)
-    },
     error() {
       this.alert = Boolean(this.error)
     },
@@ -125,7 +117,7 @@ export default {
   methods: {
     register() {
       if (this.$refs.form.validate()) {
-        store.dispatch("auth/register", this.form)
+        this.$emit("registration", this.form)
       }
     },
   },

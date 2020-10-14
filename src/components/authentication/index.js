@@ -23,9 +23,6 @@
  *
  */
 
-import FirebaseAuth from "./views/AuthGuard"
-import FirebaseAuthStore from "./store/submodule"
-import FirebaseAuthRoutes from "./routes"
-import FirebaseAuthGuard from "./middleware/guard"
+import AuthenticationGuard from "./Guard.vue"
 
-export { FirebaseAuth, FirebaseAuthStore, FirebaseAuthRoutes, FirebaseAuthGuard }
+export default AuthenticationGuard

@@ -1,10 +1,8 @@
-import store from "@/store"
-import firebase from "@/middleware/firebase"
+import { firebase } from "@/middleware"
 
 // this gets hit ONLY when route is protected with beforeEnter: AuthGuard
 export default (to, from, next) => {
   const user = firebase.auth().currentUser
 
-  if (user) next()
-  else store.commit("auth/setAuthenticated", false)
+  if (user?.uid) next()
 }
