@@ -306,7 +306,7 @@
     }); },
 
     mounted: function mounted() {
-      // this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
+      // this.recaptchaVerifier = new this.firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
       // // render the rapchaVerifier.
       // this.recaptchaVerifier.render().then(widgetId => (this.recaptchaWidgetId = widgetId))
     },
@@ -335,13 +335,13 @@
       },
 
       loginWithGoogle: function loginWithGoogle() {
-        var provider = new firebase.auth.GoogleAuthProvider();
-        firebase.auth().signInWithRedirect(provider);
+        var provider = new this.firebase.auth.GoogleAuthProvider();
+        this.firebase.auth().signInWithRedirect(provider);
       },
 
       loginWithPhone: function loginWithPhone() {
         // Turn off phone auth app verification.
-        firebase.auth().settings.appVerificationDisabledForTesting = true;
+        this.firebase.auth().settings.appVerificationDisabledForTesting = true;
 
         // switch dialog to allow entering mobile phone number
         this.step = 2;
@@ -350,7 +350,7 @@
       sendCode: function sendCode() {
         var this$1 = this;
 
-        firebase
+        this.firebase
           .auth()
           .signInWithPhoneNumber("+1" + this.phoneNumber, this.recaptchaVerifier)
           .then(function (res) {
