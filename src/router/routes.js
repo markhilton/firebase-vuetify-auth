@@ -1,4 +1,4 @@
-import AuthGuard from "@/middleware/guard"
+import { guard as AuthGuard } from "@/middleware"
 
 export default [
   {

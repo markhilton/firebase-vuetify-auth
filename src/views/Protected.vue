@@ -56,8 +56,6 @@
 </template>
 
 <script>
-import store from "@/store"
-
 export default {
   name: "Protected",
 
@@ -77,15 +75,6 @@ export default {
   },
 
   computed: {
-    user() {
-      return store.getters["auth/getUser"]
-    },
-    error() {
-      return store.getters["auth/getError"]
-    },
-    progress() {
-      return store.getters["auth/getProgress"]
-    },
     rules() {
       const validation = {
         password: this.form.password == "" ? "Password cannot be empty" : true,
@@ -108,7 +97,7 @@ export default {
 
   methods: {
     updateUser() {
-      store.dispatch("updateUser", this.form)
+      alert("this is just a test!")
     },
   },
 }

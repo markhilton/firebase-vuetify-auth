@@ -1,24 +1,16 @@
 import Vue from "vue"
-import App from "@/App.vue"
-import store from "@/store"
+import App from "@/App"
 import router from "@/router"
 import vuetify from "@/plugins/vuetify"
-import firebase from "@/middleware/firebase"
+import { firebase } from "@/middleware"
 
 Vue.config.productionTip = false
 
-// Initialize Firebase
-let app
-
-firebase.auth().onAuthStateChanged(user => {
-  store.dispatch("auth/authStateChanged", user)
-
-  if (!app) {
-    app = new Vue({
-      store,
-      router,
-      vuetify,
-      render: h => h(App),
-    }).$mount("#app")
-  }
+// reload VUE app on Firebase auth state change
+firebase.auth().onAuthStateChanged(() => {
+  new Vue({
+    router,
+    vuetify,
+    render: h => h(App),
+  }).$mount("#app")
 })

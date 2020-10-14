@@ -3,7 +3,7 @@
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="register()">
         <!-- error alerts -->
-        <v-alert v-if="error" v-model="alert" type="error" dismissible>
+        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
@@ -54,7 +54,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn block large class="mt-2" color="primary" type="submit" :disabled="progress">
+          <v-btn block large color="primary" type="submit" :disabled="isLoading">
             Register
           </v-btn>
         </v-card-actions>
@@ -64,13 +64,14 @@
 </template>
 
 <script>
-import store from "@/store"
-import Branding from "./Branding"
+import Branding from "./Branding.vue"
 
 export default {
   name: "Register",
 
   components: { Branding },
+
+  props: ["error", "isLoading"],
 
   data: () => ({
     form: {
@@ -80,23 +81,17 @@ export default {
       confirm: "",
       agree: true,
     },
-    alert: true,
+    alert: false,
     valid: false,
   }),
 
   computed: {
-    error() {
-      return store.getters["auth/getError"]
-    },
-    progress() {
-      return store.getters["auth/getProgress"]
-    },
     rules() {
       const validation = {
         email: this.form.email == "" ? "Email cannot be empty" : true,
         password: this.form.password == "" ? "Password cannot be empty" : true,
         name: this.form.name == "" ? "Name cannot be empty" : true,
-        agree: this.form.agree !== true ? "You must accept Terms of Service to continue" : true,
+        // agree: this.form.agree !== true ? "You must accept Terms of Service to continue" : true,
         confirm: this.form.password !== this.form.confirm ? "Passwords do not match" : true,
       }
 
@@ -114,9 +109,6 @@ export default {
   },
 
   watch: {
-    alert(value) {
-      if (!value) store.commit("auth/SET_ERROR", null)
-    },
     error() {
       this.alert = Boolean(this.error)
     },
@@ -125,9 +117,7 @@ export default {
   methods: {
     register() {
       if (this.$refs.form.validate()) {
-        store.dispatch("auth/registerUser", this.form).then(() => {
-          if (!this.error) this.$emit("exit")
-        })
+        this.$emit("registration", this.form)
       }
     },
   },

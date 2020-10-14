@@ -1,9 +1,9 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid">
+      <v-form ref="form" v-model="valid" @submit.prevent="loginWithEmail()">
         <!-- error alerrts -->
-        <v-alert v-if="error" v-model="alert" type="error" dismissible>
+        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
@@ -18,8 +18,7 @@
           </div>
 
           <v-text-field
-            :autofocus="autofocus"
-            v-model="credentials.email"
+            v-model="form.email"
             required
             class="mr-2"
             label="Email"
@@ -30,7 +29,7 @@
           <v-text-field
             v-if="!forgotPassword"
             autocomplete="off"
-            v-model="credentials.password"
+            v-model="form.password"
             class="mr-2"
             name="password"
             type="password"
@@ -48,29 +47,24 @@
                         />-->
         </v-card-text>
 
-        <div class="text-center pb-4">
-          <v-btn v-if="!forgotPassword" @click.prevent="forgotPassword = true" text x-small color="primary">
-            Forgot Password?
-          </v-btn>
-          <v-btn v-else @click.prevent="forgotPassword = false" text x-small color="primary">
-            Login with password
-          </v-btn>
+        <div class="text-center pb-4" v-if="!forgotPassword">
+          <v-btn @click.prevent="forgotPassword = true" text x-small color="primary">Forgot Password?</v-btn>
         </div>
 
         <v-card-actions v-if="!forgotPassword">
-          <v-btn block large color="primary" @click.prevent="loginWithPassword()" :disabled="progress">
+          <v-btn block large color="primary" type="submit" :disabled="isLoading">
             Login
           </v-btn>
         </v-card-actions>
 
         <v-card-actions v-if="forgotPassword">
-          <v-btn block large color="primary" @click.prevent="sendEmailLoginLink()" type="submit" :disabled="progress">
-            Email Auth Link
+          <v-btn block large color="primary" type="submit" :disabled="isLoading">
+            Email Password Reset Link
           </v-btn>
         </v-card-actions>
 
         <v-card-actions>
-          <LoginWithGoogle />
+          <LoginWith3rdPartyProvider />
         </v-card-actions>
       </v-form>
     </v-card>
@@ -78,37 +72,30 @@
 </template>
 
 <script>
-import store from "@/store"
-
-import Branding from "./Branding"
-import LoginWithGoogle from "./LoginWithGoogle"
+import Branding from "./Branding.vue"
+import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
 
 export default {
-  components: { Branding, LoginWithGoogle },
+  components: { Branding, LoginWith3rdPartyProvider },
+
+  props: ["error", "isLoading"],
 
   data: () => ({
-    credentials: {
+    form: {
       email: "",
       password: "",
       remember: false,
     },
-    alert: true,
+    alert: false,
     valid: false,
-    autofocus: true,
     forgotPassword: false,
   }),
 
   computed: {
-    error() {
-      return store.getters["auth/getError"]
-    },
-    progress() {
-      return store.getters["auth/getProgress"]
-    },
     rules() {
       const validation = {
-        email: this.credentials.email == "" ? "Email cannot be empty" : true,
-        password: this.credentials.password == "" ? "Password cannot be empty" : true,
+        email: this.form.email == "" ? "Email cannot be empty" : true,
+        password: this.form.password == "" ? "Password cannot be empty" : true,
       }
 
       return validation
@@ -116,24 +103,16 @@ export default {
   },
 
   watch: {
-    alert(value) {
-      if (!value) store.commit("auth/SET_ERROR", null)
-    },
-    forgotPassword(value) {
-      if (value) store.commit("auth/SET_ERROR", null)
-    },
     error() {
       this.alert = Boolean(this.error)
     },
   },
 
   methods: {
-    loginWithPassword() {
-      if (this.$refs.form.validate()) store.dispatch("auth/loginWithPassword", this.credentials)
-    },
-    sendEmailLoginLink() {
-      this.forgotPassword = false
-      if (this.$refs.form.validate()) store.dispatch("auth/sendEmailLoginLink", this.credentials.email)
+    loginWithEmail() {
+      if (this.$refs.form.validate()) {
+        this.$emit("credentials", { email: this.form.email, password: this.form.password })
+      }
     },
   },
 }
