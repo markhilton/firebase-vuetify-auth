@@ -1,6 +1,6 @@
 {
   "name": "@nerd305/firebase-vuetify-auth",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Firebase user auth guard with Vuetify templates",
   "author": "Mark Hilton <nerd305@gmail.com>",
   "license": "MIT",
@@ -24,9 +24,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "css-loader": "^3.6.0",
-    "firebase": "^7.23.0",
-    "stylus": "^0.54.8",
-    "stylus-loader": "^3.0.2",
+    "firebase": "^7.24.0",
     "vuetify": "^2.3.14"
   },
   "devDependencies": {
@@ -46,15 +44,17 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-vue": "^5.0.0",
     "prettier": "^1.18.2",
-    "rollup": "^2.30.0",
+    "rollup": "^2.32.0",
     "rollup-plugin-postcss": "^3.1.8",
     "rollup-plugin-vue": "^5.0.1",
     "rollup-plugin-vuetify": "^0.2.3",
     "sass": "^1.27.0",
     "sass-loader": "^8.0.2",
+    "stylus": "^0.54.8",
+    "stylus-loader": "^3.0.2",
     "vue": "^2.6.12",
     "vue-cli-plugin-vuetify": "^2.0.7",
-    "vue-router": "^3.4.6",
+    "vue-router": "^3.4.7",
     "vue-template-compiler": "^2.6.12",
     "vuetify-loader": "^1.6.0"
   }

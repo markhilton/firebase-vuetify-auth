@@ -20,6 +20,12 @@ This package assumes your VUE project is already integrated with Firebase:
 1. `.env` file containing Firebase application environment variables is set up
 2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase SDK
 
+## Install
+
+```bash
+npm i @nerd305/firebase-vuetify-auth
+```
+
 ## Setup
 
 #### STEP 1: Create a Firebase auth guard middleware interceptor file
