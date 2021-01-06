@@ -1,11 +1,22 @@
 <template>
   <v-container class="text-center ma-0 pa-0">
-    <div class="caption">or login with</div>
+    <div class="caption">
+      or login with
+    </div>
 
     <v-container>
       <v-tooltip top>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="#db3236" class="mr-2" v-bind="attrs" v-on="on" fab dark small @click="loginWithGoogle()">
+        <template #activator="{ on, attrs }">
+          <v-btn
+            color="#db3236"
+            class="mr-2"
+            v-bind="attrs"
+            fab
+            dark
+            small
+            v-on="on"
+            @click="loginWithGoogle()"
+          >
             <v-icon>mdi-google</v-icon>
           </v-btn>
         </template>
@@ -14,8 +25,17 @@
       </v-tooltip>
 
       <v-tooltip top>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="#3b5998" class="mr-2" v-bind="attrs" v-on="on" fab dark small @click="loginWithFacebook()">
+        <template #activator="{ on, attrs }">
+          <v-btn
+            color="#3b5998"
+            class="mr-2"
+            v-bind="attrs"
+            fab
+            dark
+            small
+            v-on="on"
+            @click="loginWithFacebook()"
+          >
             <v-icon>mdi-facebook</v-icon>
           </v-btn>
         </template>
@@ -24,8 +44,16 @@
       </v-tooltip>
 
       <v-tooltip top>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn color="primary" v-bind="attrs" v-on="on" fab dark small @click="loginWithPhone()">
+        <template #activator="{ on, attrs }">
+          <v-btn
+            color="primary"
+            v-bind="attrs"
+            fab
+            dark
+            small
+            v-on="on"
+            @click="loginWithPhone()"
+          >
             <v-icon>phone</v-icon>
           </v-btn>
         </template>
@@ -34,8 +62,11 @@
       </v-tooltip>
     </v-container>
 
-    <v-dialog v-model="dialog" width="500">
-      <div id="recaptcha-container"></div>
+    <v-dialog
+      v-model="dialog"
+      width="500"
+    >
+      <div id="recaptcha-container" />
 
       <!-- phone authentication provider: enter phone number -->
       <v-card v-if="step === 2">
@@ -45,19 +76,27 @@
 
         <v-card-text>
           <v-container fluid>
-            <v-row align="center" justify="center">
+            <v-row
+              align="center"
+              justify="center"
+            >
               <v-col>
                 <v-text-field
-                  autocomplete="off"
                   v-model="phoneNumber"
+                  v-mask="phoneMask"
+                  autocomplete="off"
                   label="Phone Number"
                   prepend-icon="phone"
-                  v-mask="phoneMask"
                 />
               </v-col>
 
               <v-col>
-                <v-btn color="primary" outlined :disabled="progress" @click="sendCode()">
+                <v-btn
+                  color="primary"
+                  outlined
+                  :disabled="progress"
+                  @click="sendCode()"
+                >
                   Send Code
                 </v-btn>
               </v-col>
@@ -74,18 +113,26 @@
 
         <v-card-text>
           <v-container fluid>
-            <v-row align="center" justify="center">
+            <v-row
+              align="center"
+              justify="center"
+            >
               <v-col>
                 <v-text-field
-                  autocomplete="off"
                   v-model="confirmationCode"
-                  label="Confirmation Code"
                   v-mask="codeMask"
+                  autocomplete="off"
+                  label="Confirmation Code"
                 />
               </v-col>
 
               <v-col>
-                <v-btn color="primary" outlined :disabled="progress" @click="confirmCode()">
+                <v-btn
+                  color="primary"
+                  outlined
+                  :disabled="progress"
+                  @click="confirmCode()"
+                >
                   Confirm Code
                 </v-btn>
               </v-col>
@@ -98,12 +145,13 @@
 </template>
 
 <script>
+import firebase from "firebase/app"
+
 export default {
   props: ["firebase"],
 
   data: () => ({
     step: 1,
-    alert: true,
     valid: false,
     dialog: false,
     codeAuth: null,
@@ -116,12 +164,6 @@ export default {
     recaptchaWidgetId: null,
   }),
 
-  mounted() {
-    // this.recaptchaVerifier = new this.firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
-    // // render the rapchaVerifier.
-    // this.recaptchaVerifier.render().then(widgetId => (this.recaptchaWidgetId = widgetId))
-  },
-
   computed: {
     rules() {
       const validation = {
@@ -131,12 +173,16 @@ export default {
 
       return validation
     },
+
+    alert() {
+      return Boolean(this.error)
+    },
   },
 
-  watch: {
-    error() {
-      this.alert = Boolean(this.error)
-    },
+  mounted() {
+    // this.recaptchaVerifier = new this.firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
+    // // render the rapchaVerifier.
+    // this.recaptchaVerifier.render().then(widgetId => (this.recaptchaWidgetId = widgetId))
   },
 
   methods: {
@@ -146,7 +192,7 @@ export default {
     },
 
     loginWithGoogle() {
-      const provider = new this.firebase.auth.GoogleAuthProvider()
+      const provider = new firebase.auth.GoogleAuthProvider()
       this.firebase.auth().signInWithRedirect(provider)
     },
 

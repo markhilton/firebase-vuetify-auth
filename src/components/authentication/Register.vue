@@ -1,14 +1,26 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="register()">
+      <v-form
+        ref="form"
+        v-model="valid"
+        @submit.prevent="register()"
+      >
         <!-- error alerts -->
-        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
+        <v-alert
+          v-if="alert"
+          v-model="alert"
+          type="error"
+          dismissible
+        >
           {{ error.message }}
         </v-alert>
 
         <!-- application branding -->
-        <branding v-else class="text-center" />
+        <branding
+          v-else
+          class="text-center"
+        />
 
         <!-- registration form -->
         <v-card-text class="mb-0 pb-0">
@@ -31,8 +43,8 @@
           />
 
           <v-text-field
-            autocomplete="off"
             v-model="form.password"
+            autocomplete="off"
             required
             class="mr-2"
             type="password"
@@ -42,8 +54,8 @@
           />
 
           <v-text-field
-            autocomplete="off"
             v-model="form.confirm"
+            autocomplete="off"
             required
             class="mr-2"
             type="password"
@@ -54,7 +66,14 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn block large color="primary" type="submit" :disabled="isLoading">
+          <v-btn
+            block
+            large
+            depressed
+            color="primary"
+            type="submit"
+            :disabled="isLoading"
+          >
             Register
           </v-btn>
         </v-card-actions>
@@ -81,7 +100,6 @@ export default {
       confirm: "",
       agree: true,
     },
-    alert: false,
     valid: false,
   }),
 
@@ -106,11 +124,9 @@ export default {
 
       return validation
     },
-  },
 
-  watch: {
-    error() {
-      this.alert = Boolean(this.error)
+    alert() {
+      return Boolean(this.error)
     },
   },
 

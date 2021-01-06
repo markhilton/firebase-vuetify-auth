@@ -10,7 +10,9 @@
           {{ appTitle }}
         </v-list-item-title>
         <v-list-item-subtitle>
-          <div class="ml-1">{{ appSubTitle }}</div>
+          <div class="ml-1">
+            {{ appSubTitle }}
+          </div>
         </v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
@@ -18,6 +20,8 @@
 </template>
 
 <script>
+/* eslint-env node */
+
 export default {
   computed: {
     appTitle() {

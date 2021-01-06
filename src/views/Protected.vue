@@ -3,20 +3,34 @@
     <h2>[ protected route view ]</h2>
     <div>This is a protected page that does require user authentication.</div>
 
-    <h3 class="mt-5 pt-5">Account Management</h3>
+    <h3 class="mt-5 pt-5">
+      Account Management
+    </h3>
 
-    <v-card flat width="350">
-      <v-form ref="form" v-model="valid" @submit.prevent="updateUser()">
+    <v-card
+      flat
+      width="350"
+    >
+      <v-form
+        ref="form"
+        v-model="valid"
+        @submit.prevent="updateUser()"
+      >
         <!-- error alerts -->
-        <v-alert v-if="error" v-model="alert" type="error" dismissible>
+        <v-alert
+          v-if="error"
+          v-model="alert"
+          type="error"
+          dismissible
+        >
           {{ error.message }}
         </v-alert>
 
         <!-- user account management form -->
         <v-card-text class="mb-0 pb-0">
           <v-text-field
-            autocomplete="off"
             v-model="form.name"
+            autocomplete="off"
             required
             label="User Display Name"
             prepend-icon="person"
@@ -24,8 +38,8 @@
           />
 
           <v-text-field
-            autocomplete="off"
             v-model="form.password"
+            autocomplete="off"
             required
             type="password"
             label="Set New Password"
@@ -34,8 +48,8 @@
           />
 
           <v-text-field
-            autocomplete="off"
             v-model="form.confirm"
+            autocomplete="off"
             required
             class="mr-2"
             type="password"
@@ -46,7 +60,12 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn class="mt-2" color="primary" type="submit" :disabled="progress">
+          <v-btn
+            class="mt-2"
+            color="primary"
+            type="submit"
+            :disabled="progress"
+          >
             Update
           </v-btn>
         </v-card-actions>
@@ -70,10 +89,6 @@ export default {
     valid: false,
   }),
 
-  mounted() {
-    this.form.name = this.user.displayName
-  },
-
   computed: {
     rules() {
       const validation = {
@@ -93,6 +108,10 @@ export default {
 
       return validation
     },
+  },
+
+  mounted() {
+    this.form.name = this.user.displayName
   },
 
   methods: {

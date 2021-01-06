@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 // Import vue component
 import AuthenticationGuard from "./components/authentication"
 

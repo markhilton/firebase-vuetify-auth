@@ -16,46 +16,135 @@
   },
   "scripts": {
     "serve": "vue-cli-service serve",
+    "lint": "vue-cli-service lint --fix",
     "build": "npm run build:umd & npm run build:es & npm run build:unpkg",
     "build:umd": "rollup --config build/rollup.config.js --format umd --file dist/authentication-guard.umd.js",
     "build:es": "rollup --config build/rollup.config.js --format es --file dist/authentication-guard.esm.js",
     "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/authentication-guard.min.js"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
-    "css-loader": "^3.6.0",
-    "firebase": "^7.24.0",
-    "vuetify": "^2.3.14"
+    "firebase": "^8.2.1",
+    "vuetify": "^2.4.1"
   },
   "devDependencies": {
-    "@mdi/font": "^5.7.55",
+    "@babel/core": "^7.12.10",
+    "@babel/eslint-parser": "^7.12.1",
+    "@mdi/font": "^5.8.55",
     "@rollup/plugin-buble": "^0.21.3",
-    "@rollup/plugin-commonjs": "^11.1.0",
-    "@rollup/plugin-node-resolve": "^8.0.1",
-    "@vue/cli-plugin-babel": "^4.5.7",
-    "@vue/cli-plugin-eslint": "^4.5.7",
-    "@vue/cli-plugin-router": "^4.5.7",
-    "@vue/cli-plugin-vuex": "^4.5.7",
-    "@vue/cli-service": "^4.5.7",
-    "@vue/eslint-config-prettier": "^5.0.0",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "@vue/cli-plugin-babel": "^4.5.10",
+    "@vue/cli-plugin-eslint": "^4.5.10",
+    "@vue/cli-plugin-pwa": "^4.5.9",
+    "@vue/cli-plugin-router": "^4.5.10",
+    "@vue/cli-plugin-vuex": "^4.5.10",
+    "@vue/cli-service": "^4.5.10",
+    "@vue/eslint-config-prettier": "^6.0.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^5.16.0",
-    "eslint-plugin-prettier": "^3.1.4",
+    "core-js": "^3.8.2",
+    "css-loader": "^5.0.1",
+    "eslint": "^7.5.0",
+    "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-vue": "^5.0.0",
-    "prettier": "^1.18.2",
-    "rollup": "^2.32.0",
-    "rollup-plugin-postcss": "^3.1.8",
-    "rollup-plugin-vue": "^5.0.1",
-    "rollup-plugin-vuetify": "^0.2.3",
-    "sass": "^1.27.0",
-    "sass-loader": "^8.0.2",
+    "eslint-plugin-vue": "^7.4.1",
+    "postcss": "^8.2.2",
+    "prettier": "^2.2.1",
+    "rollup": "^2.36.0",
+    "rollup-plugin-postcss": "^4.0.0",
+    "rollup-plugin-vue": "^6.0.0",
+    "rollup-plugin-vuetify": "^0.2.4",
+    "sass": "^1.32.0",
+    "sass-loader": "^10.1.0",
     "stylus": "^0.54.8",
-    "stylus-loader": "^3.0.2",
+    "stylus-loader": "^4.3.1",
     "vue": "^2.6.12",
-    "vue-cli-plugin-vuetify": "^2.0.7",
-    "vue-router": "^3.4.7",
+    "vue-cli-plugin-vuetify": "^2.0.9",
+    "vue-router": "^3.4.9",
     "vue-template-compiler": "^2.6.12",
     "vuetify-loader": "^1.6.0"
+  },
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "babel": {
+    "presets": [
+      "@vue/cli-plugin-babel/preset"
+    ]
+  },
+  "prettier": {
+    "parser": "babel",
+    "printWidth": 120,
+    "arrowParens": "avoid",
+    "trailingComma": "all",
+    "semi": false,
+    "bracketSpacing": true
+  },
+  "eslintConfig": {
+    "root": true,
+    "globals": {
+      "dataLayer": "writable"
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:vue/recommended"
+    ],
+    "rules": {
+      "vue/max-attributes-per-line": [
+        "error",
+        {
+          "singleline": 1,
+          "multiline": {
+            "max": 1,
+            "allowFirstLine": false
+          }
+        }
+      ],
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "log",
+            "error",
+            "warn"
+          ]
+        }
+      ],
+      "comma-dangle": [
+        "error",
+        "always-multiline"
+      ],
+      "arrow-parens": [
+        "error",
+        "as-needed"
+      ],
+      "no-debugger": "off",
+      "vue/no-v-html": 0,
+      "vue/require-prop-types": 0,
+      "vue/require-default-prop": 0
+    },
+    "parser": "vue-eslint-parser",
+    "parserOptions": {
+      "parser": "babel-eslint",
+      "sourceType": "module",
+      "ecmaVersion": 2018,
+      "ecmaFeatures": {
+        "globalReturn": false,
+        "impliedStrict": false,
+        "jsx": false
+      }
+    }
+  },
+  "env": {
+    "browser": true
+  },
+  "engines": {
+    "node": "12"
   }
 }

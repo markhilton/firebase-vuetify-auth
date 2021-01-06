@@ -1,22 +1,29 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="loginWithEmail()">
+      <v-form
+        ref="form"
+        v-model="valid"
+        @submit.prevent="loginWithEmail"
+      >
         <!-- error alerrts -->
-        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
+        <v-alert
+          v-if="alert"
+          v-model="alert"
+          type="error"
+          dismissible
+        >
           {{ error.message }}
         </v-alert>
 
         <!-- application branding -->
-        <branding v-else class="text-center" />
+        <branding
+          v-else
+          class="text-center"
+        />
 
         <!-- login form -->
         <v-card-text class="mb-0 pb-0">
-          <!-- forgot password message -->
-          <div v-if="forgotPassword" class="mb-5">
-            Enter registered user email address and we will send you a link to reset your password.
-          </div>
-
           <v-text-field
             v-model="form.email"
             required
@@ -27,9 +34,8 @@
           />
 
           <v-text-field
-            v-if="!forgotPassword"
-            autocomplete="off"
             v-model="form.password"
+            autocomplete="off"
             class="mr-2"
             name="password"
             type="password"
@@ -47,24 +53,32 @@
                         />-->
         </v-card-text>
 
-        <div class="text-center pb-4" v-if="!forgotPassword">
-          <v-btn @click.prevent="forgotPassword = true" text x-small color="primary">Forgot Password?</v-btn>
+        <div class="text-center pb-4">
+          <v-btn
+            text
+            x-small
+            color="primary"
+            @click.prevent="$emit('resetPassword')"
+          >
+            Forgot Password?
+          </v-btn>
         </div>
 
-        <v-card-actions v-if="!forgotPassword">
-          <v-btn block large color="primary" type="submit" :disabled="isLoading">
+        <v-card-actions>
+          <v-btn
+            depressed
+            block
+            large
+            color="primary"
+            type="submit"
+            :disabled="isLoading"
+          >
             Login
           </v-btn>
         </v-card-actions>
 
-        <v-card-actions v-if="forgotPassword">
-          <v-btn block large color="primary" type="submit" :disabled="isLoading">
-            Email Password Reset Link
-          </v-btn>
-        </v-card-actions>
-
         <v-card-actions>
-          <LoginWith3rdPartyProvider />
+          <LoginWith3rdPartyProvider :firebase="firebase" />
         </v-card-actions>
       </v-form>
     </v-card>
@@ -78,7 +92,7 @@ import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
 export default {
   components: { Branding, LoginWith3rdPartyProvider },
 
-  props: ["error", "isLoading"],
+  props: ["firebase", "error", "isLoading"],
 
   data: () => ({
     form: {
@@ -86,25 +100,21 @@ export default {
       password: "",
       remember: false,
     },
-    alert: false,
     valid: false,
-    forgotPassword: false,
   }),
 
   computed: {
     rules() {
       const validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
-        password: this.form.password == "" ? "Password cannot be empty" : true,
-      }
+      email: this.form.email == "" ? "Email cannot be empty" : true,
+      password: this.form.password == "" ? "Password cannot be empty" : true,
+    }
 
       return validation
     },
-  },
 
-  watch: {
-    error() {
-      this.alert = Boolean(this.error)
+    alert() {
+      return Boolean(this.error)
     },
   },
 

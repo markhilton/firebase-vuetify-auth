@@ -1,105 +1,133 @@
 <template>
-  <v-form ref="form" v-model="valid">
-    <div v-if="error">
-      <app-alert :text="error.message" @dismissed="onDismissed"></app-alert>
-    </div>
+  <v-container>
+    <v-card flat>
+      <v-form
+        ref="form"
+        v-model="valid"
+        @submit.prevent="emailPasswordResetLink"
+      >
+        <!-- error alerrts -->
+        <v-alert
+          v-if="alert"
+          v-model="alert"
+          type="error"
+          dismissible
+        >
+          {{ error.message }}
+        </v-alert>
 
-    <div v-else>
-      <v-card-title class="justify-center title pt-4 pb-0">
-        <v-container class="ma-0 pa-0 text-xs-center">
-          <v-icon color="blue-grey darken-2" size="40">verified_user</v-icon>
+        <!-- application branding -->
+        <branding
+          v-else
+          class="text-center"
+        />
+
+        <!-- login form -->
+        <div v-if="!success">
+          <v-card-text class="mb-0 pb-0">
+            <div class="mb-5">
+              Enter registered user email address and we will send you a link to reset your password.
+            </div>
+
+            <v-text-field
+              v-model="form.email"
+              required
+              :error="alert"
+              class="mr-2"
+              label="Email"
+              prepend-icon="person"
+              :rules="[rules.email]"
+            />
+          </v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              block
+              large
+              depressed
+              color="primary"
+              type="submit"
+              :disabled="isLoading"
+            >
+              Email Password Reset Link
+            </v-btn>
+          </v-card-actions>
+        </div>
+
+        <!-- success message -->
+        <v-container
+          v-if="success"
+          class="pa-4 text-center"
+        >
+          <v-card-text class="text-h5">
+            Email has been sent!
+          </v-card-text>
+
+          <v-card-text>Please check your inbox and follow the instructions in the email to reset your account password</v-card-text>
+
+          <v-card-actions>
+            <v-btn
+              block
+              large
+              depressed
+              color="primary"
+              @click="$emit('showSignInTab')"
+            >
+              Login
+            </v-btn>
+          </v-card-actions>
         </v-container>
 
-        <v-subheader>Password Reset</v-subheader>
-      </v-card-title>
-    </div>
-
-    <v-card-text class="mt-0 pt-0 mb-0 pb-0">
-      <v-text-field disabled type="email" class="mr-2" :value="email" label="E-Mail" prepend-icon="person" />
-
-      <v-text-field
-        v-model="password"
-        autofocus
-        required
-        class="mr-2"
-        type="password"
-        prepend-icon="lock"
-        label="Password"
-        :rules="[rules.password]"
-      />
-
-      <v-text-field
-        v-model="confirm"
-        required
-        class="mr-2"
-        type="password"
-        prepend-icon="lock"
-        label="Confirm Password"
-        :rules="[rules.confirm]"
-      />
-    </v-card-text>
-
-    <v-card-actions class="mt-2 mb-2">
-      <v-btn block large color="primary" :loading="loading" :disabled="loading" @click.prevent="submit()"
-        >Reset Password</v-btn
-      >
-    </v-card-actions>
-
-    <div class="text-xs-center pb-4">
-      <router-link v-if="user" to="/">Dashboard</router-link>
-      <router-link v-else to="/login">Login</router-link>
-    </div>
-  </v-form>
+        <v-card-actions>
+          <LoginWith3rdPartyProvider />
+        </v-card-actions>
+      </v-form>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
-export default {
-  name: "PasswordReset",
-  props: ["code"],
+import Branding from "./Branding.vue"
+import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
 
-  data() {
-    return {
-      valid: false,
-      password: "",
-      confirm: "",
-    }
-  },
+export default {
+  components: { Branding, LoginWith3rdPartyProvider },
+
+  props: ["firebase", "isLoading"],
+
+  data: () => ({
+    form: {
+      email: "",
+    },
+    error: null,
+    valid: false,
+    success: false,
+  }),
 
   computed: {
-    user() {
-      return this.$store.getters["user/account"]
-    },
-    email() {
-      return this.$store.getters["user/passwordResetEmail"]
-    },
-    loading() {
-      return this.$store.getters.loading
-    },
-    error() {
-      return this.$store.getters.error
-    },
-    // validation error messages
     rules() {
-      var validation = {
-        password: this.password.trim() == "" ? "Password cannot be empty" : true,
-        confirm: this.password !== this.confirm ? "Passwords do not match" : true,
+      const validation = {
+        email: this.form.email == "" ? "Email cannot be empty" : true,
       }
 
       return validation
     },
+
+    alert() {
+      return Boolean(this.error)
+    },
   },
 
   methods: {
-    onDismissed() {
-      this.$store.commit("clearError")
-    },
-    submit() {
-      if (this.$refs.form.validate()) {
-        this.$store.dispatch("user/confirmPasswordReset", {
-          code: this.code,
-          password: this.password,
-        })
-      }
+    //
+    emailPasswordResetLink() {
+      this.firebase.auth().sendPasswordResetEmail(this.form.email).then(() => {
+        this.error = null
+        this.success = true
+      }).catch(error => {
+        this.error = error
+        this.success = false
+      });
     },
   },
 }
