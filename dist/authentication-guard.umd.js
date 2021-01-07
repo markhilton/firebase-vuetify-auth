@@ -66,6 +66,681 @@
   script.render = render;
   script.__file = "src/components/authentication/Branding.vue";
 
+  var script$1 = {
+    components: { Branding: script },
+
+    props: ["firebase", "error", "isLoading"],
+
+    data: function () { return ({
+      form: {
+        email: "",
+        password: "",
+        remember: false,
+      },
+      valid: false,
+    }); },
+
+    computed: {
+      rules: function rules() {
+        var validation = {
+          email: this.form.email == "" ? "Email cannot be empty" : true,
+          password: this.form.password == "" ? "Password cannot be empty" : true,
+        };
+
+        return validation
+      },
+
+      alert: function alert() {
+        return Boolean(this.error)
+      },
+    },
+
+    methods: {
+      loginWithEmail: function loginWithEmail() {
+        if (this.$refs.form.validate()) {
+          this.$emit("credentials", { email: this.form.email, password: this.form.password });
+        }
+      },
+    },
+  };
+
+  var _hoisted_1$1 = { class: "text-center pb-4" };
+  var _hoisted_2$1 = /*#__PURE__*/vue.createTextVNode(" Forgot Password? ");
+  var _hoisted_3 = /*#__PURE__*/vue.createTextVNode(" Login ");
+
+  function render$1(_ctx, _cache, $props, $setup, $data, $options) {
+    var _component_v_alert = vue.resolveComponent("v-alert");
+    var _component_branding = vue.resolveComponent("branding");
+    var _component_v_text_field = vue.resolveComponent("v-text-field");
+    var _component_v_card_text = vue.resolveComponent("v-card-text");
+    var _component_v_btn = vue.resolveComponent("v-btn");
+    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
+    var _component_v_form = vue.resolveComponent("v-form");
+    var _component_v_card = vue.resolveComponent("v-card");
+    var _component_v_container = vue.resolveComponent("v-container");
+
+    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
+      default: vue.withCtx(function () { return [
+        vue.createVNode(_component_v_card, { flat: "" }, {
+          default: vue.withCtx(function () { return [
+            vue.createVNode(_component_v_form, {
+              ref: "form",
+              modelValue: _ctx.valid,
+              "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) { return (_ctx.valid = $event); }),
+              onSubmit: vue.withModifiers($options.loginWithEmail, ["prevent"])
+            }, {
+              default: vue.withCtx(function () { return [
+                vue.createCommentVNode(" error alerrts "),
+                ($options.alert)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
+                      key: 0,
+                      modelValue: $options.alert,
+                      "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
+                      type: "error",
+                      dismissible: ""
+                    }, {
+                      default: vue.withCtx(function () { return [
+                        vue.createTextVNode(vue.toDisplayString($props.error.message), 1 /* TEXT */)
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }, 8 /* PROPS */, ["modelValue"]))
+                  : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
+                      vue.createCommentVNode(" application branding "),
+                      vue.createVNode(_component_branding, { class: "text-center" })
+                    ], 64 /* STABLE_FRAGMENT */)),
+                vue.createCommentVNode(" login form "),
+                vue.createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
+                  default: vue.withCtx(function () { return [
+                    vue.createVNode(_component_v_text_field, {
+                      modelValue: _ctx.form.email,
+                      "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.email = $event); }),
+                      required: "",
+                      class: "mr-2",
+                      label: "Email",
+                      "prepend-icon": "person",
+                      rules: [$options.rules.email]
+                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
+                    vue.createVNode(_component_v_text_field, {
+                      modelValue: _ctx.form.password,
+                      "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) { return (_ctx.form.password = $event); }),
+                      autocomplete: "off",
+                      class: "mr-2",
+                      name: "password",
+                      type: "password",
+                      label: "Password",
+                      "prepend-icon": "lock",
+                      rules: [$options.rules.password]
+                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
+                    vue.createCommentVNode(" <v-checkbox\n\t\t\t\t\t\t\tvalue=\"1\"\n\t\t\t\t\t\t\tname=\"remember\"\n\t\t\t\t\t\t\tclass=\"ml-4 pl-2\"\n\t\t\t\t\t\t\tv-model=\"remember\"\n\t\t\t\t\t\t\tlabel=\"Remember Me\"\n                        />")
+                  ]; }),
+                  _: 1 /* STABLE */
+                }),
+                vue.createVNode("div", _hoisted_1$1, [
+                  vue.createVNode(_component_v_btn, {
+                    text: "",
+                    "x-small": "",
+                    color: "primary",
+                    onClick: _cache[4] || (_cache[4] = vue.withModifiers(function ($event) { return (_ctx.$emit('resetPassword')); }, ["prevent"]))
+                  }, {
+                    default: vue.withCtx(function () { return [
+                      _hoisted_2$1
+                    ]; }),
+                    _: 1 /* STABLE */
+                  })
+                ]),
+                vue.createVNode(_component_v_card_actions, null, {
+                  default: vue.withCtx(function () { return [
+                    vue.createVNode(_component_v_btn, {
+                      depressed: "",
+                      block: "",
+                      large: "",
+                      color: "primary",
+                      type: "submit",
+                      disabled: $props.isLoading
+                    }, {
+                      default: vue.withCtx(function () { return [
+                        _hoisted_3
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }, 8 /* PROPS */, ["disabled"])
+                  ]; }),
+                  _: 1 /* STABLE */
+                })
+              ]; }),
+              _: 1 /* STABLE */
+            }, 8 /* PROPS */, ["modelValue", "onSubmit"])
+          ]; }),
+          _: 1 /* STABLE */
+        })
+      ]; }),
+      _: 1 /* STABLE */
+    }))
+  }
+
+  script$1.render = render$1;
+  script$1.__file = "src/components/authentication/Login.vue";
+
+  var script$2 = {
+    name: "Register",
+
+    components: { Branding: script },
+
+    props: ["error", "isLoading"],
+
+    data: function () { return ({
+      form: {
+        name: "",
+        email: "",
+        password: "",
+        confirm: "",
+        agree: true,
+      },
+      valid: false,
+    }); },
+
+    computed: {
+      rules: function rules() {
+        var validation = {
+          email: this.form.email == "" ? "Email cannot be empty" : true,
+          password: this.form.password == "" ? "Password cannot be empty" : true,
+          name: this.form.name == "" ? "Name cannot be empty" : true,
+          // agree: this.form.agree !== true ? "You must accept Terms of Service to continue" : true,
+          confirm: this.form.password !== this.form.confirm ? "Passwords do not match" : true,
+        };
+
+        if (this.error) {
+          if (this.error.code == "auth/invalid-email") {
+            validation.email = this.error.message;
+          }
+          if (this.error.code == "auth/weak-password") {
+            validation.password = this.error.message;
+          }
+        }
+
+        return validation
+      },
+
+      alert: function alert() {
+        return Boolean(this.error)
+      },
+    },
+
+    methods: {
+      register: function register() {
+        if (this.$refs.form.validate()) {
+          this.$emit("registration", this.form);
+        }
+      },
+    },
+  };
+
+  var _hoisted_1$2 = /*#__PURE__*/vue.createTextVNode(" Register ");
+
+  function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+    var _component_v_alert = vue.resolveComponent("v-alert");
+    var _component_branding = vue.resolveComponent("branding");
+    var _component_v_text_field = vue.resolveComponent("v-text-field");
+    var _component_v_card_text = vue.resolveComponent("v-card-text");
+    var _component_v_btn = vue.resolveComponent("v-btn");
+    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
+    var _component_v_form = vue.resolveComponent("v-form");
+    var _component_v_card = vue.resolveComponent("v-card");
+    var _component_v_container = vue.resolveComponent("v-container");
+
+    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
+      default: vue.withCtx(function () { return [
+        vue.createVNode(_component_v_card, { flat: "" }, {
+          default: vue.withCtx(function () { return [
+            vue.createVNode(_component_v_form, {
+              ref: "form",
+              modelValue: _ctx.valid,
+              "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) { return (_ctx.valid = $event); }),
+              onSubmit: _cache[7] || (_cache[7] = vue.withModifiers(function ($event) { return ($options.register()); }, ["prevent"]))
+            }, {
+              default: vue.withCtx(function () { return [
+                vue.createCommentVNode(" error alerts "),
+                ($options.alert)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
+                      key: 0,
+                      modelValue: $options.alert,
+                      "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
+                      type: "error",
+                      dismissible: ""
+                    }, {
+                      default: vue.withCtx(function () { return [
+                        vue.createTextVNode(vue.toDisplayString($props.error.message), 1 /* TEXT */)
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }, 8 /* PROPS */, ["modelValue"]))
+                  : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
+                      vue.createCommentVNode(" application branding "),
+                      vue.createVNode(_component_branding, { class: "text-center" })
+                    ], 64 /* STABLE_FRAGMENT */)),
+                vue.createCommentVNode(" registration form "),
+                vue.createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
+                  default: vue.withCtx(function () { return [
+                    vue.createVNode(_component_v_text_field, {
+                      modelValue: _ctx.form.name,
+                      "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.name = $event); }),
+                      required: "",
+                      class: "mr-2",
+                      label: "Name",
+                      "prepend-icon": "person",
+                      rules: [$options.rules.name]
+                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
+                    vue.createVNode(_component_v_text_field, {
+                      modelValue: _ctx.form.email,
+                      "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) { return (_ctx.form.email = $event); }),
+                      required: "",
+                      class: "mr-2",
+                      label: "Email",
+                      "prepend-icon": "email",
+                      rules: [$options.rules.email]
+                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
+                    vue.createVNode(_component_v_text_field, {
+                      modelValue: _ctx.form.password,
+                      "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.form.password = $event); }),
+                      autocomplete: "off",
+                      required: "",
+                      class: "mr-2",
+                      type: "password",
+                      label: "Password",
+                      "prepend-icon": "lock",
+                      rules: [$options.rules.password]
+                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
+                    vue.createVNode(_component_v_text_field, {
+                      modelValue: _ctx.form.confirm,
+                      "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) { return (_ctx.form.confirm = $event); }),
+                      autocomplete: "off",
+                      required: "",
+                      class: "mr-2",
+                      type: "password",
+                      label: "Confirm password",
+                      "prepend-icon": "lock",
+                      rules: [$options.rules.confirm]
+                    }, null, 8 /* PROPS */, ["modelValue", "rules"])
+                  ]; }),
+                  _: 1 /* STABLE */
+                }),
+                vue.createVNode(_component_v_card_actions, null, {
+                  default: vue.withCtx(function () { return [
+                    vue.createVNode(_component_v_btn, {
+                      block: "",
+                      large: "",
+                      depressed: "",
+                      color: "primary",
+                      type: "submit",
+                      disabled: $props.isLoading
+                    }, {
+                      default: vue.withCtx(function () { return [
+                        _hoisted_1$2
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }, 8 /* PROPS */, ["disabled"])
+                  ]; }),
+                  _: 1 /* STABLE */
+                })
+              ]; }),
+              _: 1 /* STABLE */
+            }, 8 /* PROPS */, ["modelValue"])
+          ]; }),
+          _: 1 /* STABLE */
+        })
+      ]; }),
+      _: 1 /* STABLE */
+    }))
+  }
+
+  script$2.render = render$2;
+  script$2.__file = "src/components/authentication/Register.vue";
+
+  var script$3 = {
+    components: { Branding: script },
+
+    props: ["firebase", "isLoading"],
+
+    data: function () { return ({
+      form: {
+        email: "",
+      },
+      error: null,
+      valid: false,
+      success: false,
+    }); },
+
+    computed: {
+      rules: function rules() {
+        var validation = {
+          email: this.form.email == "" ? "Email cannot be empty" : true,
+        };
+
+        return validation
+      },
+
+      alert: function alert() {
+        return Boolean(this.error)
+      },
+    },
+
+    methods: {
+      //
+      emailPasswordResetLink: function emailPasswordResetLink() {
+        var this$1 = this;
+
+        this.firebase
+          .auth()
+          .sendPasswordResetEmail(this.form.email)
+          .then(function () {
+            this$1.error = null;
+            this$1.success = true;
+          })
+          .catch(function (error) {
+            this$1.error = error;
+            this$1.success = false;
+          });
+      },
+    },
+  };
+
+  var _hoisted_1$3 = { key: 2 };
+  var _hoisted_2$2 = /*#__PURE__*/vue.createVNode("div", { class: "mb-5" }, " Enter registered user email address and we will send you a link to reset your password. ", -1 /* HOISTED */);
+  var _hoisted_3$1 = /*#__PURE__*/vue.createTextVNode(" Email Password Reset Link ");
+  var _hoisted_4 = /*#__PURE__*/vue.createTextVNode(" Email has been sent! ");
+  var _hoisted_5 = /*#__PURE__*/vue.createTextVNode("Please check your inbox and follow the instructions in the email to reset your account password");
+  var _hoisted_6 = /*#__PURE__*/vue.createTextVNode(" Login ");
+
+  function render$3(_ctx, _cache, $props, $setup, $data, $options) {
+    var _component_v_alert = vue.resolveComponent("v-alert");
+    var _component_branding = vue.resolveComponent("branding");
+    var _component_v_text_field = vue.resolveComponent("v-text-field");
+    var _component_v_card_text = vue.resolveComponent("v-card-text");
+    var _component_v_btn = vue.resolveComponent("v-btn");
+    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
+    var _component_v_container = vue.resolveComponent("v-container");
+    var _component_v_form = vue.resolveComponent("v-form");
+    var _component_v_card = vue.resolveComponent("v-card");
+
+    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
+      default: vue.withCtx(function () { return [
+        vue.createVNode(_component_v_card, { flat: "" }, {
+          default: vue.withCtx(function () { return [
+            vue.createVNode(_component_v_form, {
+              ref: "form",
+              modelValue: _ctx.valid,
+              "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.valid = $event); }),
+              onSubmit: vue.withModifiers($options.emailPasswordResetLink, ["prevent"])
+            }, {
+              default: vue.withCtx(function () { return [
+                vue.createCommentVNode(" error alerrts "),
+                ($options.alert)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
+                      key: 0,
+                      modelValue: $options.alert,
+                      "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
+                      type: "error",
+                      dismissible: ""
+                    }, {
+                      default: vue.withCtx(function () { return [
+                        vue.createTextVNode(vue.toDisplayString(_ctx.error.message), 1 /* TEXT */)
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }, 8 /* PROPS */, ["modelValue"]))
+                  : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
+                      vue.createCommentVNode(" application branding "),
+                      vue.createVNode(_component_branding, { class: "text-center" })
+                    ], 64 /* STABLE_FRAGMENT */)),
+                vue.createCommentVNode(" login form "),
+                (!_ctx.success)
+                  ? (vue.openBlock(), vue.createBlock("div", _hoisted_1$3, [
+                      vue.createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
+                        default: vue.withCtx(function () { return [
+                          _hoisted_2$2,
+                          vue.createVNode(_component_v_text_field, {
+                            modelValue: _ctx.form.email,
+                            "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.email = $event); }),
+                            required: "",
+                            error: $options.alert,
+                            class: "mr-2",
+                            label: "Email",
+                            "prepend-icon": "person",
+                            rules: [$options.rules.email]
+                          }, null, 8 /* PROPS */, ["modelValue", "error", "rules"])
+                        ]; }),
+                        _: 1 /* STABLE */
+                      }),
+                      vue.createVNode(_component_v_card_actions, null, {
+                        default: vue.withCtx(function () { return [
+                          vue.createVNode(_component_v_btn, {
+                            block: "",
+                            large: "",
+                            depressed: "",
+                            color: "primary",
+                            type: "submit",
+                            disabled: $props.isLoading
+                          }, {
+                            default: vue.withCtx(function () { return [
+                              _hoisted_3$1
+                            ]; }),
+                            _: 1 /* STABLE */
+                          }, 8 /* PROPS */, ["disabled"])
+                        ]; }),
+                        _: 1 /* STABLE */
+                      })
+                    ]))
+                  : vue.createCommentVNode("v-if", true),
+                vue.createCommentVNode(" success message "),
+                (_ctx.success)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_container, {
+                      key: 3,
+                      class: "pa-4 text-center"
+                    }, {
+                      default: vue.withCtx(function () { return [
+                        vue.createVNode(_component_v_card_text, { class: "text-h5" }, {
+                          default: vue.withCtx(function () { return [
+                            _hoisted_4
+                          ]; }),
+                          _: 1 /* STABLE */
+                        }),
+                        vue.createVNode(_component_v_card_text, null, {
+                          default: vue.withCtx(function () { return [
+                            _hoisted_5
+                          ]; }),
+                          _: 1 /* STABLE */
+                        }),
+                        vue.createVNode(_component_v_card_actions, null, {
+                          default: vue.withCtx(function () { return [
+                            vue.createVNode(_component_v_btn, {
+                              block: "",
+                              large: "",
+                              depressed: "",
+                              color: "primary",
+                              onClick: _cache[3] || (_cache[3] = function ($event) { return (_ctx.$emit('showSignInTab')); })
+                            }, {
+                              default: vue.withCtx(function () { return [
+                                _hoisted_6
+                              ]; }),
+                              _: 1 /* STABLE */
+                            })
+                          ]; }),
+                          _: 1 /* STABLE */
+                        })
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }))
+                  : vue.createCommentVNode("v-if", true)
+              ]; }),
+              _: 1 /* STABLE */
+            }, 8 /* PROPS */, ["modelValue", "onSubmit"])
+          ]; }),
+          _: 1 /* STABLE */
+        })
+      ]; }),
+      _: 1 /* STABLE */
+    }))
+  }
+
+  script$3.render = render$3;
+  script$3.__file = "src/components/authentication/PasswordReset.vue";
+
+  var script$4 = {
+    props: ["error", "isLoading"],
+
+    data: function () { return ({
+      emailSent: false,
+    }); },
+
+    methods: {
+      resendVerificationEmail: function resendVerificationEmail() {
+        this.emailSent = true;
+        this.$emit("sendEmail");
+      },
+      goToLogin: function goToLogin() {
+        this.$emit("signOut");
+      },
+    },
+  };
+
+  var _hoisted_1$4 = { key: 0 };
+  var _hoisted_2$3 = /*#__PURE__*/vue.createVNode("div", { class: "display-1 grey--text mb-3" }, "Error!", -1 /* HOISTED */);
+  var _hoisted_3$2 = /*#__PURE__*/vue.createTextVNode(" Back to Login ");
+  var _hoisted_4$1 = { key: 0 };
+  var _hoisted_5$1 = /*#__PURE__*/vue.createVNode("div", { class: "display-1 grey--text mb-3" }, "Verification Required", -1 /* HOISTED */);
+  var _hoisted_6$1 = /*#__PURE__*/vue.createTextVNode(" verified_user ");
+  var _hoisted_7 = { key: 1 };
+  var _hoisted_8 = /*#__PURE__*/vue.createVNode("div", { class: "display-1 grey--text mb-3" }, "Email sent!", -1 /* HOISTED */);
+  var _hoisted_9 = /*#__PURE__*/vue.createTextVNode(" mail ");
+  var _hoisted_10 = /*#__PURE__*/vue.createVNode("div", { class: "grey--text text--darken-2 mb-7 body-2" }, [
+    /*#__PURE__*/vue.createVNode("p", null, " Please check your email to verify your address. Click at the link in the email we've sent you to confirm your account access. ")
+  ], -1 /* HOISTED */);
+  var _hoisted_11 = { key: 2 };
+  var _hoisted_12 = /*#__PURE__*/vue.createVNode("p", { class: "grey--text text--darken-2 mb-7 body-2" }, [
+    /*#__PURE__*/vue.createTextVNode(" If you have not received verification email"),
+    /*#__PURE__*/vue.createVNode("br"),
+    /*#__PURE__*/vue.createTextVNode("click at the button below. ")
+  ], -1 /* HOISTED */);
+  var _hoisted_13 = /*#__PURE__*/vue.createTextVNode(" Send Verification Email ");
+  var _hoisted_14 = { key: 3 };
+  var _hoisted_15 = /*#__PURE__*/vue.createTextVNode(" Back to Login ");
+
+  function render$4(_ctx, _cache, $props, $setup, $data, $options) {
+    var _component_v_alert = vue.resolveComponent("v-alert");
+    var _component_v_btn = vue.resolveComponent("v-btn");
+    var _component_v_icon = vue.resolveComponent("v-icon");
+    var _component_v_card = vue.resolveComponent("v-card");
+    var _component_v_container = vue.resolveComponent("v-container");
+
+    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
+      default: vue.withCtx(function () { return [
+        vue.createCommentVNode(" user with no email verification "),
+        vue.createVNode(_component_v_card, {
+          flat: "",
+          class: "text-center pa-5"
+        }, {
+          default: vue.withCtx(function () { return [
+            vue.createCommentVNode(" email error "),
+            ($props.error)
+              ? (vue.openBlock(), vue.createBlock("div", _hoisted_1$4, [
+                  _hoisted_2$3,
+                  ($props.error)
+                    ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
+                        key: 0,
+                        type: "error"
+                      }, {
+                        default: vue.withCtx(function () { return [
+                          vue.createTextVNode(vue.toDisplayString($props.error), 1 /* TEXT */)
+                        ]; }),
+                        _: 1 /* STABLE */
+                      }))
+                    : vue.createCommentVNode("v-if", true),
+                  vue.createVNode(_component_v_btn, {
+                    color: "primary",
+                    onClick: $options.goToLogin
+                  }, {
+                    default: vue.withCtx(function () { return [
+                      _hoisted_3$2
+                    ]; }),
+                    _: 1 /* STABLE */
+                  }, 8 /* PROPS */, ["onClick"])
+                ]))
+              : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
+                  vue.createCommentVNode(" email verification "),
+                  vue.createVNode("div", null, [
+                    vue.createCommentVNode(" email confirmation required message "),
+                    (!_ctx.emailSent)
+                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_4$1, [
+                          _hoisted_5$1,
+                          vue.createVNode(_component_v_icon, {
+                            size: "100",
+                            color: "grey",
+                            class: "ma-4"
+                          }, {
+                            default: vue.withCtx(function () { return [
+                              _hoisted_6$1
+                            ]; }),
+                            _: 1 /* STABLE */
+                          })
+                        ]))
+                      : vue.createCommentVNode("v-if", true),
+                    vue.createCommentVNode(" email sent confirmation "),
+                    (_ctx.emailSent)
+                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_7, [
+                          _hoisted_8,
+                          vue.createVNode(_component_v_icon, {
+                            size: "100",
+                            color: "grey",
+                            class: "ma-4"
+                          }, {
+                            default: vue.withCtx(function () { return [
+                              _hoisted_9
+                            ]; }),
+                            _: 1 /* STABLE */
+                          })
+                        ]))
+                      : vue.createCommentVNode("v-if", true),
+                    _hoisted_10,
+                    vue.createCommentVNode(" send verification email button "),
+                    (!_ctx.emailSent)
+                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_11, [
+                          _hoisted_12,
+                          vue.createVNode(_component_v_btn, {
+                            disabled: $props.isLoading,
+                            color: "primary",
+                            onClick: $options.resendVerificationEmail
+                          }, {
+                            default: vue.withCtx(function () { return [
+                              _hoisted_13
+                            ]; }),
+                            _: 1 /* STABLE */
+                          }, 8 /* PROPS */, ["disabled", "onClick"])
+                        ]))
+                      : vue.createCommentVNode("v-if", true),
+                    vue.createCommentVNode(" back to login page button "),
+                    (_ctx.emailSent)
+                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_14, [
+                          vue.createVNode(_component_v_btn, {
+                            color: "primary",
+                            onClick: $options.goToLogin
+                          }, {
+                            default: vue.withCtx(function () { return [
+                              _hoisted_15
+                            ]; }),
+                            _: 1 /* STABLE */
+                          }, 8 /* PROPS */, ["onClick"])
+                        ]))
+                      : vue.createCommentVNode("v-if", true)
+                  ])
+                ], 64 /* STABLE_FRAGMENT */))
+          ]; }),
+          _: 1 /* STABLE */
+        })
+      ]; }),
+      _: 1 /* STABLE */
+    }))
+  }
+
+  script$4.render = render$4;
+  script$4.__file = "src/components/authentication/EmailVerification.vue";
+
   /*! *****************************************************************************
   Copyright (c) Microsoft Corporation.
 
@@ -1922,8 +2597,8 @@
    */
   firebase$1.registerVersion(name$d, version$2, 'app');
 
-  var script$1 = {
-    props: ["firebase"],
+  var script$5 = {
+    props: ["firebase", "google", "facebook", "phone"],
 
     data: function () { return ({
       step: 1,
@@ -2006,20 +2681,20 @@
     },
   };
 
-  var _hoisted_1$1 = /*#__PURE__*/vue.createVNode("div", { class: "caption" }, " or login with ", -1 /* HOISTED */);
-  var _hoisted_2$1 = /*#__PURE__*/vue.createTextVNode("mdi-google");
-  var _hoisted_3 = /*#__PURE__*/vue.createVNode("span", null, "Google Gmail Account", -1 /* HOISTED */);
-  var _hoisted_4 = /*#__PURE__*/vue.createTextVNode("mdi-facebook");
-  var _hoisted_5 = /*#__PURE__*/vue.createVNode("span", null, "Facebook Account", -1 /* HOISTED */);
-  var _hoisted_6 = /*#__PURE__*/vue.createTextVNode("phone");
-  var _hoisted_7 = /*#__PURE__*/vue.createVNode("span", null, "Text Message To Your Phone", -1 /* HOISTED */);
-  var _hoisted_8 = /*#__PURE__*/vue.createVNode("div", { id: "recaptcha-container" }, null, -1 /* HOISTED */);
-  var _hoisted_9 = /*#__PURE__*/vue.createTextVNode(" Enter Phone Number ");
-  var _hoisted_10 = /*#__PURE__*/vue.createTextVNode(" Send Code ");
-  var _hoisted_11 = /*#__PURE__*/vue.createTextVNode(" Enter Confirm Code ");
-  var _hoisted_12 = /*#__PURE__*/vue.createTextVNode(" Confirm Code ");
+  var _hoisted_1$5 = /*#__PURE__*/vue.createVNode("div", { class: "caption" }, "or login with", -1 /* HOISTED */);
+  var _hoisted_2$4 = /*#__PURE__*/vue.createTextVNode("mdi-google");
+  var _hoisted_3$3 = /*#__PURE__*/vue.createVNode("span", null, "Google Gmail Account", -1 /* HOISTED */);
+  var _hoisted_4$2 = /*#__PURE__*/vue.createTextVNode("mdi-facebook");
+  var _hoisted_5$2 = /*#__PURE__*/vue.createVNode("span", null, "Facebook Account", -1 /* HOISTED */);
+  var _hoisted_6$2 = /*#__PURE__*/vue.createTextVNode("phone");
+  var _hoisted_7$1 = /*#__PURE__*/vue.createVNode("span", null, "Text Message To Your Phone", -1 /* HOISTED */);
+  var _hoisted_8$1 = /*#__PURE__*/vue.createVNode("div", { id: "recaptcha-container" }, null, -1 /* HOISTED */);
+  var _hoisted_9$1 = /*#__PURE__*/vue.createTextVNode(" Enter Phone Number ");
+  var _hoisted_10$1 = /*#__PURE__*/vue.createTextVNode(" Send Code ");
+  var _hoisted_11$1 = /*#__PURE__*/vue.createTextVNode(" Enter Confirm Code ");
+  var _hoisted_12$1 = /*#__PURE__*/vue.createTextVNode(" Confirm Code ");
 
-  function render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  function render$5(_ctx, _cache, $props, $setup, $data, $options) {
     var _component_v_icon = vue.resolveComponent("v-icon");
     var _component_v_btn = vue.resolveComponent("v-btn");
     var _component_v_tooltip = vue.resolveComponent("v-tooltip");
@@ -2033,751 +2708,188 @@
     var _component_v_dialog = vue.resolveComponent("v-dialog");
     var _directive_mask = vue.resolveDirective("mask");
 
-    return (vue.openBlock(), vue.createBlock(_component_v_container, { class: "text-center ma-0 pa-0" }, {
-      default: vue.withCtx(function () { return [
-        _hoisted_1$1,
-        vue.createVNode(_component_v_container, null, {
-          default: vue.withCtx(function () { return [
-            vue.createVNode(_component_v_tooltip, { top: "" }, {
-              activator: vue.withCtx(function (ref) {
-                var on = ref.on;
-                var attrs = ref.attrs;
-
-                return [
-                vue.createVNode(_component_v_btn, vue.mergeProps({
-                  color: "#db3236",
-                  class: "mr-2"
-                }, attrs, {
-                  fab: "",
-                  dark: "",
-                  small: ""
-                }, vue.toHandlers(on), {
-                  onClick: _cache[1] || (_cache[1] = function ($event) { return ($options.loginWithGoogle()); })
-                }), {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_icon, null, {
-                      default: vue.withCtx(function () { return [
-                        _hoisted_2$1
-                      ]; }),
-                      _: 1 /* STABLE */
-                    })
-                  ]; }),
-                  _: 2 /* DYNAMIC */
-                }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
-              ];
-            }),
-              default: vue.withCtx(function () { return [
-                _hoisted_3
-              ]; }),
-              _: 1 /* STABLE */
-            }),
-            vue.createVNode(_component_v_tooltip, { top: "" }, {
-              activator: vue.withCtx(function (ref) {
-                var on = ref.on;
-                var attrs = ref.attrs;
-
-                return [
-                vue.createVNode(_component_v_btn, vue.mergeProps({
-                  color: "#3b5998",
-                  class: "mr-2"
-                }, attrs, {
-                  fab: "",
-                  dark: "",
-                  small: ""
-                }, vue.toHandlers(on), {
-                  onClick: _cache[2] || (_cache[2] = function ($event) { return (_ctx.loginWithFacebook()); })
-                }), {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_icon, null, {
-                      default: vue.withCtx(function () { return [
-                        _hoisted_4
-                      ]; }),
-                      _: 1 /* STABLE */
-                    })
-                  ]; }),
-                  _: 2 /* DYNAMIC */
-                }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
-              ];
-            }),
-              default: vue.withCtx(function () { return [
-                _hoisted_5
-              ]; }),
-              _: 1 /* STABLE */
-            }),
-            vue.createVNode(_component_v_tooltip, { top: "" }, {
-              activator: vue.withCtx(function (ref) {
-                var on = ref.on;
-                var attrs = ref.attrs;
-
-                return [
-                vue.createVNode(_component_v_btn, vue.mergeProps({ color: "primary" }, attrs, {
-                  fab: "",
-                  dark: "",
-                  small: ""
-                }, vue.toHandlers(on), {
-                  onClick: _cache[3] || (_cache[3] = function ($event) { return ($options.loginWithPhone()); })
-                }), {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_icon, null, {
-                      default: vue.withCtx(function () { return [
-                        _hoisted_6
-                      ]; }),
-                      _: 1 /* STABLE */
-                    })
-                  ]; }),
-                  _: 2 /* DYNAMIC */
-                }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
-              ];
-            }),
-              default: vue.withCtx(function () { return [
-                _hoisted_7
-              ]; }),
-              _: 1 /* STABLE */
-            })
-          ]; }),
-          _: 1 /* STABLE */
-        }),
-        vue.createVNode(_component_v_dialog, {
-          modelValue: _ctx.dialog,
-          "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) { return (_ctx.dialog = $event); }),
-          width: "500"
+    return ($props.google || $props.facebook || $props.phone)
+      ? (vue.openBlock(), vue.createBlock(_component_v_container, {
+          key: 0,
+          class: "text-center ma-0 pa-0"
         }, {
           default: vue.withCtx(function () { return [
-            _hoisted_8,
-            vue.createCommentVNode(" phone authentication provider: enter phone number "),
-            (_ctx.step === 2)
-              ? (vue.openBlock(), vue.createBlock(_component_v_card, { key: 0 }, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_card_title, { class: "body-1 primary white--text" }, {
-                      default: vue.withCtx(function () { return [
-                        _hoisted_9
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }),
-                    vue.createVNode(_component_v_card_text, null, {
-                      default: vue.withCtx(function () { return [
-                        vue.createVNode(_component_v_container, { fluid: "" }, {
+            _hoisted_1$5,
+            vue.createVNode(_component_v_container, null, {
+              default: vue.withCtx(function () { return [
+                ($props.google)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_tooltip, {
+                      key: 0,
+                      top: ""
+                    }, {
+                      activator: vue.withCtx(function (ref) {
+                        var on = ref.on;
+                        var attrs = ref.attrs;
+
+                        return [
+                        vue.createVNode(_component_v_btn, vue.mergeProps({
+                          color: "#db3236",
+                          class: "mr-2"
+                        }, attrs, {
+                          fab: "",
+                          dark: "",
+                          small: ""
+                        }, vue.toHandlers(on), {
+                          onClick: _cache[1] || (_cache[1] = function ($event) { return ($options.loginWithGoogle()); })
+                        }), {
                           default: vue.withCtx(function () { return [
-                            vue.createVNode(_component_v_row, {
-                              align: "center",
-                              justify: "center"
-                            }, {
+                            vue.createVNode(_component_v_icon, null, {
                               default: vue.withCtx(function () { return [
-                                vue.createVNode(_component_v_col, null, {
-                                  default: vue.withCtx(function () { return [
-                                    vue.withDirectives(vue.createVNode(_component_v_text_field, {
-                                      modelValue: _ctx.phoneNumber,
-                                      "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.phoneNumber = $event); }),
-                                      autocomplete: "off",
-                                      label: "Phone Number",
-                                      "prepend-icon": "phone"
-                                    }, null, 8 /* PROPS */, ["modelValue"]), [
-                                      [_directive_mask, _ctx.phoneMask]
-                                    ])
-                                  ]; }),
-                                  _: 1 /* STABLE */
-                                }),
-                                vue.createVNode(_component_v_col, null, {
-                                  default: vue.withCtx(function () { return [
-                                    vue.createVNode(_component_v_btn, {
-                                      color: "primary",
-                                      outlined: "",
-                                      disabled: _ctx.progress,
-                                      onClick: _cache[5] || (_cache[5] = function ($event) { return ($options.sendCode()); })
-                                    }, {
-                                      default: vue.withCtx(function () { return [
-                                        _hoisted_10
-                                      ]; }),
-                                      _: 1 /* STABLE */
-                                    }, 8 /* PROPS */, ["disabled"])
-                                  ]; }),
-                                  _: 1 /* STABLE */
-                                })
+                                _hoisted_2$4
                               ]; }),
                               _: 1 /* STABLE */
                             })
                           ]; }),
-                          _: 1 /* STABLE */
-                        })
-                      ]; }),
-                      _: 1 /* STABLE */
-                    })
-                  ]; }),
-                  _: 1 /* STABLE */
-                }))
-              : vue.createCommentVNode("v-if", true),
-            vue.createCommentVNode(" phone authentication provider: enter phone number "),
-            (_ctx.step === 3)
-              ? (vue.openBlock(), vue.createBlock(_component_v_card, { key: 1 }, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_card_title, { class: "body-1 primary white--text" }, {
-                      default: vue.withCtx(function () { return [
-                        _hoisted_11
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }),
-                    vue.createVNode(_component_v_card_text, null, {
-                      default: vue.withCtx(function () { return [
-                        vue.createVNode(_component_v_container, { fluid: "" }, {
-                          default: vue.withCtx(function () { return [
-                            vue.createVNode(_component_v_row, {
-                              align: "center",
-                              justify: "center"
-                            }, {
-                              default: vue.withCtx(function () { return [
-                                vue.createVNode(_component_v_col, null, {
-                                  default: vue.withCtx(function () { return [
-                                    vue.withDirectives(vue.createVNode(_component_v_text_field, {
-                                      modelValue: _ctx.confirmationCode,
-                                      "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) { return (_ctx.confirmationCode = $event); }),
-                                      autocomplete: "off",
-                                      label: "Confirmation Code"
-                                    }, null, 8 /* PROPS */, ["modelValue"]), [
-                                      [_directive_mask, _ctx.codeMask]
-                                    ])
-                                  ]; }),
-                                  _: 1 /* STABLE */
-                                }),
-                                vue.createVNode(_component_v_col, null, {
-                                  default: vue.withCtx(function () { return [
-                                    vue.createVNode(_component_v_btn, {
-                                      color: "primary",
-                                      outlined: "",
-                                      disabled: _ctx.progress,
-                                      onClick: _cache[7] || (_cache[7] = function ($event) { return ($options.confirmCode()); })
-                                    }, {
-                                      default: vue.withCtx(function () { return [
-                                        _hoisted_12
-                                      ]; }),
-                                      _: 1 /* STABLE */
-                                    }, 8 /* PROPS */, ["disabled"])
-                                  ]; }),
-                                  _: 1 /* STABLE */
-                                })
-                              ]; }),
-                              _: 1 /* STABLE */
-                            })
-                          ]; }),
-                          _: 1 /* STABLE */
-                        })
-                      ]; }),
-                      _: 1 /* STABLE */
-                    })
-                  ]; }),
-                  _: 1 /* STABLE */
-                }))
-              : vue.createCommentVNode("v-if", true)
-          ]; }),
-          _: 1 /* STABLE */
-        }, 8 /* PROPS */, ["modelValue"])
-      ]; }),
-      _: 1 /* STABLE */
-    }))
-  }
-
-  script$1.render = render$1;
-  script$1.__file = "src/components/authentication/LoginWith3rdPartyProvider.vue";
-
-  var script$2 = {
-    components: { Branding: script, LoginWith3rdPartyProvider: script$1 },
-
-    props: ["firebase", "error", "isLoading"],
-
-    data: function () { return ({
-      form: {
-        email: "",
-        password: "",
-        remember: false,
-      },
-      valid: false,
-    }); },
-
-    computed: {
-      rules: function rules() {
-        var validation = {
-          email: this.form.email == "" ? "Email cannot be empty" : true,
-          password: this.form.password == "" ? "Password cannot be empty" : true,
-        };
-
-        return validation
-      },
-
-      alert: function alert() {
-        return Boolean(this.error)
-      },
-    },
-
-    methods: {
-      loginWithEmail: function loginWithEmail() {
-        if (this.$refs.form.validate()) {
-          this.$emit("credentials", { email: this.form.email, password: this.form.password });
-        }
-      },
-    },
-  };
-
-  var _hoisted_1$2 = { class: "text-center pb-4" };
-  var _hoisted_2$2 = /*#__PURE__*/vue.createTextVNode(" Forgot Password? ");
-  var _hoisted_3$1 = /*#__PURE__*/vue.createTextVNode(" Login ");
-
-  function render$2(_ctx, _cache, $props, $setup, $data, $options) {
-    var _component_v_alert = vue.resolveComponent("v-alert");
-    var _component_branding = vue.resolveComponent("branding");
-    var _component_v_text_field = vue.resolveComponent("v-text-field");
-    var _component_v_card_text = vue.resolveComponent("v-card-text");
-    var _component_v_btn = vue.resolveComponent("v-btn");
-    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
-    var _component_LoginWith3rdPartyProvider = vue.resolveComponent("LoginWith3rdPartyProvider");
-    var _component_v_form = vue.resolveComponent("v-form");
-    var _component_v_card = vue.resolveComponent("v-card");
-    var _component_v_container = vue.resolveComponent("v-container");
-
-    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
-      default: vue.withCtx(function () { return [
-        vue.createVNode(_component_v_card, { flat: "" }, {
-          default: vue.withCtx(function () { return [
-            vue.createVNode(_component_v_form, {
-              ref: "form",
-              modelValue: _ctx.valid,
-              "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) { return (_ctx.valid = $event); }),
-              onSubmit: vue.withModifiers($options.loginWithEmail, ["prevent"])
-            }, {
-              default: vue.withCtx(function () { return [
-                vue.createCommentVNode(" error alerrts "),
-                ($options.alert)
-                  ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
-                      key: 0,
-                      modelValue: $options.alert,
-                      "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
-                      type: "error",
-                      dismissible: ""
-                    }, {
-                      default: vue.withCtx(function () { return [
-                        vue.createTextVNode(vue.toDisplayString($props.error.message), 1 /* TEXT */)
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }, 8 /* PROPS */, ["modelValue"]))
-                  : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
-                      vue.createCommentVNode(" application branding "),
-                      vue.createVNode(_component_branding, { class: "text-center" })
-                    ], 64 /* STABLE_FRAGMENT */)),
-                vue.createCommentVNode(" login form "),
-                vue.createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_text_field, {
-                      modelValue: _ctx.form.email,
-                      "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.email = $event); }),
-                      required: "",
-                      class: "mr-2",
-                      label: "Email",
-                      "prepend-icon": "person",
-                      rules: [$options.rules.email]
-                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                    vue.createVNode(_component_v_text_field, {
-                      modelValue: _ctx.form.password,
-                      "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) { return (_ctx.form.password = $event); }),
-                      autocomplete: "off",
-                      class: "mr-2",
-                      name: "password",
-                      type: "password",
-                      label: "Password",
-                      "prepend-icon": "lock",
-                      rules: [$options.rules.password]
-                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                    vue.createCommentVNode(" <v-checkbox\n\t\t\t\t\t\t\tvalue=\"1\"\n\t\t\t\t\t\t\tname=\"remember\"\n\t\t\t\t\t\t\tclass=\"ml-4 pl-2\"\n\t\t\t\t\t\t\tv-model=\"remember\"\n\t\t\t\t\t\t\tlabel=\"Remember Me\"\n                        />")
-                  ]; }),
-                  _: 1 /* STABLE */
+                          _: 2 /* DYNAMIC */
+                        }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
+                      ];
                 }),
-                vue.createVNode("div", _hoisted_1$2, [
-                  vue.createVNode(_component_v_btn, {
-                    text: "",
-                    "x-small": "",
-                    color: "primary",
-                    onClick: _cache[4] || (_cache[4] = vue.withModifiers(function ($event) { return (_ctx.$emit('resetPassword')); }, ["prevent"]))
-                  }, {
-                    default: vue.withCtx(function () { return [
-                      _hoisted_2$2
-                    ]; }),
-                    _: 1 /* STABLE */
-                  })
-                ]),
-                vue.createVNode(_component_v_card_actions, null, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_btn, {
-                      depressed: "",
-                      block: "",
-                      large: "",
-                      color: "primary",
-                      type: "submit",
-                      disabled: $props.isLoading
-                    }, {
                       default: vue.withCtx(function () { return [
-                        _hoisted_3$1
+                        _hoisted_3$3
                       ]; }),
                       _: 1 /* STABLE */
-                    }, 8 /* PROPS */, ["disabled"])
-                  ]; }),
-                  _: 1 /* STABLE */
-                }),
-                vue.createVNode(_component_v_card_actions, null, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_LoginWith3rdPartyProvider, { firebase: $props.firebase }, null, 8 /* PROPS */, ["firebase"])
-                  ]; }),
-                  _: 1 /* STABLE */
-                })
-              ]; }),
-              _: 1 /* STABLE */
-            }, 8 /* PROPS */, ["modelValue", "onSubmit"])
-          ]; }),
-          _: 1 /* STABLE */
-        })
-      ]; }),
-      _: 1 /* STABLE */
-    }))
-  }
-
-  script$2.render = render$2;
-  script$2.__file = "src/components/authentication/Login.vue";
-
-  var script$3 = {
-    name: "Register",
-
-    components: { Branding: script },
-
-    props: ["error", "isLoading"],
-
-    data: function () { return ({
-      form: {
-        name: "",
-        email: "",
-        password: "",
-        confirm: "",
-        agree: true,
-      },
-      valid: false,
-    }); },
-
-    computed: {
-      rules: function rules() {
-        var validation = {
-          email: this.form.email == "" ? "Email cannot be empty" : true,
-          password: this.form.password == "" ? "Password cannot be empty" : true,
-          name: this.form.name == "" ? "Name cannot be empty" : true,
-          // agree: this.form.agree !== true ? "You must accept Terms of Service to continue" : true,
-          confirm: this.form.password !== this.form.confirm ? "Passwords do not match" : true,
-        };
-
-        if (this.error) {
-          if (this.error.code == "auth/invalid-email") {
-            validation.email = this.error.message;
-          }
-          if (this.error.code == "auth/weak-password") {
-            validation.password = this.error.message;
-          }
-        }
-
-        return validation
-      },
-
-      alert: function alert() {
-        return Boolean(this.error)
-      },
-    },
-
-    methods: {
-      register: function register() {
-        if (this.$refs.form.validate()) {
-          this.$emit("registration", this.form);
-        }
-      },
-    },
-  };
-
-  var _hoisted_1$3 = /*#__PURE__*/vue.createTextVNode(" Register ");
-
-  function render$3(_ctx, _cache, $props, $setup, $data, $options) {
-    var _component_v_alert = vue.resolveComponent("v-alert");
-    var _component_branding = vue.resolveComponent("branding");
-    var _component_v_text_field = vue.resolveComponent("v-text-field");
-    var _component_v_card_text = vue.resolveComponent("v-card-text");
-    var _component_v_btn = vue.resolveComponent("v-btn");
-    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
-    var _component_v_form = vue.resolveComponent("v-form");
-    var _component_v_card = vue.resolveComponent("v-card");
-    var _component_v_container = vue.resolveComponent("v-container");
-
-    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
-      default: vue.withCtx(function () { return [
-        vue.createVNode(_component_v_card, { flat: "" }, {
-          default: vue.withCtx(function () { return [
-            vue.createVNode(_component_v_form, {
-              ref: "form",
-              modelValue: _ctx.valid,
-              "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) { return (_ctx.valid = $event); }),
-              onSubmit: _cache[7] || (_cache[7] = vue.withModifiers(function ($event) { return ($options.register()); }, ["prevent"]))
-            }, {
-              default: vue.withCtx(function () { return [
-                vue.createCommentVNode(" error alerts "),
-                ($options.alert)
-                  ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
-                      key: 0,
-                      modelValue: $options.alert,
-                      "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
-                      type: "error",
-                      dismissible: ""
-                    }, {
-                      default: vue.withCtx(function () { return [
-                        vue.createTextVNode(vue.toDisplayString($props.error.message), 1 /* TEXT */)
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }, 8 /* PROPS */, ["modelValue"]))
-                  : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
-                      vue.createCommentVNode(" application branding "),
-                      vue.createVNode(_component_branding, { class: "text-center" })
-                    ], 64 /* STABLE_FRAGMENT */)),
-                vue.createCommentVNode(" registration form "),
-                vue.createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_text_field, {
-                      modelValue: _ctx.form.name,
-                      "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.name = $event); }),
-                      required: "",
-                      class: "mr-2",
-                      label: "Name",
-                      "prepend-icon": "person",
-                      rules: [$options.rules.name]
-                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                    vue.createVNode(_component_v_text_field, {
-                      modelValue: _ctx.form.email,
-                      "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) { return (_ctx.form.email = $event); }),
-                      required: "",
-                      class: "mr-2",
-                      label: "Email",
-                      "prepend-icon": "email",
-                      rules: [$options.rules.email]
-                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                    vue.createVNode(_component_v_text_field, {
-                      modelValue: _ctx.form.password,
-                      "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.form.password = $event); }),
-                      autocomplete: "off",
-                      required: "",
-                      class: "mr-2",
-                      type: "password",
-                      label: "Password",
-                      "prepend-icon": "lock",
-                      rules: [$options.rules.password]
-                    }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                    vue.createVNode(_component_v_text_field, {
-                      modelValue: _ctx.form.confirm,
-                      "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) { return (_ctx.form.confirm = $event); }),
-                      autocomplete: "off",
-                      required: "",
-                      class: "mr-2",
-                      type: "password",
-                      label: "Confirm password",
-                      "prepend-icon": "lock",
-                      rules: [$options.rules.confirm]
-                    }, null, 8 /* PROPS */, ["modelValue", "rules"])
-                  ]; }),
-                  _: 1 /* STABLE */
-                }),
-                vue.createVNode(_component_v_card_actions, null, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_v_btn, {
-                      block: "",
-                      large: "",
-                      depressed: "",
-                      color: "primary",
-                      type: "submit",
-                      disabled: $props.isLoading
-                    }, {
-                      default: vue.withCtx(function () { return [
-                        _hoisted_1$3
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }, 8 /* PROPS */, ["disabled"])
-                  ]; }),
-                  _: 1 /* STABLE */
-                })
-              ]; }),
-              _: 1 /* STABLE */
-            }, 8 /* PROPS */, ["modelValue"])
-          ]; }),
-          _: 1 /* STABLE */
-        })
-      ]; }),
-      _: 1 /* STABLE */
-    }))
-  }
-
-  script$3.render = render$3;
-  script$3.__file = "src/components/authentication/Register.vue";
-
-  var script$4 = {
-    components: { Branding: script, LoginWith3rdPartyProvider: script$1 },
-
-    props: ["firebase", "isLoading"],
-
-    data: function () { return ({
-      form: {
-        email: "",
-      },
-      error: null,
-      valid: false,
-      success: false,
-    }); },
-
-    computed: {
-      rules: function rules() {
-        var validation = {
-          email: this.form.email == "" ? "Email cannot be empty" : true,
-        };
-
-        return validation
-      },
-
-      alert: function alert() {
-        return Boolean(this.error)
-      },
-    },
-
-    methods: {
-      //
-      emailPasswordResetLink: function emailPasswordResetLink() {
-        var this$1 = this;
-
-        this.firebase
-          .auth()
-          .sendPasswordResetEmail(this.form.email)
-          .then(function () {
-            this$1.error = null;
-            this$1.success = true;
-          })
-          .catch(function (error) {
-            this$1.error = error;
-            this$1.success = false;
-          });
-      },
-    },
-  };
-
-  var _hoisted_1$4 = { key: 2 };
-  var _hoisted_2$3 = /*#__PURE__*/vue.createVNode("div", { class: "mb-5" }, " Enter registered user email address and we will send you a link to reset your password. ", -1 /* HOISTED */);
-  var _hoisted_3$2 = /*#__PURE__*/vue.createTextVNode(" Email Password Reset Link ");
-  var _hoisted_4$1 = /*#__PURE__*/vue.createTextVNode(" Email has been sent! ");
-  var _hoisted_5$1 = /*#__PURE__*/vue.createTextVNode("Please check your inbox and follow the instructions in the email to reset your account password");
-  var _hoisted_6$1 = /*#__PURE__*/vue.createTextVNode(" Login ");
-
-  function render$4(_ctx, _cache, $props, $setup, $data, $options) {
-    var _component_v_alert = vue.resolveComponent("v-alert");
-    var _component_branding = vue.resolveComponent("branding");
-    var _component_v_text_field = vue.resolveComponent("v-text-field");
-    var _component_v_card_text = vue.resolveComponent("v-card-text");
-    var _component_v_btn = vue.resolveComponent("v-btn");
-    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
-    var _component_v_container = vue.resolveComponent("v-container");
-    var _component_LoginWith3rdPartyProvider = vue.resolveComponent("LoginWith3rdPartyProvider");
-    var _component_v_form = vue.resolveComponent("v-form");
-    var _component_v_card = vue.resolveComponent("v-card");
-
-    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
-      default: vue.withCtx(function () { return [
-        vue.createVNode(_component_v_card, { flat: "" }, {
-          default: vue.withCtx(function () { return [
-            vue.createVNode(_component_v_form, {
-              ref: "form",
-              modelValue: _ctx.valid,
-              "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.valid = $event); }),
-              onSubmit: vue.withModifiers($options.emailPasswordResetLink, ["prevent"])
-            }, {
-              default: vue.withCtx(function () { return [
-                vue.createCommentVNode(" error alerrts "),
-                ($options.alert)
-                  ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
-                      key: 0,
-                      modelValue: $options.alert,
-                      "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
-                      type: "error",
-                      dismissible: ""
-                    }, {
-                      default: vue.withCtx(function () { return [
-                        vue.createTextVNode(vue.toDisplayString(_ctx.error.message), 1 /* TEXT */)
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }, 8 /* PROPS */, ["modelValue"]))
-                  : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
-                      vue.createCommentVNode(" application branding "),
-                      vue.createVNode(_component_branding, { class: "text-center" })
-                    ], 64 /* STABLE_FRAGMENT */)),
-                vue.createCommentVNode(" login form "),
-                (!_ctx.success)
-                  ? (vue.openBlock(), vue.createBlock("div", _hoisted_1$4, [
-                      vue.createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
-                        default: vue.withCtx(function () { return [
-                          _hoisted_2$3,
-                          vue.createVNode(_component_v_text_field, {
-                            modelValue: _ctx.form.email,
-                            "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.email = $event); }),
-                            required: "",
-                            error: $options.alert,
-                            class: "mr-2",
-                            label: "Email",
-                            "prepend-icon": "person",
-                            rules: [$options.rules.email]
-                          }, null, 8 /* PROPS */, ["modelValue", "error", "rules"])
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }),
-                      vue.createVNode(_component_v_card_actions, null, {
-                        default: vue.withCtx(function () { return [
-                          vue.createVNode(_component_v_btn, {
-                            block: "",
-                            large: "",
-                            depressed: "",
-                            color: "primary",
-                            type: "submit",
-                            disabled: $props.isLoading
-                          }, {
-                            default: vue.withCtx(function () { return [
-                              _hoisted_3$2
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }, 8 /* PROPS */, ["disabled"])
-                        ]; }),
-                        _: 1 /* STABLE */
-                      })
-                    ]))
+                    }))
                   : vue.createCommentVNode("v-if", true),
-                vue.createCommentVNode(" success message "),
-                (_ctx.success)
-                  ? (vue.openBlock(), vue.createBlock(_component_v_container, {
-                      key: 3,
-                      class: "pa-4 text-center"
+                ($props.facebook)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_tooltip, {
+                      key: 1,
+                      top: ""
                     }, {
-                      default: vue.withCtx(function () { return [
-                        vue.createVNode(_component_v_card_text, { class: "text-h5" }, {
+                      activator: vue.withCtx(function (ref) {
+                        var on = ref.on;
+                        var attrs = ref.attrs;
+
+                        return [
+                        vue.createVNode(_component_v_btn, vue.mergeProps({
+                          color: "#3b5998",
+                          class: "mr-2"
+                        }, attrs, {
+                          fab: "",
+                          dark: "",
+                          small: ""
+                        }, vue.toHandlers(on), {
+                          onClick: _cache[2] || (_cache[2] = function ($event) { return (_ctx.loginWithFacebook()); })
+                        }), {
                           default: vue.withCtx(function () { return [
-                            _hoisted_4$1
+                            vue.createVNode(_component_v_icon, null, {
+                              default: vue.withCtx(function () { return [
+                                _hoisted_4$2
+                              ]; }),
+                              _: 1 /* STABLE */
+                            })
+                          ]; }),
+                          _: 2 /* DYNAMIC */
+                        }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
+                      ];
+                }),
+                      default: vue.withCtx(function () { return [
+                        _hoisted_5$2
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }))
+                  : vue.createCommentVNode("v-if", true),
+                ($props.phone)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_tooltip, {
+                      key: 2,
+                      top: ""
+                    }, {
+                      activator: vue.withCtx(function (ref) {
+                        var on = ref.on;
+                        var attrs = ref.attrs;
+
+                        return [
+                        vue.createVNode(_component_v_btn, vue.mergeProps({ color: "primary" }, attrs, {
+                          fab: "",
+                          dark: "",
+                          small: ""
+                        }, vue.toHandlers(on), {
+                          onClick: _cache[3] || (_cache[3] = function ($event) { return ($options.loginWithPhone()); })
+                        }), {
+                          default: vue.withCtx(function () { return [
+                            vue.createVNode(_component_v_icon, null, {
+                              default: vue.withCtx(function () { return [
+                                _hoisted_6$2
+                              ]; }),
+                              _: 1 /* STABLE */
+                            })
+                          ]; }),
+                          _: 2 /* DYNAMIC */
+                        }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
+                      ];
+                }),
+                      default: vue.withCtx(function () { return [
+                        _hoisted_7$1
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }))
+                  : vue.createCommentVNode("v-if", true)
+              ]; }),
+              _: 1 /* STABLE */
+            }),
+            vue.createVNode(_component_v_dialog, {
+              modelValue: _ctx.dialog,
+              "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) { return (_ctx.dialog = $event); }),
+              width: "500"
+            }, {
+              default: vue.withCtx(function () { return [
+                _hoisted_8$1,
+                vue.createCommentVNode(" phone authentication provider: enter phone number "),
+                (_ctx.step === 2)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_card, { key: 0 }, {
+                      default: vue.withCtx(function () { return [
+                        vue.createVNode(_component_v_card_title, { class: "body-1 primary white--text" }, {
+                          default: vue.withCtx(function () { return [
+                            _hoisted_9$1
                           ]; }),
                           _: 1 /* STABLE */
                         }),
                         vue.createVNode(_component_v_card_text, null, {
                           default: vue.withCtx(function () { return [
-                            _hoisted_5$1
-                          ]; }),
-                          _: 1 /* STABLE */
-                        }),
-                        vue.createVNode(_component_v_card_actions, null, {
-                          default: vue.withCtx(function () { return [
-                            vue.createVNode(_component_v_btn, {
-                              block: "",
-                              large: "",
-                              depressed: "",
-                              color: "primary",
-                              onClick: _cache[3] || (_cache[3] = function ($event) { return (_ctx.$emit('showSignInTab')); })
-                            }, {
+                            vue.createVNode(_component_v_container, { fluid: "" }, {
                               default: vue.withCtx(function () { return [
-                                _hoisted_6$1
+                                vue.createVNode(_component_v_row, {
+                                  align: "center",
+                                  justify: "center"
+                                }, {
+                                  default: vue.withCtx(function () { return [
+                                    vue.createVNode(_component_v_col, null, {
+                                      default: vue.withCtx(function () { return [
+                                        vue.withDirectives(vue.createVNode(_component_v_text_field, {
+                                          modelValue: _ctx.phoneNumber,
+                                          "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.phoneNumber = $event); }),
+                                          autocomplete: "off",
+                                          label: "Phone Number",
+                                          "prepend-icon": "phone"
+                                        }, null, 8 /* PROPS */, ["modelValue"]), [
+                                          [_directive_mask, _ctx.phoneMask]
+                                        ])
+                                      ]; }),
+                                      _: 1 /* STABLE */
+                                    }),
+                                    vue.createVNode(_component_v_col, null, {
+                                      default: vue.withCtx(function () { return [
+                                        vue.createVNode(_component_v_btn, {
+                                          color: "primary",
+                                          outlined: "",
+                                          disabled: _ctx.progress,
+                                          onClick: _cache[5] || (_cache[5] = function ($event) { return ($options.sendCode()); })
+                                        }, {
+                                          default: vue.withCtx(function () { return [
+                                            _hoisted_10$1
+                                          ]; }),
+                                          _: 1 /* STABLE */
+                                        }, 8 /* PROPS */, ["disabled"])
+                                      ]; }),
+                                      _: 1 /* STABLE */
+                                    })
+                                  ]; }),
+                                  _: 1 /* STABLE */
+                                })
                               ]; }),
                               _: 1 /* STABLE */
                             })
@@ -2788,194 +2900,110 @@
                       _: 1 /* STABLE */
                     }))
                   : vue.createCommentVNode("v-if", true),
-                vue.createVNode(_component_v_card_actions, null, {
-                  default: vue.withCtx(function () { return [
-                    vue.createVNode(_component_LoginWith3rdPartyProvider)
-                  ]; }),
-                  _: 1 /* STABLE */
-                })
+                vue.createCommentVNode(" phone authentication provider: enter phone number "),
+                (_ctx.step === 3)
+                  ? (vue.openBlock(), vue.createBlock(_component_v_card, { key: 1 }, {
+                      default: vue.withCtx(function () { return [
+                        vue.createVNode(_component_v_card_title, { class: "body-1 primary white--text" }, {
+                          default: vue.withCtx(function () { return [
+                            _hoisted_11$1
+                          ]; }),
+                          _: 1 /* STABLE */
+                        }),
+                        vue.createVNode(_component_v_card_text, null, {
+                          default: vue.withCtx(function () { return [
+                            vue.createVNode(_component_v_container, { fluid: "" }, {
+                              default: vue.withCtx(function () { return [
+                                vue.createVNode(_component_v_row, {
+                                  align: "center",
+                                  justify: "center"
+                                }, {
+                                  default: vue.withCtx(function () { return [
+                                    vue.createVNode(_component_v_col, null, {
+                                      default: vue.withCtx(function () { return [
+                                        vue.withDirectives(vue.createVNode(_component_v_text_field, {
+                                          modelValue: _ctx.confirmationCode,
+                                          "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) { return (_ctx.confirmationCode = $event); }),
+                                          autocomplete: "off",
+                                          label: "Confirmation Code"
+                                        }, null, 8 /* PROPS */, ["modelValue"]), [
+                                          [_directive_mask, _ctx.codeMask]
+                                        ])
+                                      ]; }),
+                                      _: 1 /* STABLE */
+                                    }),
+                                    vue.createVNode(_component_v_col, null, {
+                                      default: vue.withCtx(function () { return [
+                                        vue.createVNode(_component_v_btn, {
+                                          color: "primary",
+                                          outlined: "",
+                                          disabled: _ctx.progress,
+                                          onClick: _cache[7] || (_cache[7] = function ($event) { return ($options.confirmCode()); })
+                                        }, {
+                                          default: vue.withCtx(function () { return [
+                                            _hoisted_12$1
+                                          ]; }),
+                                          _: 1 /* STABLE */
+                                        }, 8 /* PROPS */, ["disabled"])
+                                      ]; }),
+                                      _: 1 /* STABLE */
+                                    })
+                                  ]; }),
+                                  _: 1 /* STABLE */
+                                })
+                              ]; }),
+                              _: 1 /* STABLE */
+                            })
+                          ]; }),
+                          _: 1 /* STABLE */
+                        })
+                      ]; }),
+                      _: 1 /* STABLE */
+                    }))
+                  : vue.createCommentVNode("v-if", true)
               ]; }),
               _: 1 /* STABLE */
-            }, 8 /* PROPS */, ["modelValue", "onSubmit"])
+            }, 8 /* PROPS */, ["modelValue"])
           ]; }),
           _: 1 /* STABLE */
-        })
-      ]; }),
-      _: 1 /* STABLE */
-    }))
-  }
-
-  script$4.render = render$4;
-  script$4.__file = "src/components/authentication/PasswordReset.vue";
-
-  var script$5 = {
-    props: ["error", "isLoading"],
-
-    data: function () { return ({
-      emailSent: false,
-    }); },
-
-    methods: {
-      resendVerificationEmail: function resendVerificationEmail() {
-        this.emailSent = true;
-        this.$emit("sendEmail");
-      },
-      goToLogin: function goToLogin() {
-        this.$emit("signOut");
-      },
-    },
-  };
-
-  var _hoisted_1$5 = { key: 0 };
-  var _hoisted_2$4 = /*#__PURE__*/vue.createVNode("div", { class: "display-1 grey--text mb-3" }, " Error! ", -1 /* HOISTED */);
-  var _hoisted_3$3 = /*#__PURE__*/vue.createTextVNode(" Back to Login ");
-  var _hoisted_4$2 = { key: 0 };
-  var _hoisted_5$2 = /*#__PURE__*/vue.createVNode("div", { class: "display-1 grey--text mb-3" }, " Verification Required ", -1 /* HOISTED */);
-  var _hoisted_6$2 = /*#__PURE__*/vue.createTextVNode(" verified_user ");
-  var _hoisted_7$1 = { key: 1 };
-  var _hoisted_8$1 = /*#__PURE__*/vue.createVNode("div", { class: "display-1 grey--text mb-3" }, " Email sent! ", -1 /* HOISTED */);
-  var _hoisted_9$1 = /*#__PURE__*/vue.createTextVNode(" mail ");
-  var _hoisted_10$1 = /*#__PURE__*/vue.createVNode("div", { class: "grey--text text--darken-2 mb-7 body-2" }, [
-    /*#__PURE__*/vue.createVNode("p", null, " Please check your email to verify your address. Click at the link in the email we've sent you to confirm your account access. ")
-  ], -1 /* HOISTED */);
-  var _hoisted_11$1 = { key: 2 };
-  var _hoisted_12$1 = /*#__PURE__*/vue.createVNode("p", { class: "grey--text text--darken-2 mb-7 body-2" }, [
-    /*#__PURE__*/vue.createTextVNode(" If you have not received verification email"),
-    /*#__PURE__*/vue.createVNode("br"),
-    /*#__PURE__*/vue.createTextVNode("click at the button below. ")
-  ], -1 /* HOISTED */);
-  var _hoisted_13 = /*#__PURE__*/vue.createTextVNode(" Send Verification Email ");
-  var _hoisted_14 = { key: 3 };
-  var _hoisted_15 = /*#__PURE__*/vue.createTextVNode(" Back to Login ");
-
-  function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-    var _component_v_alert = vue.resolveComponent("v-alert");
-    var _component_v_btn = vue.resolveComponent("v-btn");
-    var _component_v_icon = vue.resolveComponent("v-icon");
-    var _component_v_card = vue.resolveComponent("v-card");
-    var _component_v_container = vue.resolveComponent("v-container");
-
-    return (vue.openBlock(), vue.createBlock(_component_v_container, null, {
-      default: vue.withCtx(function () { return [
-        vue.createCommentVNode(" user with no email verification "),
-        vue.createVNode(_component_v_card, {
-          flat: "",
-          class: "text-center pa-5"
-        }, {
-          default: vue.withCtx(function () { return [
-            vue.createCommentVNode(" email error "),
-            ($props.error)
-              ? (vue.openBlock(), vue.createBlock("div", _hoisted_1$5, [
-                  _hoisted_2$4,
-                  ($props.error)
-                    ? (vue.openBlock(), vue.createBlock(_component_v_alert, {
-                        key: 0,
-                        type: "error"
-                      }, {
-                        default: vue.withCtx(function () { return [
-                          vue.createTextVNode(vue.toDisplayString($props.error), 1 /* TEXT */)
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }))
-                    : vue.createCommentVNode("v-if", true),
-                  vue.createVNode(_component_v_btn, {
-                    color: "primary",
-                    onClick: $options.goToLogin
-                  }, {
-                    default: vue.withCtx(function () { return [
-                      _hoisted_3$3
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["onClick"])
-                ]))
-              : (vue.openBlock(), vue.createBlock(vue.Fragment, { key: 1 }, [
-                  vue.createCommentVNode(" email verification "),
-                  vue.createVNode("div", null, [
-                    vue.createCommentVNode(" email confirmation required message "),
-                    (!_ctx.emailSent)
-                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_4$2, [
-                          _hoisted_5$2,
-                          vue.createVNode(_component_v_icon, {
-                            size: "100",
-                            color: "grey",
-                            class: "ma-4"
-                          }, {
-                            default: vue.withCtx(function () { return [
-                              _hoisted_6$2
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]))
-                      : vue.createCommentVNode("v-if", true),
-                    vue.createCommentVNode(" email sent confirmation "),
-                    (_ctx.emailSent)
-                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_7$1, [
-                          _hoisted_8$1,
-                          vue.createVNode(_component_v_icon, {
-                            size: "100",
-                            color: "grey",
-                            class: "ma-4"
-                          }, {
-                            default: vue.withCtx(function () { return [
-                              _hoisted_9$1
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]))
-                      : vue.createCommentVNode("v-if", true),
-                    _hoisted_10$1,
-                    vue.createCommentVNode(" send verification email button "),
-                    (!_ctx.emailSent)
-                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_11$1, [
-                          _hoisted_12$1,
-                          vue.createVNode(_component_v_btn, {
-                            disabled: $props.isLoading,
-                            color: "primary",
-                            onClick: $options.resendVerificationEmail
-                          }, {
-                            default: vue.withCtx(function () { return [
-                              _hoisted_13
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }, 8 /* PROPS */, ["disabled", "onClick"])
-                        ]))
-                      : vue.createCommentVNode("v-if", true),
-                    vue.createCommentVNode(" back to login page button "),
-                    (_ctx.emailSent)
-                      ? (vue.openBlock(), vue.createBlock("div", _hoisted_14, [
-                          vue.createVNode(_component_v_btn, {
-                            color: "primary",
-                            onClick: $options.goToLogin
-                          }, {
-                            default: vue.withCtx(function () { return [
-                              _hoisted_15
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }, 8 /* PROPS */, ["onClick"])
-                        ]))
-                      : vue.createCommentVNode("v-if", true)
-                  ])
-                ], 64 /* STABLE_FRAGMENT */))
-          ]; }),
-          _: 1 /* STABLE */
-        })
-      ]; }),
-      _: 1 /* STABLE */
-    }))
+        }))
+      : vue.createCommentVNode("v-if", true)
   }
 
   script$5.render = render$5;
-  script$5.__file = "src/components/authentication/EmailVerification.vue";
+  script$5.__file = "src/components/authentication/LoginWith3rdPartyProvider.vue";
 
   var script$6 = {
     components: {
-      Login: script$2,
-      Register: script$3,
-      PasswordReset: script$4,
-      EmailVerification: script$5,
+      Login: script$1,
+      Register: script$2,
+      PasswordReset: script$3,
+      EmailVerification: script$4,
+      LoginWith3rdPartyProvider: script$5,
     },
 
-    props: ["firebase"],
+    props: {
+      firebase: {
+        type: Object,
+        required: true,
+      },
+      registration: {
+        type: Boolean,
+        default: true,
+      },
+      google: {
+        type: Boolean,
+        default: true,
+      },
+      facebook: {
+        type: Boolean,
+        default: true,
+      },
+      phone: {
+        type: Boolean,
+        default: true,
+      },
+    },
 
     data: function () { return ({
       tab: 0,
@@ -3096,6 +3124,8 @@
     var _component_Register = vue.resolveComponent("Register");
     var _component_PasswordReset = vue.resolveComponent("PasswordReset");
     var _component_v_tabs_items = vue.resolveComponent("v-tabs-items");
+    var _component_LoginWith3rdPartyProvider = vue.resolveComponent("LoginWith3rdPartyProvider");
+    var _component_v_card_actions = vue.resolveComponent("v-card-actions");
     var _component_v_card = vue.resolveComponent("v-card");
     var _component_v_container = vue.resolveComponent("v-container");
 
@@ -3134,7 +3164,7 @@
                             ]; }),
                             _: 1 /* STABLE */
                           }, 8 /* PROPS */, ["onClick"]),
-                          (!_ctx.resetPassword)
+                          (!_ctx.resetPassword && $props.registration)
                             ? (vue.openBlock(), vue.createBlock(_component_v_tab, { key: 0 }, {
                                 default: vue.withCtx(function () { return [
                                   _hoisted_4$3
@@ -3142,7 +3172,7 @@
                                 _: 1 /* STABLE */
                               }))
                             : vue.createCommentVNode("v-if", true),
-                          (_ctx.resetPassword)
+                          (_ctx.resetPassword || !$props.registration)
                             ? (vue.openBlock(), vue.createBlock(_component_v_tab, { key: 1 }, {
                                 default: vue.withCtx(function () { return [
                                   _hoisted_5$3
@@ -3170,7 +3200,7 @@
                             ]; }),
                             _: 1 /* STABLE */
                           }),
-                          (!_ctx.resetPassword)
+                          (!_ctx.resetPassword && $props.registration)
                             ? (vue.openBlock(), vue.createBlock(_component_v_tab_item, {
                                 key: 0,
                                 class: "pt-5"
@@ -3185,7 +3215,7 @@
                                 _: 1 /* STABLE */
                               }))
                             : vue.createCommentVNode("v-if", true),
-                          (_ctx.resetPassword)
+                          (_ctx.resetPassword || !$props.registration)
                             ? (vue.openBlock(), vue.createBlock(_component_v_tab_item, {
                                 key: 1,
                                 class: "pt-5"
@@ -3204,7 +3234,17 @@
                         ]; }),
                         _: 1 /* STABLE */
                       }, 8 /* PROPS */, ["modelValue"])
-                    ]))
+                    ])),
+                vue.createVNode(_component_v_card_actions, null, {
+                  default: vue.withCtx(function () { return [
+                    vue.createVNode(_component_LoginWith3rdPartyProvider, {
+                      google: $props.google,
+                      facebook: $props.facebook,
+                      phone: $props.phone
+                    }, null, 8 /* PROPS */, ["google", "facebook", "phone"])
+                  ]; }),
+                  _: 1 /* STABLE */
+                })
               ]; }),
               _: 1 /* STABLE */
             })
