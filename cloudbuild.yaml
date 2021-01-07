@@ -19,8 +19,6 @@ steps:
         "build",
         "--build-arg",
         "NPM_TOKEN=$_NPM_TOKEN",
-        "-t",
-        "gcr.io/$PROJECT_ID/$_IMAGE:$BRANCH_NAME$TAG_NAME",
         ".",
       ]
     timeout: 1500s
