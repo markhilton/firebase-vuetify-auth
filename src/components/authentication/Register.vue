@@ -54,9 +54,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn block large depressed color="primary" type="submit" :disabled="isLoading">
-            Register
-          </v-btn>
+          <v-btn block large depressed color="primary" type="submit" :disabled="isLoading"> Register </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>

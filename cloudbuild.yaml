@@ -1,0 +1,52 @@
+steps:
+  # slack deployment status
+  - name: "gcr.io/cloud-builders/curl"
+    args:
+      [
+        "-X",
+        "POST",
+        "-H",
+        "Content-type: application/json",
+        "--data",
+        '{"text":"`$REPO_NAME:$BRANCH_NAME$TAG_NAME` build started!"}',
+        "${_WEBHOOK_URL}",
+      ]
+
+  # build docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "--build-arg",
+        "NPM_TOKEN=$_NPM_TOKEN",
+        "-t",
+        "gcr.io/$PROJECT_ID/$_IMAGE:$BRANCH_NAME$TAG_NAME",
+        ".",
+      ]
+    timeout: 1500s
+
+  # push docker image to the repository
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/$PROJECT_ID/$_IMAGE:$BRANCH_NAME$TAG_NAME"]
+
+  # slack deployment status
+  - name: "gcr.io/cloud-builders/curl"
+    args:
+      [
+        "-X",
+        "POST",
+        "-H",
+        "Content-type: application/json",
+        "--data",
+        '{"text":"`$REPO_NAME:$BRANCH_NAME$TAG_NAME` build completed!"}',
+        "${_WEBHOOK_URL}",
+      ]
+
+timeout: 1500s
+
+# store artifact
+images: ["gcr.io/$PROJECT_ID/$_IMAGE:$BRANCH_NAME$TAG_NAME"]
+
+# env defaults
+substitutions:
+  _NPM_TOKEN: NPM registry private package

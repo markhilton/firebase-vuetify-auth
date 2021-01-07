@@ -16,8 +16,8 @@
         <div v-else>
           <v-tabs v-model="tab" grow>
             <v-tab @click="showSignInTab"> Sign In </v-tab>
-            <v-tab v-if="!resetPassword"> Register </v-tab>
-            <v-tab v-if="resetPassword"> Reset Password </v-tab>
+            <v-tab v-if="!resetPassword && registration"> Register </v-tab>
+            <v-tab v-if="resetPassword || !registration"> Reset Password </v-tab>
           </v-tabs>
 
           <v-tabs-items v-model="tab">
@@ -31,11 +31,11 @@
               />
             </v-tab-item>
 
-            <v-tab-item v-if="!resetPassword" class="pt-5">
+            <v-tab-item v-if="!resetPassword && registration" class="pt-5">
               <Register :error="registrationError" :is-loading="isLoading" @registration="registerUser" />
             </v-tab-item>
 
-            <v-tab-item v-if="resetPassword" class="pt-5">
+            <v-tab-item v-if="resetPassword || !registration" class="pt-5">
               <PasswordReset
                 :firebase="firebase"
                 :error="loginError"
@@ -45,6 +45,10 @@
             </v-tab-item>
           </v-tabs-items>
         </div>
+
+        <v-card-actions>
+          <LoginWith3rdPartyProvider :google="google" :facebook="facebook" :phone="phone" />
+        </v-card-actions>
       </v-card>
     </v-container>
   </v-container>
@@ -55,6 +59,7 @@ import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
 import EmailVerification from "./EmailVerification.vue"
+import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
 
 export default {
   components: {
@@ -62,9 +67,31 @@ export default {
     Register,
     PasswordReset,
     EmailVerification,
+    LoginWith3rdPartyProvider,
   },
 
-  props: ["firebase"],
+  props: {
+    firebase: {
+      type: Object,
+      required: true,
+    },
+    registration: {
+      type: Boolean,
+      default: true,
+    },
+    google: {
+      type: Boolean,
+      default: true,
+    },
+    facebook: {
+      type: Boolean,
+      default: true,
+    },
+    phone: {
+      type: Boolean,
+      default: true,
+    },
+  },
 
   data: () => ({
     tab: 0,
@@ -78,7 +105,7 @@ export default {
 
   mounted() {
     // emit isAuthenticated when user auth state changes
-    this.firebase.auth().onAuthStateChanged(user => {
+    this.firebase.auth().onAuthStateChanged((user) => {
       let emailVerified = false
       let isAuthenticated = user && user.uid ? true : false
 
@@ -108,7 +135,7 @@ export default {
       this.firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
-        .catch(error => (this.loginError = error))
+        .catch((error) => (this.loginError = error))
         .finally(() => (this.isLoading = false))
     },
 
@@ -155,7 +182,7 @@ export default {
       this.firebase
         .auth()
         .currentUser.sendEmailVerification()
-        .catch(error => (this.verificationError = error))
+        .catch((error) => (this.verificationError = error))
         .finally(() => (this.isLoading = false))
     },
   },

@@ -59,7 +59,7 @@ firebase.auth().onAuthStateChanged(() => {
     router,
     store,
     vuetify,
-    render: h => h(App),
+    render: (h) => h(App),
   }).$mount("#app")
 }) // close onAuthStateChanged listener wrapper
 ```
@@ -158,3 +158,21 @@ export default router
 ### Thats it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
+
+## Available props
+
+| Prop         | Type    | Default | Description                              |
+| ------------ | ------- | ------- | ---------------------------------------- |
+| firebase     | Object  | null    | Firebase middleware                      |
+| registration | Boolean | true    | allow new user registrations             |
+| google       | Boolean | true    | allow users to singin using gmail        |
+| facebook     | Boolean | true    | allow users to singin using facebook     |
+| phone        | Boolean | true    | allow users to singin using phone number |
+
+## Events
+
+These events are emitted on actions in the datepicker
+
+| Event           | Output  | Description                             |
+| --------------- | ------- | --------------------------------------- |
+| isAuthenticated | Boolean | true / false user authentication status |

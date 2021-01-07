@@ -1,11 +1,9 @@
 <template>
-  <v-container class="text-center ma-0 pa-0">
-    <div class="caption">
-      or login with
-    </div>
+  <v-container class="text-center ma-0 pa-0" v-if="google || facebook || phone">
+    <div class="caption">or login with</div>
 
     <v-container>
-      <v-tooltip top>
+      <v-tooltip top v-if="google">
         <template #activator="{ on, attrs }">
           <v-btn color="#db3236" class="mr-2" v-bind="attrs" fab dark small v-on="on" @click="loginWithGoogle()">
             <v-icon>mdi-google</v-icon>
@@ -15,7 +13,7 @@
         <span>Google Gmail Account</span>
       </v-tooltip>
 
-      <v-tooltip top>
+      <v-tooltip top v-if="facebook">
         <template #activator="{ on, attrs }">
           <v-btn color="#3b5998" class="mr-2" v-bind="attrs" fab dark small v-on="on" @click="loginWithFacebook()">
             <v-icon>mdi-facebook</v-icon>
@@ -25,7 +23,7 @@
         <span>Facebook Account</span>
       </v-tooltip>
 
-      <v-tooltip top>
+      <v-tooltip top v-if="phone">
         <template #activator="{ on, attrs }">
           <v-btn color="primary" v-bind="attrs" fab dark small v-on="on" @click="loginWithPhone()">
             <v-icon>phone</v-icon>
@@ -41,9 +39,7 @@
 
       <!-- phone authentication provider: enter phone number -->
       <v-card v-if="step === 2">
-        <v-card-title class="body-1 primary white--text">
-          Enter Phone Number
-        </v-card-title>
+        <v-card-title class="body-1 primary white--text"> Enter Phone Number </v-card-title>
 
         <v-card-text>
           <v-container fluid>
@@ -59,9 +55,7 @@
               </v-col>
 
               <v-col>
-                <v-btn color="primary" outlined :disabled="progress" @click="sendCode()">
-                  Send Code
-                </v-btn>
+                <v-btn color="primary" outlined :disabled="progress" @click="sendCode()"> Send Code </v-btn>
               </v-col>
             </v-row>
           </v-container>
@@ -70,9 +64,7 @@
 
       <!-- phone authentication provider: enter phone number -->
       <v-card v-if="step === 3">
-        <v-card-title class="body-1 primary white--text">
-          Enter Confirm Code
-        </v-card-title>
+        <v-card-title class="body-1 primary white--text"> Enter Confirm Code </v-card-title>
 
         <v-card-text>
           <v-container fluid>
@@ -87,9 +79,7 @@
               </v-col>
 
               <v-col>
-                <v-btn color="primary" outlined :disabled="progress" @click="confirmCode()">
-                  Confirm Code
-                </v-btn>
+                <v-btn color="primary" outlined :disabled="progress" @click="confirmCode()"> Confirm Code </v-btn>
               </v-col>
             </v-row>
           </v-container>
@@ -103,7 +93,7 @@
 import firebase from "firebase/app"
 
 export default {
-  props: ["firebase"],
+  props: ["firebase", "google", "facebook", "phone"],
 
   data: () => ({
     step: 1,
@@ -163,11 +153,11 @@ export default {
       this.firebase
         .auth()
         .signInWithPhoneNumber("+1" + this.phoneNumber, this.recaptchaVerifier)
-        .then(res => {
+        .then((res) => {
           this.step = 3
           this.codeAuth = res
         })
-        .catch(error => {
+        .catch((error) => {
           alert(error)
           this.step = 1
         })
@@ -177,7 +167,7 @@ export default {
       this.codeAuth
         .confirm(this.confirmationCode)
         .then(() => (this.step = 1))
-        .catch(err => alert(err))
+        .catch((err) => alert(err))
     },
   },
 }

@@ -48,10 +48,6 @@
         <v-card-actions>
           <v-btn depressed block large color="primary" type="submit" :disabled="isLoading"> Login </v-btn>
         </v-card-actions>
-
-        <v-card-actions>
-          <LoginWith3rdPartyProvider :firebase="firebase" />
-        </v-card-actions>
       </v-form>
     </v-card>
   </v-container>
@@ -59,10 +55,9 @@
 
 <script>
 import Branding from "./Branding.vue"
-import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
 
 export default {
-  components: { Branding, LoginWith3rdPartyProvider },
+  components: { Branding },
 
   props: ["firebase", "error", "isLoading"],
 

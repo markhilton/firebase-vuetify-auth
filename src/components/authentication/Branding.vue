@@ -3,9 +3,7 @@
     <v-list-item>
       <v-list-item-content>
         <v-list-item-title class="title">
-          <v-icon color="orange">
-            brightness_high
-          </v-icon>
+          <v-icon color="orange"> brightness_high </v-icon>
 
           {{ appTitle }}
         </v-list-item-title>

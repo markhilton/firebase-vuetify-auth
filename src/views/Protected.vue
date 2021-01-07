@@ -3,9 +3,7 @@
     <h2>[ protected route view ]</h2>
     <div>This is a protected page that does require user authentication.</div>
 
-    <h3 class="mt-5 pt-5">
-      Account Management
-    </h3>
+    <h3 class="mt-5 pt-5">Account Management</h3>
 
     <v-card flat width="350">
       <v-form ref="form" v-model="valid" @submit.prevent="updateUser()">
@@ -48,9 +46,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn class="mt-2" color="primary" type="submit" :disabled="progress">
-            Update
-          </v-btn>
+          <v-btn class="mt-2" color="primary" type="submit" :disabled="progress"> Update </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
