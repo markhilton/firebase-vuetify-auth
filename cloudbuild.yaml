@@ -18,6 +18,8 @@ steps:
       [
         "build",
         "--build-arg",
+        "TAG_NAME=$TAG_NAME",
+        "--build-arg",
         "NPM_TOKEN=$_NPM_TOKEN",
         ".",
       ]

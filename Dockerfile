@@ -1,5 +1,6 @@
 FROM node:12
 
+ARG TAG_NAME
 ARG NPM_TOKEN
 
 WORKDIR /app
