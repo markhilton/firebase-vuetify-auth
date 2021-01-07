@@ -11,6 +11,7 @@ export default {
     name: "AuthenticationGuard",
     exports: "named",
     globals: {
+      "vue": "vue",
       "vuetify/lib": "vuetify/lib",
       "@/middleware": "./src/middleware",
     },
