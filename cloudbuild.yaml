@@ -25,10 +25,6 @@ steps:
       ]
     timeout: 1500s
 
-  # push docker image to the repository
-  - name: "gcr.io/cloud-builders/docker"
-    args: ["push", "gcr.io/$PROJECT_ID/$_IMAGE:$BRANCH_NAME$TAG_NAME"]
-
   # slack deployment status
   - name: "gcr.io/cloud-builders/curl"
     args:
