@@ -43,15 +43,23 @@
     "babel-eslint": "^10.1.0",
     "core-js": "^3.8.2",
     "css-loader": "^5.0.1",
-    "eslint": "^7.5.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-config-prettier-standard": "^3.0.1",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-prettier-vue": "^2.1.1",
     "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^5.0.0",
     "eslint-plugin-vue": "^7.4.1",
     "postcss": "^8.2.2",
-    "prettier": "^2.2.1",
+    "prettier": "2.2.1",
+    "prettier-config-standard": "^1.0.1",
     "rollup": "^2.36.0",
     "rollup-plugin-postcss": "^4.0.0",
-    "rollup-plugin-vue": "^6.0.0",
     "rollup-plugin-vuetify": "^0.2.4",
     "sass": "^1.32.0",
     "sass-loader": "^10.1.0",
@@ -92,20 +100,14 @@
       "dataLayer": "writable"
     },
     "extends": [
-      "eslint:recommended",
-      "plugin:vue/recommended"
+      "plugin:vue/recommended",
+      "prettier",
+      "prettier/vue"
+    ],
+    "plugins": [
+      "vue"
     ],
     "rules": {
-      "vue/max-attributes-per-line": [
-        "error",
-        {
-          "singleline": 1,
-          "multiline": {
-            "max": 1,
-            "allowFirstLine": false
-          }
-        }
-      ],
       "no-console": [
         "error",
         {
@@ -133,15 +135,20 @@
     "parserOptions": {
       "parser": "babel-eslint",
       "sourceType": "module",
-      "ecmaVersion": 2018,
+      "ecmaVersion": 2020,
       "ecmaFeatures": {
         "globalReturn": false,
         "impliedStrict": false,
         "jsx": false
+      },
+      "vueFeatures": {
+        "filter": true,
+        "interpolationAsNonHTML": false
       }
     }
   },
   "env": {
+    "es6": true,
     "browser": true
   },
   "engines": {
