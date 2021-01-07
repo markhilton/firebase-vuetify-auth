@@ -44,9 +44,7 @@ steps:
 
 timeout: 1500s
 
-# store artifact
-images: ["gcr.io/$PROJECT_ID/$_IMAGE:$BRANCH_NAME$TAG_NAME"]
-
 # env defaults
 substitutions:
   _NPM_TOKEN: NPM registry private package
+  _WEBHOOK_URL: slack_notification_webhook_url
