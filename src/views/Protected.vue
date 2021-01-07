@@ -7,22 +7,10 @@
       Account Management
     </h3>
 
-    <v-card
-      flat
-      width="350"
-    >
-      <v-form
-        ref="form"
-        v-model="valid"
-        @submit.prevent="updateUser()"
-      >
+    <v-card flat width="350">
+      <v-form ref="form" v-model="valid" @submit.prevent="updateUser()">
         <!-- error alerts -->
-        <v-alert
-          v-if="error"
-          v-model="alert"
-          type="error"
-          dismissible
-        >
+        <v-alert v-if="error" v-model="alert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
@@ -60,12 +48,7 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn
-            class="mt-2"
-            color="primary"
-            type="submit"
-            :disabled="progress"
-          >
+          <v-btn class="mt-2" color="primary" type="submit" :disabled="progress">
             Update
           </v-btn>
         </v-card-actions>

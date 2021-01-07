@@ -7,16 +7,7 @@
     <v-container>
       <v-tooltip top>
         <template #activator="{ on, attrs }">
-          <v-btn
-            color="#db3236"
-            class="mr-2"
-            v-bind="attrs"
-            fab
-            dark
-            small
-            v-on="on"
-            @click="loginWithGoogle()"
-          >
+          <v-btn color="#db3236" class="mr-2" v-bind="attrs" fab dark small v-on="on" @click="loginWithGoogle()">
             <v-icon>mdi-google</v-icon>
           </v-btn>
         </template>
@@ -26,16 +17,7 @@
 
       <v-tooltip top>
         <template #activator="{ on, attrs }">
-          <v-btn
-            color="#3b5998"
-            class="mr-2"
-            v-bind="attrs"
-            fab
-            dark
-            small
-            v-on="on"
-            @click="loginWithFacebook()"
-          >
+          <v-btn color="#3b5998" class="mr-2" v-bind="attrs" fab dark small v-on="on" @click="loginWithFacebook()">
             <v-icon>mdi-facebook</v-icon>
           </v-btn>
         </template>
@@ -45,15 +27,7 @@
 
       <v-tooltip top>
         <template #activator="{ on, attrs }">
-          <v-btn
-            color="primary"
-            v-bind="attrs"
-            fab
-            dark
-            small
-            v-on="on"
-            @click="loginWithPhone()"
-          >
+          <v-btn color="primary" v-bind="attrs" fab dark small v-on="on" @click="loginWithPhone()">
             <v-icon>phone</v-icon>
           </v-btn>
         </template>
@@ -62,10 +36,7 @@
       </v-tooltip>
     </v-container>
 
-    <v-dialog
-      v-model="dialog"
-      width="500"
-    >
+    <v-dialog v-model="dialog" width="500">
       <div id="recaptcha-container" />
 
       <!-- phone authentication provider: enter phone number -->
@@ -76,10 +47,7 @@
 
         <v-card-text>
           <v-container fluid>
-            <v-row
-              align="center"
-              justify="center"
-            >
+            <v-row align="center" justify="center">
               <v-col>
                 <v-text-field
                   v-model="phoneNumber"
@@ -91,12 +59,7 @@
               </v-col>
 
               <v-col>
-                <v-btn
-                  color="primary"
-                  outlined
-                  :disabled="progress"
-                  @click="sendCode()"
-                >
+                <v-btn color="primary" outlined :disabled="progress" @click="sendCode()">
                   Send Code
                 </v-btn>
               </v-col>
@@ -113,10 +76,7 @@
 
         <v-card-text>
           <v-container fluid>
-            <v-row
-              align="center"
-              justify="center"
-            >
+            <v-row align="center" justify="center">
               <v-col>
                 <v-text-field
                   v-model="confirmationCode"
@@ -127,12 +87,7 @@
               </v-col>
 
               <v-col>
-                <v-btn
-                  color="primary"
-                  outlined
-                  :disabled="progress"
-                  @click="confirmCode()"
-                >
+                <v-btn color="primary" outlined :disabled="progress" @click="confirmCode()">
                   Confirm Code
                 </v-btn>
               </v-col>
