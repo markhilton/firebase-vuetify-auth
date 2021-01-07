@@ -23,8 +23,8 @@
     "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/authentication-guard.min.js"
   },
   "dependencies": {
-    "firebase": "^8.2.1",
-    "vuetify": "^2.4.1"
+    "firebase": ">=8.0.0",
+    "vuetify": ">=2.0.0"
   },
   "devDependencies": {
     "@mdi/font": "^5.7.55",
@@ -38,10 +38,12 @@
     "@vue/cli-service": "^4.5.7",
     "@vue/eslint-config-prettier": "^5.0.0",
     "babel-eslint": "^10.1.0",
+    "css-loader": "^5.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-vue": "^5.0.0",
+    "postcss": "^8.2.3",
     "prettier": "^1.18.2",
     "rollup": "^2.30.0",
     "rollup-plugin-postcss": "^3.1.8",
@@ -62,14 +64,8 @@
   },
   "browserslist": [
     "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
+    "last 2 versions"
   ],
-  "babel": {
-    "presets": [
-      "@vue/cli-plugin-babel/preset"
-    ]
-  },
   "env": {
     "es6": true,
     "browser": true
