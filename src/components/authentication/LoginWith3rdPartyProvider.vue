@@ -1,9 +1,9 @@
 <template>
-  <v-container class="text-center ma-0 pa-0" v-if="google || facebook || phone">
+  <v-container v-if="google || facebook || phone" class="text-center ma-0 pa-0">
     <div class="caption">or login with</div>
 
     <v-container>
-      <v-tooltip top v-if="google">
+      <v-tooltip v-if="google" top>
         <template #activator="{ on, attrs }">
           <v-btn color="#db3236" class="mr-2" v-bind="attrs" fab dark small v-on="on" @click="loginWithGoogle()">
             <v-icon>mdi-google</v-icon>
@@ -13,7 +13,7 @@
         <span>Google Gmail Account</span>
       </v-tooltip>
 
-      <v-tooltip top v-if="facebook">
+      <v-tooltip v-if="facebook" top>
         <template #activator="{ on, attrs }">
           <v-btn color="#3b5998" class="mr-2" v-bind="attrs" fab dark small v-on="on" @click="loginWithFacebook()">
             <v-icon>mdi-facebook</v-icon>
@@ -23,7 +23,7 @@
         <span>Facebook Account</span>
       </v-tooltip>
 
-      <v-tooltip top v-if="phone">
+      <v-tooltip v-if="phone" top>
         <template #activator="{ on, attrs }">
           <v-btn color="primary" v-bind="attrs" fab dark small v-on="on" @click="loginWithPhone()">
             <v-icon>phone</v-icon>

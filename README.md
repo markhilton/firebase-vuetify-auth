@@ -161,13 +161,14 @@ After following implementation instruction requests to protected views, should r
 
 ## Available props
 
-| Prop         | Type    | Default | Description                              |
-| ------------ | ------- | ------- | ---------------------------------------- |
-| firebase     | Object  | null    | Firebase middleware                      |
-| registration | Boolean | true    | allow new user registrations             |
-| google       | Boolean | true    | allow users to singin using gmail        |
-| facebook     | Boolean | true    | allow users to singin using facebook     |
-| phone        | Boolean | true    | allow users to singin using phone number |
+| Prop         | Type             | Default | Description                                                                             |
+| ------------ | ---------------- | ------- | --------------------------------------------------------------------------------------- |
+| firebase     | Object           | null    | Firebase middleware                                                                     |
+| registration | Boolean          | true    | allow new user registrations                                                            |
+| google       | Boolean          | true    | allow users to singin using gmail                                                       |
+| facebook     | Boolean          | true    | allow users to singin using facebook                                                    |
+| phone        | Boolean          | true    | allow users to singin using phone number                                                |
+| verification | Boolean or array | true    | require email verification to sign in for all accounts or for specific domains in array |
 
 ## Events
 

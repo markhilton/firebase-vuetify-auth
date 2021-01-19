@@ -46,7 +46,7 @@
           </v-tabs-items>
         </div>
 
-        <v-card-actions>
+        <v-card-actions v-if="!emailVerificationRequired">
           <LoginWith3rdPartyProvider :google="google" :facebook="facebook" :phone="phone" />
         </v-card-actions>
       </v-card>
@@ -91,6 +91,9 @@ export default {
       type: Boolean,
       default: true,
     },
+    verification: {
+      default: true,
+    },
   },
 
   data: () => ({
@@ -110,12 +113,28 @@ export default {
       let isAuthenticated = user && user.uid ? true : false
 
       if (isAuthenticated) {
-        emailVerified = user.emailVerified
+        emailVerified = user.emailVerified || false
 
-        if (!user.emailVerified) this.emailVerificationRequired = true
+        const domain = user.email.split("@")[1]
+
+        // check if email verification is required
+        if (this.verification !== false) {
+          // check if verification prop is an array
+          if (Array.isArray(this.verification)) {
+            // check if user email domain is listed as required validation
+            if (this.verification.includes(domain)) {
+              this.emailVerificationRequired = true
+            }
+          }
+
+          // check if user email is verified
+          else if (emailVerified !== true) {
+            this.emailVerificationRequired = true
+          }
+        }
       }
 
-      this.$emit("isAuthenticated", emailVerified)
+      this.$emit("isAuthenticated", !this.emailVerificationRequired)
     })
   },
 

@@ -42,6 +42,7 @@
           :google="true"
           :facebook="false"
           :phone="false"
+          :verification="true"
           @isAuthenticated="isAuthenticated = $event"
         />
       </v-main>

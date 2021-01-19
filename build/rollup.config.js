@@ -12,6 +12,7 @@ export default {
     exports: "named",
     globals: {
       vue: "vue",
+      "@mdi/font": "@mdi/font",
       "vuetify/lib": "vuetify/lib",
       "@/middleware": "./src/middleware",
     },

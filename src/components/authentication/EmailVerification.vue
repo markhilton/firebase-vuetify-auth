@@ -49,12 +49,20 @@
         <div v-if="emailSent">
           <v-btn color="primary" @click="goToLogin"> Back to Login </v-btn>
         </div>
+
+        <!-- allow to log out in case user cannot confirm the email address -->
+        <v-container>
+          <div class="caption mb-2">- or -</div>
+          <v-btn color="primary" outlined @click="signOut"> Signout </v-btn>
+        </v-container>
       </div>
     </v-card>
   </v-container>
 </template>
 
 <script>
+import { firebase } from "../../middleware"
+
 export default {
   props: ["error", "isLoading"],
 
@@ -69,6 +77,9 @@ export default {
     },
     goToLogin() {
       this.$emit("signOut")
+    },
+    signOut() {
+      firebase.auth().signOut()
     },
   },
 }
