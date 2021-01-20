@@ -118,22 +118,14 @@ export default {
         const domain = user.email.split("@")[1]
 
         // check if email verification is required
-        if (this.verification !== false) {
-          // check if verification prop is an array
-          if (Array.isArray(this.verification)) {
-            // check if user email domain is listed as required validation
-            if (this.verification.includes(domain)) {
-              this.emailVerificationRequired = true
-            }
-          }
-
-          // check if user email is verified
-          else if (emailVerified !== true) {
-            this.emailVerificationRequired = true
-          }
+        if (this.verification === false || (Array.isArray(this.verification) && !this.verification.includes(domain))) {
+          emailVerified = true
+          console.log("emailVerified", emailVerified)
         }
 
-        this.$emit("isAuthenticated", !this.emailVerificationRequired)
+        if (this.emailVerified !== true) this.emailVerificationRequired = true
+
+        this.$emit("isAuthenticated", emailVerified)
       } else this.$emit("isAuthenticated", false)
     })
   },

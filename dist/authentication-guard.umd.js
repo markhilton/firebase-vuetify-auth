@@ -4022,22 +4022,14 @@
           var domain = user.email.split("@")[1];
 
           // check if email verification is required
-          if (this$1.verification !== false) {
-            // check if verification prop is an array
-            if (Array.isArray(this$1.verification)) {
-              // check if user email domain is listed as required validation
-              if (this$1.verification.includes(domain)) {
-                this$1.emailVerificationRequired = true;
-              }
-            }
-
-            // check if user email is verified
-            else if (emailVerified !== true) {
-              this$1.emailVerificationRequired = true;
-            }
+          if (this$1.verification === false || (Array.isArray(this$1.verification) && !this$1.verification.includes(domain))) {
+            emailVerified = true;
+            console.log("emailVerified", emailVerified);
           }
 
-          this$1.$emit("isAuthenticated", !this$1.emailVerificationRequired);
+          if (this$1.emailVerified !== true) { this$1.emailVerificationRequired = true; }
+
+          this$1.$emit("isAuthenticated", emailVerified);
         } else { this$1.$emit("isAuthenticated", false); }
       });
     },
