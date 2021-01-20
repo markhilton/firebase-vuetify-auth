@@ -4032,9 +4032,9 @@ var script$6 = {
             this$1.emailVerificationRequired = true;
           }
         }
-      }
 
-      this$1.$emit("isAuthenticated", !this$1.emailVerificationRequired);
+        this$1.$emit("isAuthenticated", !this$1.emailVerificationRequired);
+      } else { this$1.$emit("isAuthenticated", false); }
     });
   },
 
