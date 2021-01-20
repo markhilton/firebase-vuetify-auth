@@ -37,7 +37,6 @@
     "@vue/cli-plugin-router": "^4.5.7",
     "@vue/cli-plugin-vuex": "^4.5.7",
     "@vue/cli-service": "^4.5.7",
-    "@vue/compiler-sfc": "^3.0.5",
     "@vue/eslint-config-prettier": "^6.0.0",
     "babel-eslint": "^10.1.0",
     "clean-publish": "^1.1.8",
@@ -56,11 +55,6 @@
     "vue-router": "^3.4.6",
     "vue-template-compiler": "^2.6.12",
     "vuetify-loader": "^1.6.0"
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
   },
   "browserslist": [
     "> 1%",
