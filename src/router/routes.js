@@ -6,6 +6,11 @@ export default [
     component: () => import(/* webpackChunkName: "home" */ "@/views/Home"),
   },
   {
+    name: "Login",
+    path: "/login",
+    component: () => import(/* webpackChunkName: "login" */ "@/views/Login"),
+  },
+  {
     path: "/public",
     component: () => import(/* webpackChunkName: "public" */ "@/views/Public"),
   },

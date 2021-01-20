@@ -20,6 +20,27 @@ This package assumes your VUE project is already integrated with Firebase:
 1. `.env` file containing Firebase application environment variables is set up
 2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase SDK
 
+example: 
+
+```javascript
+import firebase from "firebase/app"
+import "firebase/auth"
+
+const config = {
+  appId: process.env.VUE_APP_FIREBASE_APP_ID,
+  apiKey: process.env.VUE_APP_FIREBASE_APIKEY,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH,
+  databaseURL: process.env.VUE_APP_FIREBASE_DATABASE,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT,
+  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE,
+  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING,
+  measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID,
+}
+
+// export default firebase
+export default !firebase.apps.length ? firebase.initializeApp(config) : firebase.app()
+```
+
 ## Install
 
 ```bash
@@ -39,10 +60,14 @@ import firebase from "./src/middleware/firebase"
 
 export default (to, from, next) => {
   const user = firebase.auth().currentUser
+  const isAuthenticated = user && user.uid ? true : false
 
-  if (user && user.uid) next()
+  if (isAuthenticated) next()
+  else next({ name: "Login" })
 }
 ```
+
+This guard middleware will redirect current route to "Login" page route if requested route is protected and the user is not logged in.
 
 #### STEP 2: Update your `main.js` app file
 
@@ -64,75 +89,71 @@ firebase.auth().onAuthStateChanged(() => {
 }) // close onAuthStateChanged listener wrapper
 ```
 
-#### STEP 3: Update main VUE app view
+#### STEP 3: Create Login view template
 
-3. In your main `App.vue` implement conditional logic for authenticated and non-authenticated users view.
-   This example illustrates how to pass firebase middleware into the component and capture event when user auth state changes into `isAuthenticated` property.
+3. Create a login view `Login.vue` to be served for not authenticated users.
 
 ```html
 <template>
   <v-app>
-    <!-- authenticated users view -->
-    <v-main v-if="isAuthenticated">
-      <router-view />
-    </v-main>
-
-    <!-- not authenticated users login / register view -->
-    <v-main v-if="!isAuthenticated">
-      <AuthenticationGuard :firebase="firebase" @isAuthenticated="isAuthenticated = $event" />
+    <v-main>
+      <AuthenticationGuard
+        :firebase="firebase"
+        :verification="true"
+        :registration="true"
+        :phone="false"
+        :google="true"
+        :facebook="false"
+      />
     </v-main>
   </v-app>
 </template>
 
 <script>
-  import firebase from "@/middleware/firebase"
-  import AuthenticationGuard from "@nerd305/firebase-vuetify-auth"
+import firebase from "./src/middleware/firebase"
+import AuthenticationGuard from "@nerd305/firebase-vuetify-auth"
 
-  export default {
-    name: "App",
+export default {
+  components: {
+    AuthenticationGuard,
+  },
 
-    components: {
-      AuthenticationGuard,
+  computed: {
+    // firebase middleware for Authentication Guard component
+    firebase() {
+      return firebase
     },
-
-    data: () => ({
-      // default authentication state
-      isAuthenticated: false,
-    }),
-
-    computed: {
-      // firebase middleware for Authentication Guard component
-      firebase() {
-        return firebase
-      },
-      // example authenticated user object or null
-      user() {
-        return firebase.auth().currentUser
-      },
-    },
-
-    methods: {
-      // example signout method
-      signOut() {
-        firebase.auth().signOut()
-      },
-    },
-  }
+  },
+}
 </script>
 ```
 
 #### STEP 4: Update vue router to protect desired routes
 
-Example of `router.js` implementation to protect specific route.
+Example of `router.js` implementation to define `/login` route for not authenticated users.
+Import your authentication guard middleware:
+
+```javascript
+import FirebaseAuthGuard from "./src/middleware/guard" 
+```
+
+and add `beforeEnter: FirebaseAuthGuard` for any route that would requre authentication.
+
+Full example: 
 
 ```javascript
 import Vue from "vue"
 import VueRouter from "vue-router"
-import FirebaseAuthGuard from "@/middleware/guard" // middleware guard created in STEP 1
+import FirebaseAuthGuard from "./src/middleware/guard" // middleware guard created in STEP 1
 
 Vue.use(VueRouter)
 
 const routes = [
+  {
+    name: "Login",
+    path: "/login",
+    component: () => import(/* webpackChunkName: "login" */ "@/views/Login"),
+  },
   {
     path: "/public", // this route is public, no `beforeEnter`
     name: "public",
@@ -155,6 +176,10 @@ const router = new VueRouter({
 export default router
 ```
 
+This will trigger `FirebaseAuthGuard` to be executed before entering `/protected` route, which will validate if the user 
+is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middeware
+will redirect the route to "Login" view, which has implemented `AuthenticationGuard` component and render the login use authentication page.
+
 ### Thats it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
@@ -164,11 +189,11 @@ After following implementation instruction requests to protected views, should r
 | Prop         | Type             | Default | Description                                                                             |
 | ------------ | ---------------- | ------- | --------------------------------------------------------------------------------------- |
 | firebase     | Object           | null    | Firebase middleware                                                                     |
+| verification | Boolean or array | true    | require email verification to sign in for all accounts or for specific domains in array |
 | registration | Boolean          | true    | allow new user registrations                                                            |
+| phone        | Boolean          | true    | allow users to singin using phone number                                                |
 | google       | Boolean          | true    | allow users to singin using gmail                                                       |
 | facebook     | Boolean          | true    | allow users to singin using facebook                                                    |
-| phone        | Boolean          | true    | allow users to singin using phone number                                                |
-| verification | Boolean or array | true    | require email verification to sign in for all accounts or for specific domains in array |
 
 ## Events
 
