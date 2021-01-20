@@ -3,7 +3,7 @@
     <v-app v-if="isAuthenticated">
       <v-app-bar app dark>
         <v-toolbar-title>
-          User: <v-chip>{{ user.displayName }}</v-chip>
+          User: <v-chip>{{ displayName }}</v-chip>
         </v-toolbar-title>
 
         <v-spacer />
@@ -73,11 +73,18 @@ export default {
     user() {
       return firebase.auth().currentUser
     },
+    displayName() {
+      return (this.user && this.user.displayName) || ""
+    },
   },
 
   methods: {
     signOut() {
-      firebase.auth().signOut()
+      firebase
+        .auth()
+        .signOut()
+        .then(() => console.log("User signed out!"))
+        .catch((error) => console.error("Failed to sign out the user!"))
     },
   },
 }

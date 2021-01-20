@@ -132,9 +132,9 @@ export default {
             this.emailVerificationRequired = true
           }
         }
-      }
 
-      this.$emit("isAuthenticated", !this.emailVerificationRequired)
+        this.$emit("isAuthenticated", !this.emailVerificationRequired)
+      } else this.$emit("isAuthenticated", false)
     })
   },
 
