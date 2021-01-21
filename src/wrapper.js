@@ -1,7 +1,10 @@
 /* eslint-env node */
 
+// Import router middleware
+import RouterMiddlewareGuard from "./components/authentication/authguard"
+
 // Import vue component
-import AuthenticationGuard from "./components/authentication"
+import AuthenticationGuard from "./components/authentication/Guard.vue"
 
 // Declare install function executed by Vue.use()
 export function install(Vue) {
@@ -29,4 +32,5 @@ if (typeof window !== "undefined") {
 if (GlobalVue) GlobalVue.use(plugin)
 
 // To allow use as module (npm/webpack/etc.) export component
-export default AuthenticationGuard
+export const AuthGuard = AuthenticationGuard
+export const AuthMiddleware = RouterMiddlewareGuard

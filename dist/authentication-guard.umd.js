@@ -1,8 +1,41 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vuetify/lib')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vuetify/lib'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global['vuetify/lib']));
-}(this, (function (exports, lib) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuetify/lib')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuetify/lib'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global.vue, global['vuetify/lib']));
+}(this, (function (exports, Vue, lib) { 'use strict';
+
+  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+  var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
+
+  function RouterMiddlewareGuard (to, from, next) {
+    var settings = Vue__default['default'].prototype.$authGuardSettings;
+    var firebase = settings.firebase || null;
+    var user = firebase.auth().currentUser;
+    var isAuthenticated = user && user.uid ? true : false;
+    var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
+
+    if (isAuthenticated) {
+      // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+
+      var emailVerified = user.emailVerified || false;
+      var domain = user.email.split("@")[1];
+
+      // check if email verification is always required or for some specific email domain(s) only
+      if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
+        emailVerified = true;
+      }
+
+      // check if to show dialog
+      Vue__default['default'].prototype.$authGuardSettings.dialog = !emailVerified;
+
+      return next()
+    } else {
+      // console.log("[ auth guard ]: user NOT authenticated")
+      Vue__default['default'].prototype.$authGuardSettings.dialog = true;
+      return next(false)
+    }
+  }
 
   //
   //
@@ -3969,36 +4002,20 @@
       VTabsItems: lib.VTabsItems,
       VCardActions: lib.VCardActions,
       VCard: lib.VCard,
-      VContainer: lib.VContainer
-    },
-
-    props: {
-      firebase: {
-        type: Object,
-        required: true,
-      },
-      registration: {
-        type: Boolean,
-        default: true,
-      },
-      google: {
-        type: Boolean,
-        default: true,
-      },
-      facebook: {
-        type: Boolean,
-        default: true,
-      },
-      phone: {
-        type: Boolean,
-        default: true,
-      },
-      verification: {
-        default: true,
-      },
+      VContainer: lib.VContainer,
+      VDialog: lib.VDialog
     },
 
     data: function () { return ({
+      dialog: false,
+
+      firebase: null,
+      registration: true,
+      verification: true,
+      google: false,
+      facebook: false,
+      phone: false,
+
       tab: 0,
       isLoading: false,
       loginError: null,
@@ -4008,29 +4025,42 @@
       emailVerificationRequired: false,
     }); },
 
-    mounted: function mounted() {
+    created: function created() {
       var this$1 = this;
 
-      // emit isAuthenticated when user auth state changes
+      // read package config settings
+      var settings = this.$authGuardSettings;
+
+      // turn on / off the dialog based on router middleware interceptor
+      this.dialog = Vue__default['default'].prototype.$authGuardSettings.dialog;
+
+      this.firebase = settings.firebase || null;
+      this.registration = typeof settings.registration !== "undefined" ? settings.registration : true;
+      this.phone = typeof settings.phone !== "undefined" ? settings.phone : false;
+      this.google = typeof settings.google !== "undefined" ? settings.google : true;
+      this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
+
       this.firebase.auth().onAuthStateChanged(function (user) {
-        var emailVerified = false;
         var isAuthenticated = user && user.uid ? true : false;
+        var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
 
         if (isAuthenticated) {
-          emailVerified = user.emailVerified || false;
+          // console.log("[ auth guard ]: authenticated user ID:", user.uid)
 
+          var emailVerified = user.emailVerified || false;
           var domain = user.email.split("@")[1];
 
-          // check if email verification is required
-          if (this$1.verification === false || (Array.isArray(this$1.verification) && !this$1.verification.includes(domain))) {
+          // check if email verification is always required or for some specific email domain(s) only
+          if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
             emailVerified = true;
-            console.log("emailVerified", emailVerified);
           }
 
-          if (this$1.emailVerified !== true) { this$1.emailVerificationRequired = true; }
-
-          this$1.$emit("isAuthenticated", emailVerified);
-        } else { this$1.$emit("isAuthenticated", false); }
+          // check if to show dialog
+          this$1.dialog = !emailVerified;
+        } else {
+          // console.log("[ auth guard ]: user NOT authenticated")
+          this$1.dialog = true;
+        }
       });
     },
 
@@ -4054,6 +4084,7 @@
         this.firebase
           .auth()
           .signInWithEmailAndPassword(email, password)
+          .then(function () { return (Vue__default['default'].prototype.$authGuardSettings.dialog = false); })
           .catch(function (error) { return (this$1.loginError = error); })
           .finally(function () { return (this$1.isLoading = false); });
       },
@@ -4118,8 +4149,15 @@
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
     return _c(
-      "v-container",
-      { attrs: { "fill-height": "" } },
+      "v-dialog",
+      {
+        attrs: {
+          value: _vm.dialog,
+          persistent: "",
+          "overlay-opacity": "0.95",
+          "content-class": "elevation-0"
+        }
+      },
       [
         _c(
           "v-container",
@@ -4337,7 +4375,12 @@
 
   if (GlobalVue) { GlobalVue.use(plugin); }
 
-  exports.default = __vue_component__$6;
+  // To allow use as module (npm/webpack/etc.) export component
+  var AuthGuard = __vue_component__$6;
+  var AuthMiddleware = RouterMiddlewareGuard;
+
+  exports.AuthGuard = AuthGuard;
+  exports.AuthMiddleware = AuthMiddleware;
   exports.install = install;
 
   Object.defineProperty(exports, '__esModule', { value: true });

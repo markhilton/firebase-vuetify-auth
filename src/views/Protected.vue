@@ -66,6 +66,8 @@ export default {
     },
     alert: true,
     valid: false,
+    error: null,
+    progress: false,
   }),
 
   computed: {
@@ -89,8 +91,11 @@ export default {
     },
   },
 
-  mounted() {
-    this.form.name = this.user.displayName
+  created() {
+    const firebase = this.$authGuardSettings.firebase
+    const user = firebase.auth().currentUser
+
+    this.form.name = (user && user.displayName) || null
   },
 
   methods: {

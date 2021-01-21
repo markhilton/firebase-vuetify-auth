@@ -4,11 +4,7 @@ export default [
   {
     path: "/",
     component: () => import(/* webpackChunkName: "home" */ "@/views/Home"),
-  },
-  {
-    name: "Login",
-    path: "/login",
-    component: () => import(/* webpackChunkName: "login" */ "@/views/Login"),
+    beforeEnter: AuthGuard,
   },
   {
     path: "/public",

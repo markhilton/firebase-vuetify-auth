@@ -1,4 +1,34 @@
+import Vue from 'vue';
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
+
+function RouterMiddlewareGuard (to, from, next) {
+  var settings = Vue.prototype.$authGuardSettings;
+  var firebase = settings.firebase || null;
+  var user = firebase.auth().currentUser;
+  var isAuthenticated = user && user.uid ? true : false;
+  var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
+
+  if (isAuthenticated) {
+    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+
+    var emailVerified = user.emailVerified || false;
+    var domain = user.email.split("@")[1];
+
+    // check if email verification is always required or for some specific email domain(s) only
+    if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
+      emailVerified = true;
+    }
+
+    // check if to show dialog
+    Vue.prototype.$authGuardSettings.dialog = !emailVerified;
+
+    return next()
+  } else {
+    // console.log("[ auth guard ]: user NOT authenticated")
+    Vue.prototype.$authGuardSettings.dialog = true;
+    return next(false)
+  }
+}
 
 //
 //
@@ -3965,36 +3995,20 @@ var script$6 = {
     VTabsItems: VTabsItems,
     VCardActions: VCardActions,
     VCard: VCard,
-    VContainer: VContainer
-  },
-
-  props: {
-    firebase: {
-      type: Object,
-      required: true,
-    },
-    registration: {
-      type: Boolean,
-      default: true,
-    },
-    google: {
-      type: Boolean,
-      default: true,
-    },
-    facebook: {
-      type: Boolean,
-      default: true,
-    },
-    phone: {
-      type: Boolean,
-      default: true,
-    },
-    verification: {
-      default: true,
-    },
+    VContainer: VContainer,
+    VDialog: VDialog
   },
 
   data: function () { return ({
+    dialog: false,
+
+    firebase: null,
+    registration: true,
+    verification: true,
+    google: false,
+    facebook: false,
+    phone: false,
+
     tab: 0,
     isLoading: false,
     loginError: null,
@@ -4004,29 +4018,42 @@ var script$6 = {
     emailVerificationRequired: false,
   }); },
 
-  mounted: function mounted() {
+  created: function created() {
     var this$1 = this;
 
-    // emit isAuthenticated when user auth state changes
+    // read package config settings
+    var settings = this.$authGuardSettings;
+
+    // turn on / off the dialog based on router middleware interceptor
+    this.dialog = Vue.prototype.$authGuardSettings.dialog;
+
+    this.firebase = settings.firebase || null;
+    this.registration = typeof settings.registration !== "undefined" ? settings.registration : true;
+    this.phone = typeof settings.phone !== "undefined" ? settings.phone : false;
+    this.google = typeof settings.google !== "undefined" ? settings.google : true;
+    this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
+
     this.firebase.auth().onAuthStateChanged(function (user) {
-      var emailVerified = false;
       var isAuthenticated = user && user.uid ? true : false;
+      var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
 
       if (isAuthenticated) {
-        emailVerified = user.emailVerified || false;
+        // console.log("[ auth guard ]: authenticated user ID:", user.uid)
 
+        var emailVerified = user.emailVerified || false;
         var domain = user.email.split("@")[1];
 
-        // check if email verification is required
-        if (this$1.verification === false || (Array.isArray(this$1.verification) && !this$1.verification.includes(domain))) {
+        // check if email verification is always required or for some specific email domain(s) only
+        if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
           emailVerified = true;
-          console.log("emailVerified", emailVerified);
         }
 
-        if (this$1.emailVerified !== true) { this$1.emailVerificationRequired = true; }
-
-        this$1.$emit("isAuthenticated", emailVerified);
-      } else { this$1.$emit("isAuthenticated", false); }
+        // check if to show dialog
+        this$1.dialog = !emailVerified;
+      } else {
+        // console.log("[ auth guard ]: user NOT authenticated")
+        this$1.dialog = true;
+      }
     });
   },
 
@@ -4050,6 +4077,7 @@ var script$6 = {
       this.firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
+        .then(function () { return (Vue.prototype.$authGuardSettings.dialog = false); })
         .catch(function (error) { return (this$1.loginError = error); })
         .finally(function () { return (this$1.isLoading = false); });
     },
@@ -4114,8 +4142,15 @@ var __vue_render__$6 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c(
-    "v-container",
-    { attrs: { "fill-height": "" } },
+    "v-dialog",
+    {
+      attrs: {
+        value: _vm.dialog,
+        persistent: "",
+        "overlay-opacity": "0.95",
+        "content-class": "elevation-0"
+      }
+    },
     [
       _c(
         "v-container",
@@ -4333,5 +4368,8 @@ if (typeof window !== "undefined") {
 
 if (GlobalVue) { GlobalVue.use(plugin); }
 
-export default __vue_component__$6;
-export { install };
+// To allow use as module (npm/webpack/etc.) export component
+var AuthGuard = __vue_component__$6;
+var AuthMiddleware = RouterMiddlewareGuard;
+
+export { AuthGuard, AuthMiddleware, install };

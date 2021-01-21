@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar v-if="isAuthenticated" app dark>
+    <v-app-bar app dark>
       <v-toolbar-title>
         User: <v-chip>{{ displayName }}</v-chip>
       </v-toolbar-title>
@@ -12,7 +12,7 @@
     </v-app-bar>
 
     <v-main>
-      <v-container v-if="isAuthenticated">
+      <v-container>
         <h1>Firebase Vuetify Auth</h1>
 
         <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
@@ -29,6 +29,9 @@
       <!-- v-router view -->
       <router-view />
     </v-main>
+
+    <!-- auth guard -->
+    <AuthenticationGuard />
   </v-app>
 </template>
 
@@ -43,10 +46,12 @@ export default {
       return firebase.auth().currentUser
     },
     displayName() {
-      return (this.user && this.user.displayName) || ""
-    },
-    isAuthenticated() {
-      return this.user && this.user.uid ? true : false
+      if (!this.user) return null
+
+      const userEmail = (this.user && this.user.email) || null
+      const displayName = (this.user && this.user.displayName) || null
+
+      return displayName ? displayName : userEmail
     },
   },
 

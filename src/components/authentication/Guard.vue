@@ -1,5 +1,5 @@
 <template>
-  <v-container fill-height>
+  <v-dialog :value="dialog" persistent overlay-opacity="0.95" content-class="elevation-0">
     <v-container style="max-width: 500px" class="mb-5">
       <v-card flat outlined>
         <v-progress-linear :indeterminate="isLoading" />
@@ -51,10 +51,11 @@
         </v-card-actions>
       </v-card>
     </v-container>
-  </v-container>
+  </v-dialog>
 </template>
 
 <script>
+import Vue from "vue"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
@@ -70,33 +71,16 @@ export default {
     LoginWith3rdPartyProvider,
   },
 
-  props: {
-    firebase: {
-      type: Object,
-      required: true,
-    },
-    registration: {
-      type: Boolean,
-      default: true,
-    },
-    google: {
-      type: Boolean,
-      default: true,
-    },
-    facebook: {
-      type: Boolean,
-      default: true,
-    },
-    phone: {
-      type: Boolean,
-      default: true,
-    },
-    verification: {
-      default: true,
-    },
-  },
-
   data: () => ({
+    dialog: false,
+
+    firebase: null,
+    registration: true,
+    verification: true,
+    google: false,
+    facebook: false,
+    phone: false,
+
     tab: 0,
     isLoading: false,
     loginError: null,
@@ -106,27 +90,40 @@ export default {
     emailVerificationRequired: false,
   }),
 
-  mounted() {
-    // emit isAuthenticated when user auth state changes
+  created() {
+    // read package config settings
+    const settings = this.$authGuardSettings
+
+    // turn on / off the dialog based on router middleware interceptor
+    this.dialog = Vue.prototype.$authGuardSettings.dialog
+
+    this.firebase = settings.firebase || null
+    this.registration = typeof settings.registration !== "undefined" ? settings.registration : true
+    this.phone = typeof settings.phone !== "undefined" ? settings.phone : false
+    this.google = typeof settings.google !== "undefined" ? settings.google : true
+    this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
+
     this.firebase.auth().onAuthStateChanged((user) => {
-      let emailVerified = false
-      let isAuthenticated = user && user.uid ? true : false
+      const isAuthenticated = user && user.uid ? true : false
+      const verification = typeof settings.verification !== "undefined" ? settings.verification : true
 
       if (isAuthenticated) {
-        emailVerified = user.emailVerified || false
+        // console.log("[ auth guard ]: authenticated user ID:", user.uid)
 
+        let emailVerified = user.emailVerified || false
         const domain = user.email.split("@")[1]
 
-        // check if email verification is required
-        if (this.verification === false || (Array.isArray(this.verification) && !this.verification.includes(domain))) {
+        // check if email verification is always required or for some specific email domain(s) only
+        if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
           emailVerified = true
-          console.log("emailVerified", emailVerified)
         }
 
-        if (this.emailVerified !== true) this.emailVerificationRequired = true
-
-        this.$emit("isAuthenticated", emailVerified)
-      } else this.$emit("isAuthenticated", false)
+        // check if to show dialog
+        this.dialog = !emailVerified
+      } else {
+        // console.log("[ auth guard ]: user NOT authenticated")
+        this.dialog = true
+      }
     })
   },
 
@@ -146,6 +143,7 @@ export default {
       this.firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
+        .then(() => (Vue.prototype.$authGuardSettings.dialog = false))
         .catch((error) => (this.loginError = error))
         .finally(() => (this.isLoading = false))
     },
