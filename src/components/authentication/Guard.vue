@@ -143,7 +143,12 @@ export default {
       this.firebase
         .auth()
         .signInWithEmailAndPassword(email, password)
-        .then(() => (Vue.prototype.$authGuardSettings.dialog = false))
+        .then(() => {
+          Vue.prototype.$authGuardSettings.dialog = false
+
+          // this is needed to reload route that was not loaded if user was not authenticated
+          if (this.$router.currentRoute.name === null) this.$router.push(this.$router.currentRoute.path)
+        })
         .catch((error) => (this.loginError = error))
         .finally(() => (this.isLoading = false))
     },

@@ -78,7 +78,7 @@ const authGuardSettings = {
 }
 
 Vue.prototype.$authGuardSettings = authGuardSettings
-Vue.component("AuthGuard", AuthGuard)
+Vue.component("AuthenticationGuard", AuthGuard)
 
 // reload VUE app on Firebase auth state change
 firebase.auth().onAuthStateChanged(() => {
@@ -98,7 +98,7 @@ firebase.auth().onAuthStateChanged(() => {
 
 ```html
     [ ... ]
-    <AuthGuard />
+    <AuthenticationGuard />
   </v-app>
 </template>
 ```
