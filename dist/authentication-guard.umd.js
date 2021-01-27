@@ -1,41 +1,12 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuetify/lib'), require('@/wrapper')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuetify/lib', '@/wrapper'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global.vue, global['vuetify/lib']));
-}(this, (function (exports, Vue, lib) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vuetify/lib'), require('vue'), require('@/wrapper')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vuetify/lib', 'vue', '@/wrapper'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global['vuetify/lib'], global.vue));
+}(this, (function (exports, lib, Vue) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
-
-  function AuthMiddleware (to, from, next) {
-    var settings = Vue__default['default'].prototype.$authGuardSettings;
-    var firebase = settings.firebase || null;
-    var user = firebase.auth().currentUser;
-    var isAuthenticated = user && user.uid ? true : false;
-    var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
-
-    if (isAuthenticated) {
-      // console.log("[ auth guard ]: authenticated user ID:", user.uid)
-
-      var emailVerified = user.emailVerified || false;
-      var domain = user.email.split("@")[1];
-
-      // check if email verification is always required or for some specific email domain(s) only
-      if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-        emailVerified = true;
-      }
-
-      // check if to show dialog
-      Vue__default['default'].prototype.$authGuardSettings.dialog = !emailVerified;
-
-      return next()
-    } else {
-      // console.log("[ auth guard ]: user NOT authenticated")
-      Vue__default['default'].prototype.$authGuardSettings.dialog = true;
-      return next(false)
-    }
-  }
 
   //
   //
@@ -4354,6 +4325,35 @@
       undefined
     );
 
+  function AuthGuardMiddleware (to, from, next) {
+    var settings = Vue__default['default'].prototype.$authGuardSettings;
+    var firebase = settings.firebase || null;
+    var user = firebase.auth().currentUser;
+    var isAuthenticated = user && user.uid ? true : false;
+    var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
+
+    if (isAuthenticated) {
+      // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+
+      var emailVerified = user.emailVerified || false;
+      var domain = user.email.split("@")[1];
+
+      // check if email verification is always required or for some specific email domain(s) only
+      if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
+        emailVerified = true;
+      }
+
+      // check if to show dialog
+      Vue__default['default'].prototype.$authGuardSettings.dialog = !emailVerified;
+
+      return next()
+    } else {
+      // console.log("[ auth guard ]: user NOT authenticated")
+      Vue__default['default'].prototype.$authGuardSettings.dialog = true;
+      return next(false)
+    }
+  }
+
   /* eslint-env node */
 
   // Declare install function executed by Vue.use()
@@ -4384,10 +4384,11 @@
   // To allow use as module (npm/webpack/etc.) export component
   var wrapper = {
     install: install,
-    AuthMiddleware: AuthMiddleware,
-    AuthGuard: __vue_component__$6,
   };
 
+  var AuthMiddleware = AuthGuardMiddleware;
+
+  exports.AuthMiddleware = AuthMiddleware;
   exports.default = wrapper;
 
   Object.defineProperty(exports, '__esModule', { value: true });
