@@ -1,6 +1,5 @@
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
 import Vue from 'vue';
-import '@/wrapper';
 
 //
 //
@@ -949,6 +948,35 @@ __vue_render__$3._withStripped = true;
     undefined,
     undefined
   );
+
+function AuthGuardMiddleware (to, from, next) {
+  var settings = Vue.prototype.$authGuardSettings;
+  var firebase = settings.firebase || null;
+  var user = firebase.auth().currentUser;
+  var isAuthenticated = user && user.uid ? true : false;
+  var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
+
+  if (isAuthenticated) {
+    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+
+    var emailVerified = user.emailVerified || false;
+    var domain = user.email.split("@")[1];
+
+    // check if email verification is always required or for some specific email domain(s) only
+    if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
+      emailVerified = true;
+    }
+
+    // check if to show dialog
+    Vue.prototype.$authGuardSettings.dialog = !emailVerified;
+
+    return next()
+  } else {
+    // console.log("[ auth guard ]: user NOT authenticated")
+    Vue.prototype.$authGuardSettings.dialog = true;
+    return next(false)
+  }
+}
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -4318,35 +4346,6 @@ __vue_render__$6._withStripped = true;
     undefined,
     undefined
   );
-
-function AuthGuardMiddleware (to, from, next) {
-  var settings = Vue.prototype.$authGuardSettings;
-  var firebase = settings.firebase || null;
-  var user = firebase.auth().currentUser;
-  var isAuthenticated = user && user.uid ? true : false;
-  var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
-
-  if (isAuthenticated) {
-    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
-
-    var emailVerified = user.emailVerified || false;
-    var domain = user.email.split("@")[1];
-
-    // check if email verification is always required or for some specific email domain(s) only
-    if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-      emailVerified = true;
-    }
-
-    // check if to show dialog
-    Vue.prototype.$authGuardSettings.dialog = !emailVerified;
-
-    return next()
-  } else {
-    // console.log("[ auth guard ]: user NOT authenticated")
-    Vue.prototype.$authGuardSettings.dialog = true;
-    return next(false)
-  }
-}
 
 /* eslint-env node */
 
