@@ -77,8 +77,7 @@ const authGuardSettings = {
   facebook: false, // allow authentication with facebook account
 }
 
-Vue.prototype.$authGuardSettings = authGuardSettings
-Vue.component("AuthenticationGuard", AuthGuard)
+Vue.use(AuthGuard, authGuardSettings)
 
 // reload VUE app on Firebase auth state change
 firebase.auth().onAuthStateChanged(() => {

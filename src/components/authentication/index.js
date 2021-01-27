@@ -25,4 +25,11 @@
 
 import AuthenticationGuard from "./Guard.vue"
 
-export default AuthenticationGuard
+const AuthGuard = {
+  install(Vue, options) {
+    Vue.prototype.$authGuardSettings = options
+    Vue.component("AuthenticationGuard", AuthenticationGuard)
+  },
+}
+
+export default AuthGuard

@@ -3,7 +3,7 @@ import App from "@/App"
 import router from "@/router"
 import vuetify from "@/plugins/vuetify"
 import { firebase } from "@/middleware"
-import AuthenticationGuard from "@/components/authentication"
+import AuthGuard from "@/components/authentication"
 
 Vue.config.productionTip = false
 
@@ -17,8 +17,7 @@ const authGuardSettings = {
   facebook: false, // allow authentication with facebook account
 }
 
-Vue.prototype.$authGuardSettings = authGuardSettings
-Vue.component("AuthenticationGuard", AuthenticationGuard)
+Vue.use(AuthGuard, authGuardSettings)
 
 // reload VUE app on Firebase auth state change
 firebase.auth().onAuthStateChanged(() => {

@@ -7,11 +7,11 @@ import RouterMiddlewareGuard from "./components/authentication/authguard"
 import AuthenticationGuard from "./components/authentication/Guard.vue"
 
 // Declare install function executed by Vue.use()
-export function install(Vue) {
+export function install(Vue, options) {
   if (install.installed) return
 
   install.installed = true
-
+  Vue.prototype.$authGuardSettings = options
   Vue.component("AuthenticationGuard", AuthenticationGuard)
 }
 
