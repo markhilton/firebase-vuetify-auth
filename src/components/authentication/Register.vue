@@ -17,7 +17,7 @@
             required
             class="mr-2"
             label="Name"
-            prepend-icon="person"
+            prepend-icon="mdi-account"
             :rules="[rules.name]"
           />
 
@@ -26,7 +26,7 @@
             required
             class="mr-2"
             label="Email"
-            prepend-icon="email"
+            prepend-icon="mdi-email"
             :rules="[rules.email]"
           />
 
@@ -37,7 +37,7 @@
             class="mr-2"
             type="password"
             label="Password"
-            prepend-icon="lock"
+            prepend-icon="mdi-lock"
             :rules="[rules.password]"
           />
 
@@ -48,7 +48,7 @@
             class="mr-2"
             type="password"
             label="Confirm password"
-            prepend-icon="lock"
+            prepend-icon="mdi-lock"
             :rules="[rules.confirm]"
           />
         </v-card-text>

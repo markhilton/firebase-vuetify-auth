@@ -26,7 +26,7 @@
       <v-tooltip v-if="phone" top>
         <template #activator="{ on, attrs }">
           <v-btn color="primary" v-bind="attrs" fab dark small v-on="on" @click="loginWithPhone()">
-            <v-icon>phone</v-icon>
+            <v-icon>mdi-cellphone</v-icon>
           </v-btn>
         </template>
 
@@ -50,7 +50,7 @@
                   v-mask="phoneMask"
                   autocomplete="off"
                   label="Phone Number"
-                  prepend-icon="phone"
+                  prepend-icon="mdi-cellphone"
                 />
               </v-col>
 

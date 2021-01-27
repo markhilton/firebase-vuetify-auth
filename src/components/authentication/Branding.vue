@@ -3,7 +3,7 @@
     <v-list-item>
       <v-list-item-content>
         <v-list-item-title class="title">
-          <v-icon color="orange"> brightness_high </v-icon>
+          <v-icon :color="appIconColor">{{ appIcon }}</v-icon>
 
           {{ appTitle }}
         </v-list-item-title>
@@ -18,15 +18,21 @@
 </template>
 
 <script>
-/* eslint-env node */
+import Vue from "vue"
 
 export default {
   computed: {
+    appIcon() {
+      return Vue.prototype.$authGuardSettings.icon || "mdi-brightness-7"
+    },
+    appIconColor() {
+      return Vue.prototype.$authGuardSettings.iconColor || "orange"
+    },
     appTitle() {
-      return process.env.VUE_APP_TITLE
+      return Vue.prototype.$authGuardSettings.title || "Authenticate"
     },
     appSubTitle() {
-      return process.env.VUE_APP_SUBTITLE
+      return Vue.prototype.$authGuardSettings.subtitle || "Firebase Vuetify Authentication NPM package"
     },
   },
 }

@@ -19,7 +19,7 @@
             autocomplete="off"
             required
             label="User Display Name"
-            prepend-icon="person"
+            prepend-icon="mdi-account"
             :rules="[rules.name]"
           />
 
@@ -29,7 +29,7 @@
             required
             type="password"
             label="Set New Password"
-            prepend-icon="lock"
+            prepend-icon="mdi-lock"
             :rules="[rules.password]"
           />
 
@@ -40,7 +40,7 @@
             class="mr-2"
             type="password"
             label="Confirm Password"
-            prepend-icon="lock"
+            prepend-icon="mdi-lock"
             :rules="[rules.confirm]"
           />
         </v-card-text>

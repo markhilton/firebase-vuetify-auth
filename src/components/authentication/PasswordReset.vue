@@ -23,7 +23,7 @@
               :error="alert"
               class="mr-2"
               label="Email"
-              prepend-icon="person"
+              prepend-icon="mdi-account"
               :rules="[rules.email]"
             />
           </v-card-text>

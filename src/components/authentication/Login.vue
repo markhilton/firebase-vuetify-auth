@@ -17,7 +17,7 @@
             required
             class="mr-2"
             label="Email"
-            prepend-icon="person"
+            prepend-icon="mdi-account"
             :rules="[rules.email]"
           />
 
@@ -28,7 +28,7 @@
             name="password"
             type="password"
             label="Password"
-            prepend-icon="lock"
+            prepend-icon="mdi-lock"
             :rules="[rules.password]"
           />
 

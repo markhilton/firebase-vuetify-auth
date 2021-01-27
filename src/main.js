@@ -15,6 +15,10 @@ const authGuardSettings = {
   phone: false, // allow authentication with phone
   google: true, // allow authentication with gmail account
   facebook: false, // allow authentication with facebook account
+  title: "Authenticate",
+  subtitle: "Firebase Vuetify Authentication NPM package",
+  icon: "mdi-brightness-7", // authentication prompt icon
+  iconColor: "orange", // authentication prompt icon color
 }
 
 Vue.use(AuthGuard, authGuardSettings)

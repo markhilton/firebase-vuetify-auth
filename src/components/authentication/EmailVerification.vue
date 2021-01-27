@@ -18,13 +18,13 @@
         <!-- email confirmation required message -->
         <div v-if="!emailSent">
           <div class="display-1 grey--text mb-3">Verification Required</div>
-          <v-icon size="100" color="grey" class="ma-4"> verified_user </v-icon>
+          <v-icon size="100" color="grey" class="ma-4">mdi-account</v-icon>
         </div>
 
         <!-- email sent confirmation -->
         <div v-if="emailSent">
           <div class="display-1 grey--text mb-3">Email sent!</div>
-          <v-icon size="100" color="grey" class="ma-4"> mail </v-icon>
+          <v-icon size="100" color="grey" class="ma-4">mdi-email</v-icon>
         </div>
 
         <div class="grey--text text--darken-2 mb-7 body-2">
