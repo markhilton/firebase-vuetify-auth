@@ -8,28 +8,6 @@
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  /* eslint-env node */
-
   var script = {
     components: {
       VIcon: lib.VIcon,
@@ -41,11 +19,17 @@
     },
 
     computed: {
+      appIcon: function appIcon() {
+        return Vue__default['default'].prototype.$authGuardSettings.icon || "mdi-brightness-7"
+      },
+      appIconColor: function appIconColor() {
+        return Vue__default['default'].prototype.$authGuardSettings.iconColor || "orange"
+      },
       appTitle: function appTitle() {
-        return process.env.VUE_APP_TITLE
+        return Vue__default['default'].prototype.$authGuardSettings.title || "Authenticate"
       },
       appSubTitle: function appSubTitle() {
-        return process.env.VUE_APP_SUBTITLE
+        return Vue__default['default'].prototype.$authGuardSettings.subtitle || "Firebase Vuetify Authentication NPM package"
       },
     }
   };
@@ -147,8 +131,8 @@
                   "v-list-item-title",
                   { staticClass: "title" },
                   [
-                    _c("v-icon", { attrs: { color: "orange" } }, [
-                      _vm._v(" brightness_high ")
+                    _c("v-icon", { attrs: { color: _vm.appIconColor } }, [
+                      _vm._v(_vm._s(_vm.appIcon))
                     ]),
                     _vm._v("\n\n        " + _vm._s(_vm.appTitle) + "\n      ")
                   ],
@@ -318,7 +302,7 @@
                       attrs: {
                         required: "",
                         label: "Email",
-                        "prepend-icon": "person",
+                        "prepend-icon": "mdi-account",
                         rules: [_vm.rules.email]
                       },
                       model: {
@@ -337,7 +321,7 @@
                         name: "password",
                         type: "password",
                         label: "Password",
-                        "prepend-icon": "lock",
+                        "prepend-icon": "mdi-lock",
                         rules: [_vm.rules.password]
                       },
                       model: {
@@ -563,7 +547,7 @@
                       attrs: {
                         required: "",
                         label: "Name",
-                        "prepend-icon": "person",
+                        "prepend-icon": "mdi-account",
                         rules: [_vm.rules.name]
                       },
                       model: {
@@ -580,7 +564,7 @@
                       attrs: {
                         required: "",
                         label: "Email",
-                        "prepend-icon": "email",
+                        "prepend-icon": "mdi-email",
                         rules: [_vm.rules.email]
                       },
                       model: {
@@ -599,7 +583,7 @@
                         required: "",
                         type: "password",
                         label: "Password",
-                        "prepend-icon": "lock",
+                        "prepend-icon": "mdi-lock",
                         rules: [_vm.rules.password]
                       },
                       model: {
@@ -618,7 +602,7 @@
                         required: "",
                         type: "password",
                         label: "Confirm password",
-                        "prepend-icon": "lock",
+                        "prepend-icon": "mdi-lock",
                         rules: [_vm.rules.confirm]
                       },
                       model: {
@@ -828,7 +812,7 @@
                                 required: "",
                                 error: _vm.alert,
                                 label: "Email",
-                                "prepend-icon": "person",
+                                "prepend-icon": "mdi-account",
                                 rules: [_vm.rules.email]
                               },
                               model: {
@@ -3325,7 +3309,7 @@
                               staticClass: "ma-4",
                               attrs: { size: "100", color: "grey" }
                             },
-                            [_vm._v(" verified_user ")]
+                            [_vm._v("mdi-account")]
                           )
                         ],
                         1
@@ -3348,7 +3332,7 @@
                               staticClass: "ma-4",
                               attrs: { size: "100", color: "grey" }
                             },
-                            [_vm._v(" mail ")]
+                            [_vm._v("mdi-email")]
                           )
                         ],
                         1
@@ -3738,7 +3722,7 @@
                                       ),
                                       on
                                     ),
-                                    [_c("v-icon", [_vm._v("phone")])],
+                                    [_c("v-icon", [_vm._v("mdi-cellphone")])],
                                     1
                                   )
                                 ]
@@ -3747,7 +3731,7 @@
                           ],
                           null,
                           false,
-                          1503417056
+                          4126551563
                         )
                       },
                       [
@@ -3813,7 +3797,7 @@
                                           attrs: {
                                             autocomplete: "off",
                                             label: "Phone Number",
-                                            "prepend-icon": "phone"
+                                            "prepend-icon": "mdi-cellphone"
                                           },
                                           model: {
                                             value: _vm.phoneNumber,

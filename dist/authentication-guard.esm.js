@@ -1,28 +1,6 @@
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
 import Vue from 'vue';
 
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* eslint-env node */
-
 var script = {
   components: {
     VIcon: VIcon,
@@ -34,11 +12,17 @@ var script = {
   },
 
   computed: {
+    appIcon: function appIcon() {
+      return Vue.prototype.$authGuardSettings.icon || "mdi-brightness-7"
+    },
+    appIconColor: function appIconColor() {
+      return Vue.prototype.$authGuardSettings.iconColor || "orange"
+    },
     appTitle: function appTitle() {
-      return process.env.VUE_APP_TITLE
+      return Vue.prototype.$authGuardSettings.title || "Authenticate"
     },
     appSubTitle: function appSubTitle() {
-      return process.env.VUE_APP_SUBTITLE
+      return Vue.prototype.$authGuardSettings.subtitle || "Firebase Vuetify Authentication NPM package"
     },
   }
 };
@@ -140,8 +124,8 @@ var __vue_render__ = function() {
                 "v-list-item-title",
                 { staticClass: "title" },
                 [
-                  _c("v-icon", { attrs: { color: "orange" } }, [
-                    _vm._v(" brightness_high ")
+                  _c("v-icon", { attrs: { color: _vm.appIconColor } }, [
+                    _vm._v(_vm._s(_vm.appIcon))
                   ]),
                   _vm._v("\n\n        " + _vm._s(_vm.appTitle) + "\n      ")
                 ],
@@ -311,7 +295,7 @@ var __vue_render__$1 = function() {
                     attrs: {
                       required: "",
                       label: "Email",
-                      "prepend-icon": "person",
+                      "prepend-icon": "mdi-account",
                       rules: [_vm.rules.email]
                     },
                     model: {
@@ -330,7 +314,7 @@ var __vue_render__$1 = function() {
                       name: "password",
                       type: "password",
                       label: "Password",
-                      "prepend-icon": "lock",
+                      "prepend-icon": "mdi-lock",
                       rules: [_vm.rules.password]
                     },
                     model: {
@@ -556,7 +540,7 @@ var __vue_render__$2 = function() {
                     attrs: {
                       required: "",
                       label: "Name",
-                      "prepend-icon": "person",
+                      "prepend-icon": "mdi-account",
                       rules: [_vm.rules.name]
                     },
                     model: {
@@ -573,7 +557,7 @@ var __vue_render__$2 = function() {
                     attrs: {
                       required: "",
                       label: "Email",
-                      "prepend-icon": "email",
+                      "prepend-icon": "mdi-email",
                       rules: [_vm.rules.email]
                     },
                     model: {
@@ -592,7 +576,7 @@ var __vue_render__$2 = function() {
                       required: "",
                       type: "password",
                       label: "Password",
-                      "prepend-icon": "lock",
+                      "prepend-icon": "mdi-lock",
                       rules: [_vm.rules.password]
                     },
                     model: {
@@ -611,7 +595,7 @@ var __vue_render__$2 = function() {
                       required: "",
                       type: "password",
                       label: "Confirm password",
-                      "prepend-icon": "lock",
+                      "prepend-icon": "mdi-lock",
                       rules: [_vm.rules.confirm]
                     },
                     model: {
@@ -821,7 +805,7 @@ var __vue_render__$3 = function() {
                               required: "",
                               error: _vm.alert,
                               label: "Email",
-                              "prepend-icon": "person",
+                              "prepend-icon": "mdi-account",
                               rules: [_vm.rules.email]
                             },
                             model: {
@@ -3318,7 +3302,7 @@ var __vue_render__$4 = function() {
                             staticClass: "ma-4",
                             attrs: { size: "100", color: "grey" }
                           },
-                          [_vm._v(" verified_user ")]
+                          [_vm._v("mdi-account")]
                         )
                       ],
                       1
@@ -3341,7 +3325,7 @@ var __vue_render__$4 = function() {
                             staticClass: "ma-4",
                             attrs: { size: "100", color: "grey" }
                           },
-                          [_vm._v(" mail ")]
+                          [_vm._v("mdi-email")]
                         )
                       ],
                       1
@@ -3731,7 +3715,7 @@ var __vue_render__$5 = function() {
                                     ),
                                     on
                                   ),
-                                  [_c("v-icon", [_vm._v("phone")])],
+                                  [_c("v-icon", [_vm._v("mdi-cellphone")])],
                                   1
                                 )
                               ]
@@ -3740,7 +3724,7 @@ var __vue_render__$5 = function() {
                         ],
                         null,
                         false,
-                        1503417056
+                        4126551563
                       )
                     },
                     [
@@ -3806,7 +3790,7 @@ var __vue_render__$5 = function() {
                                         attrs: {
                                           autocomplete: "off",
                                           label: "Phone Number",
-                                          "prepend-icon": "phone"
+                                          "prepend-icon": "mdi-cellphone"
                                         },
                                         model: {
                                           value: _vm.phoneNumber,
