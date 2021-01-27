@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
+import '@/wrapper';
 
-function RouterMiddlewareGuard (to, from, next) {
+function AuthMiddleware (to, from, next) {
   var settings = Vue.prototype.$authGuardSettings;
   var firebase = settings.firebase || null;
   var user = firebase.auth().currentUser;
@@ -4350,13 +4351,13 @@ __vue_render__$6._withStripped = true;
 /* eslint-env node */
 
 // Declare install function executed by Vue.use()
-function install(Vue, options) {
+var install = function (Vue, options) {
   if (install.installed) { return }
 
   install.installed = true;
   Vue.prototype.$authGuardSettings = options;
   Vue.component("AuthenticationGuard", __vue_component__$6);
-}
+};
 
 // Create module definition for Vue.use()
 var plugin = {
@@ -4375,7 +4376,10 @@ if (typeof window !== "undefined") {
 if (GlobalVue) { GlobalVue.use(plugin); }
 
 // To allow use as module (npm/webpack/etc.) export component
-var AuthGuard = __vue_component__$6;
-var AuthMiddleware = RouterMiddlewareGuard;
+var wrapper = {
+  install: install,
+  AuthMiddleware: AuthMiddleware,
+  AuthGuard: __vue_component__$6,
+};
 
-export { AuthGuard, AuthMiddleware, install };
+export default wrapper;

@@ -3,7 +3,7 @@ import App from "@/App"
 import router from "@/router"
 import vuetify from "@/plugins/vuetify"
 import { firebase } from "@/middleware"
-import AuthGuard from "@/components/authentication"
+import AuthGuard from "./wrapper"
 
 Vue.config.productionTip = false
 

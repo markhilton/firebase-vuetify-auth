@@ -1,6 +1,6 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuetify/lib')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuetify/lib'], factory) :
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuetify/lib'), require('@/wrapper')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuetify/lib', '@/wrapper'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global.vue, global['vuetify/lib']));
 }(this, (function (exports, Vue, lib) { 'use strict';
 
@@ -8,7 +8,7 @@
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
 
-  function RouterMiddlewareGuard (to, from, next) {
+  function AuthMiddleware (to, from, next) {
     var settings = Vue__default['default'].prototype.$authGuardSettings;
     var firebase = settings.firebase || null;
     var user = firebase.auth().currentUser;
@@ -4357,13 +4357,13 @@
   /* eslint-env node */
 
   // Declare install function executed by Vue.use()
-  function install(Vue, options) {
+  var install = function (Vue, options) {
     if (install.installed) { return }
 
     install.installed = true;
     Vue.prototype.$authGuardSettings = options;
     Vue.component("AuthenticationGuard", __vue_component__$6);
-  }
+  };
 
   // Create module definition for Vue.use()
   var plugin = {
@@ -4382,12 +4382,13 @@
   if (GlobalVue) { GlobalVue.use(plugin); }
 
   // To allow use as module (npm/webpack/etc.) export component
-  var AuthGuard = __vue_component__$6;
-  var AuthMiddleware = RouterMiddlewareGuard;
+  var wrapper = {
+    install: install,
+    AuthMiddleware: AuthMiddleware,
+    AuthGuard: __vue_component__$6,
+  };
 
-  exports.AuthGuard = AuthGuard;
-  exports.AuthMiddleware = AuthMiddleware;
-  exports.install = install;
+  exports.default = wrapper;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
