@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="dialog" persistent overlay-opacity="0.95" content-class="elevation-0">
+  <v-dialog :value="showGuard" persistent overlay-opacity="0.95" content-class="elevation-0">
     <v-container style="max-width: 500px" class="mb-5">
       <v-card flat outlined>
         <v-progress-linear :indeterminate="isLoading" />
@@ -72,6 +72,7 @@ export default {
   },
 
   data: () => ({
+    showGuard: false,
     firebase: null,
     registration: true,
     verification: true,
@@ -88,13 +89,9 @@ export default {
     emailVerificationRequired: false,
   }),
 
-  computed: {
-    dialog() {
-      return Vue.prototype.$authGuardSettings.dialog || false
-    },
-  },
-
   created() {
+    this.showGuard = Vue.prototype.$authGuardSettings.dialog
+
     // read package config settings
     const settings = this.$authGuardSettings
 
@@ -121,8 +118,10 @@ export default {
 
         // check if to show dialog
         Vue.prototype.$authGuardSettings.dialog = !emailVerified
+        this.showGuard = !emailVerified
       } else {
         // console.log("[ auth guard ]: user NOT authenticated")
+        this.showGuard = true
         Vue.prototype.$authGuardSettings.dialog = true
       }
     })
@@ -145,8 +144,6 @@ export default {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
-          Vue.prototype.$authGuardSettings.dialog = false
-
           // this is needed to reload route that was not loaded if user was not authenticated
           if (this.$router.currentRoute.name === null) this.$router.push(this.$router.currentRoute.path)
         })

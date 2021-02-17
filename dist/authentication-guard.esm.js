@@ -3985,6 +3985,7 @@ var script$6 = {
   },
 
   data: function () { return ({
+    showGuard: false,
     firebase: null,
     registration: true,
     verification: true,
@@ -4001,13 +4002,11 @@ var script$6 = {
     emailVerificationRequired: false,
   }); },
 
-  computed: {
-    dialog: function dialog() {
-      return Vue.prototype.$authGuardSettings.dialog || false
-    },
-  },
-
   created: function created() {
+    var this$1 = this;
+
+    this.showGuard = Vue.prototype.$authGuardSettings.dialog;
+
     // read package config settings
     var settings = this.$authGuardSettings;
 
@@ -4034,8 +4033,10 @@ var script$6 = {
 
         // check if to show dialog
         Vue.prototype.$authGuardSettings.dialog = !emailVerified;
+        this$1.showGuard = !emailVerified;
       } else {
         // console.log("[ auth guard ]: user NOT authenticated")
+        this$1.showGuard = true;
         Vue.prototype.$authGuardSettings.dialog = true;
       }
     });
@@ -4062,8 +4063,6 @@ var script$6 = {
         .auth()
         .signInWithEmailAndPassword(email, password)
         .then(function () {
-          Vue.prototype.$authGuardSettings.dialog = false;
-
           // this is needed to reload route that was not loaded if user was not authenticated
           if (this$1.$router.currentRoute.name === null) { this$1.$router.push(this$1.$router.currentRoute.path); }
         })
@@ -4134,7 +4133,7 @@ var __vue_render__$6 = function() {
     "v-dialog",
     {
       attrs: {
-        value: _vm.dialog,
+        value: _vm.showGuard,
         persistent: "",
         "overlay-opacity": "0.95",
         "content-class": "elevation-0"

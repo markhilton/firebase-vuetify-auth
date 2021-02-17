@@ -3992,6 +3992,7 @@
     },
 
     data: function () { return ({
+      showGuard: false,
       firebase: null,
       registration: true,
       verification: true,
@@ -4008,13 +4009,11 @@
       emailVerificationRequired: false,
     }); },
 
-    computed: {
-      dialog: function dialog() {
-        return Vue__default['default'].prototype.$authGuardSettings.dialog || false
-      },
-    },
-
     created: function created() {
+      var this$1 = this;
+
+      this.showGuard = Vue__default['default'].prototype.$authGuardSettings.dialog;
+
       // read package config settings
       var settings = this.$authGuardSettings;
 
@@ -4041,8 +4040,10 @@
 
           // check if to show dialog
           Vue__default['default'].prototype.$authGuardSettings.dialog = !emailVerified;
+          this$1.showGuard = !emailVerified;
         } else {
           // console.log("[ auth guard ]: user NOT authenticated")
+          this$1.showGuard = true;
           Vue__default['default'].prototype.$authGuardSettings.dialog = true;
         }
       });
@@ -4069,8 +4070,6 @@
           .auth()
           .signInWithEmailAndPassword(email, password)
           .then(function () {
-            Vue__default['default'].prototype.$authGuardSettings.dialog = false;
-
             // this is needed to reload route that was not loaded if user was not authenticated
             if (this$1.$router.currentRoute.name === null) { this$1.$router.push(this$1.$router.currentRoute.path); }
           })
@@ -4141,7 +4140,7 @@
       "v-dialog",
       {
         attrs: {
-          value: _vm.dialog,
+          value: _vm.showGuard,
           persistent: "",
           "overlay-opacity": "0.95",
           "content-class": "elevation-0"
