@@ -4003,13 +4003,11 @@ var script$6 = {
 
   computed: {
     dialog: function dialog() {
-      return Vue.prototype.$authGuardSettings.dialog
+      return Vue.prototype.$authGuardSettings.dialog || false
     },
   },
 
   created: function created() {
-    var this$1 = this;
-
     // read package config settings
     var settings = this.$authGuardSettings;
 
@@ -4035,10 +4033,10 @@ var script$6 = {
         }
 
         // check if to show dialog
-        this$1.dialog = !emailVerified;
+        Vue.prototype.$authGuardSettings.dialog = !emailVerified;
       } else {
         // console.log("[ auth guard ]: user NOT authenticated")
-        this$1.dialog = true;
+        Vue.prototype.$authGuardSettings.dialog = true;
       }
     });
   },

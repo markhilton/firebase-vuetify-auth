@@ -4010,13 +4010,11 @@
 
     computed: {
       dialog: function dialog() {
-        return Vue__default['default'].prototype.$authGuardSettings.dialog
+        return Vue__default['default'].prototype.$authGuardSettings.dialog || false
       },
     },
 
     created: function created() {
-      var this$1 = this;
-
       // read package config settings
       var settings = this.$authGuardSettings;
 
@@ -4042,10 +4040,10 @@
           }
 
           // check if to show dialog
-          this$1.dialog = !emailVerified;
+          Vue__default['default'].prototype.$authGuardSettings.dialog = !emailVerified;
         } else {
           // console.log("[ auth guard ]: user NOT authenticated")
-          this$1.dialog = true;
+          Vue__default['default'].prototype.$authGuardSettings.dialog = true;
         }
       });
     },

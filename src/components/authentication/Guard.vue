@@ -90,7 +90,7 @@ export default {
 
   computed: {
     dialog() {
-      return Vue.prototype.$authGuardSettings.dialog
+      return Vue.prototype.$authGuardSettings.dialog || false
     },
   },
 
@@ -120,10 +120,10 @@ export default {
         }
 
         // check if to show dialog
-        this.dialog = !emailVerified
+        Vue.prototype.$authGuardSettings.dialog = !emailVerified
       } else {
         // console.log("[ auth guard ]: user NOT authenticated")
-        this.dialog = true
+        Vue.prototype.$authGuardSettings.dialog = true
       }
     })
   },
