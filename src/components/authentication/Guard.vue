@@ -72,8 +72,6 @@ export default {
   },
 
   data: () => ({
-    dialog: false,
-
     firebase: null,
     registration: true,
     verification: true,
@@ -90,12 +88,15 @@ export default {
     emailVerificationRequired: false,
   }),
 
+  computed: {
+    dialog() {
+      return Vue.prototype.$authGuardSettings.dialog
+    },
+  },
+
   created() {
     // read package config settings
     const settings = this.$authGuardSettings
-
-    // turn on / off the dialog based on router middleware interceptor
-    this.dialog = Vue.prototype.$authGuardSettings.dialog
 
     this.firebase = settings.firebase || null
     this.registration = typeof settings.registration !== "undefined" ? settings.registration : true

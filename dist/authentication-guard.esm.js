@@ -3985,8 +3985,6 @@ var script$6 = {
   },
 
   data: function () { return ({
-    dialog: false,
-
     firebase: null,
     registration: true,
     verification: true,
@@ -4003,14 +4001,17 @@ var script$6 = {
     emailVerificationRequired: false,
   }); },
 
+  computed: {
+    dialog: function dialog() {
+      return Vue.prototype.$authGuardSettings.dialog
+    },
+  },
+
   created: function created() {
     var this$1 = this;
 
     // read package config settings
     var settings = this.$authGuardSettings;
-
-    // turn on / off the dialog based on router middleware interceptor
-    this.dialog = Vue.prototype.$authGuardSettings.dialog;
 
     this.firebase = settings.firebase || null;
     this.registration = typeof settings.registration !== "undefined" ? settings.registration : true;
