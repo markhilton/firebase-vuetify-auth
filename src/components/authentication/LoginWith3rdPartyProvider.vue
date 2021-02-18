@@ -90,10 +90,11 @@
 </template>
 
 <script>
+import Vue from "vue"
 import firebase from "firebase/app"
 
 export default {
-  props: ["firebase", "google", "facebook", "phone"],
+  props: ["google", "facebook", "phone"],
 
   data: () => ({
     step: 1,
@@ -119,8 +120,8 @@ export default {
       return validation
     },
 
-    alert() {
-      return Boolean(this.error)
+    firebase() {
+      return Vue.prototype.$authGuardSettings.firebase
     },
   },
 
@@ -158,16 +159,12 @@ export default {
           this.codeAuth = res
         })
         .catch((error) => {
-          alert(error)
           this.step = 1
         })
     },
 
     confirmCode() {
-      this.codeAuth
-        .confirm(this.confirmationCode)
-        .then(() => (this.step = 1))
-        .catch((err) => alert(err))
+      this.codeAuth.confirm(this.confirmationCode).then(() => (this.step = 1))
     },
   },
 }
