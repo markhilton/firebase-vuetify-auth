@@ -8,7 +8,8 @@
       <v-spacer />
 
       <!-- sign in / sign out button -->
-      <v-btn outlined @click="signOut()"> Sign Out </v-btn>
+      <v-btn v-if="!user" outlined @click="$router.push('/').catch(() => {})"> Sign In </v-btn>
+      <v-btn v-else outlined @click="signOut()"> Sign Out </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -45,6 +46,7 @@ export default {
     user() {
       return firebase.auth().currentUser
     },
+
     displayName() {
       if (!this.user) return null
 

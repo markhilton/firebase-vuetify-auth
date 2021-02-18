@@ -1,61 +1,64 @@
 <template>
-  <v-dialog :value="showGuard" persistent overlay-opacity="0.95" content-class="elevation-0">
-    <v-container style="max-width: 500px" class="mb-5">
-      <v-card flat outlined>
-        <v-progress-linear :indeterminate="isLoading" />
+  <div>
+    <v-dialog v-model="showGuard" persistent overlay-opacity="0.95" content-class="elevation-0">
+      <v-container style="max-width: 500px" class="mb-5">
+        <v-card flat outlined>
+          <v-progress-linear :indeterminate="isLoading" />
 
-        <div v-if="emailVerificationRequired">
-          <EmailVerification
-            :error="verificationError"
-            :is-loading="isLoading"
-            @sendEmail="sendVerificationEmail"
-            @signOut="signOut"
-          />
-        </div>
+          <div v-if="emailVerificationRequired">
+            <EmailVerification
+              :error="verificationError"
+              :is-loading="isLoading"
+              @sendEmail="sendVerificationEmail"
+              @signOut="signOut"
+            />
+          </div>
 
-        <div v-else>
-          <v-tabs v-model="tab" grow>
-            <v-tab @click="showSignInTab"> Sign In </v-tab>
-            <v-tab v-if="!resetPassword && registration"> Register </v-tab>
-            <v-tab v-if="resetPassword || !registration"> Reset Password </v-tab>
-          </v-tabs>
+          <div v-else>
+            <v-tabs v-model="tab" grow>
+              <v-tab @click="showSignInTab"> Sign In </v-tab>
+              <v-tab v-if="!resetPassword && registration"> Register </v-tab>
+              <v-tab v-if="resetPassword || !registration"> Reset Password </v-tab>
+            </v-tabs>
 
-          <v-tabs-items v-model="tab">
-            <v-tab-item class="pt-5">
-              <Login
-                :firebase="firebase"
-                :error="loginError"
-                :is-loading="isLoading"
-                @credentials="loginWithEmail"
-                @resetPassword="emailPasswordResetLink"
-              />
-            </v-tab-item>
+            <v-tabs-items v-model="tab">
+              <v-tab-item class="pt-5">
+                <Login
+                  :firebase="firebase"
+                  :error="loginError"
+                  :is-loading="isLoading"
+                  @credentials="loginWithEmail"
+                  @resetPassword="emailPasswordResetLink"
+                />
+              </v-tab-item>
 
-            <v-tab-item v-if="!resetPassword && registration" class="pt-5">
-              <Register :error="registrationError" :is-loading="isLoading" @registration="registerUser" />
-            </v-tab-item>
+              <v-tab-item v-if="!resetPassword && registration" class="pt-5">
+                <Register :error="registrationError" :is-loading="isLoading" @registration="registerUser" />
+              </v-tab-item>
 
-            <v-tab-item v-if="resetPassword || !registration" class="pt-5">
-              <PasswordReset
-                :firebase="firebase"
-                :error="loginError"
-                :is-loading="isLoading"
-                @showSignInTab="showSignInTab"
-              />
-            </v-tab-item>
-          </v-tabs-items>
-        </div>
+              <v-tab-item v-if="resetPassword || !registration" class="pt-5">
+                <PasswordReset
+                  :firebase="firebase"
+                  :error="loginError"
+                  :is-loading="isLoading"
+                  @showSignInTab="showSignInTab"
+                />
+              </v-tab-item>
+            </v-tabs-items>
+          </div>
 
-        <v-card-actions v-if="!emailVerificationRequired">
-          <LoginWith3rdPartyProvider :google="google" :facebook="facebook" :phone="phone" />
-        </v-card-actions>
-      </v-card>
-    </v-container>
-  </v-dialog>
+          <v-card-actions v-if="!emailVerificationRequired">
+            <LoginWith3rdPartyProvider :google="google" :facebook="facebook" :phone="phone" />
+          </v-card-actions>
+        </v-card>
+      </v-container>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
 import Vue from "vue"
+import authCheck from "./authcheck"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
@@ -73,6 +76,7 @@ export default {
 
   data: () => ({
     showGuard: false,
+
     firebase: null,
     registration: true,
     verification: true,
@@ -89,9 +93,19 @@ export default {
     emailVerificationRequired: false,
   }),
 
-  created() {
-    this.showGuard = Vue.prototype.$authGuardSettings.dialog
+  computed: {
+    currentRoute() {
+      return this.$route.path
+    },
+  },
 
+  watch: {
+    currentRoute(val) {
+      this.checkRouterWhenReady()
+    },
+  },
+
+  created() {
     // read package config settings
     const settings = this.$authGuardSettings
 
@@ -101,33 +115,19 @@ export default {
     this.google = typeof settings.google !== "undefined" ? settings.google : true
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
 
-    this.firebase.auth().onAuthStateChanged((user) => {
-      const isAuthenticated = user && user.uid ? true : false
-      const verification = typeof settings.verification !== "undefined" ? settings.verification : true
-
-      if (isAuthenticated) {
-        // console.log("[ auth guard ]: authenticated user ID:", user.uid)
-
-        let emailVerified = user.emailVerified || false
-        const domain = user.email.split("@")[1]
-
-        // check if email verification is always required or for some specific email domain(s) only
-        if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-          emailVerified = true
-        }
-
-        // check if to show dialog
-        Vue.prototype.$authGuardSettings.dialog = !emailVerified
-        this.showGuard = !emailVerified
-      } else {
-        // console.log("[ auth guard ]: user NOT authenticated")
-        this.showGuard = true
-        Vue.prototype.$authGuardSettings.dialog = true
-      }
-    })
+    // monitor user auth state
+    this.firebase.auth().onAuthStateChanged(() => this.checkRouterWhenReady())
   },
 
   methods: {
+    //
+    checkRouterWhenReady() {
+      this.$authGuardSettings.router.onReady(() => {
+        // disable auth guard dialog if the current route beforeEnter is undefined
+        this.showGuard = typeof this.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false
+      })
+    },
+
     //
     showSignInTab() {
       this.resetPassword = false

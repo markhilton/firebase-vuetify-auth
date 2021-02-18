@@ -1,6 +1,35 @@
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
 import Vue from 'vue';
 
+function authCheck () {
+  var status = true;
+
+  var settings = Vue.prototype.$authGuardSettings;
+  var firebase = settings.firebase || null;
+  var user = firebase.auth().currentUser;
+  var isAuthenticated = user && user.uid ? true : false;
+  var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
+
+  if (isAuthenticated) {
+    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+
+    var emailVerified = user.emailVerified || false;
+    var domain = user.email.split("@")[1];
+
+    // check if email verification is always required or for some specific email domain(s) only
+    if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
+      emailVerified = true;
+    }
+
+    // check if to show dialog
+    status = !emailVerified;
+  }
+
+  // console.log("AUTH CHECK:", status)
+
+  return status
+}
+
 var script = {
   components: {
     VIcon: VIcon,
@@ -933,33 +962,9 @@ __vue_render__$3._withStripped = true;
     undefined
   );
 
+// dummy auth guard
 function AuthGuardMiddleware (to, from, next) {
-  var settings = Vue.prototype.$authGuardSettings;
-  var firebase = settings.firebase || null;
-  var user = firebase.auth().currentUser;
-  var isAuthenticated = user && user.uid ? true : false;
-  var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
-
-  if (isAuthenticated) {
-    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
-
-    var emailVerified = user.emailVerified || false;
-    var domain = user.email.split("@")[1];
-
-    // check if email verification is always required or for some specific email domain(s) only
-    if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-      emailVerified = true;
-    }
-
-    // check if to show dialog
-    Vue.prototype.$authGuardSettings.dialog = !emailVerified;
-
-    return next()
-  } else {
-    // console.log("[ auth guard ]: user NOT authenticated")
-    Vue.prototype.$authGuardSettings.dialog = true;
-    return next(false)
-  }
+  return next()
 }
 
 /*! *****************************************************************************
@@ -3986,6 +3991,7 @@ var script$6 = {
 
   data: function () { return ({
     showGuard: false,
+
     firebase: null,
     registration: true,
     verification: true,
@@ -4002,10 +4008,20 @@ var script$6 = {
     emailVerificationRequired: false,
   }); },
 
+  computed: {
+    currentRoute: function currentRoute() {
+      return this.$route.path
+    },
+  },
+
+  watch: {
+    currentRoute: function currentRoute(val) {
+      this.checkRouterWhenReady();
+    },
+  },
+
   created: function created() {
     var this$1 = this;
-
-    this.showGuard = Vue.prototype.$authGuardSettings.dialog;
 
     // read package config settings
     var settings = this.$authGuardSettings;
@@ -4016,33 +4032,21 @@ var script$6 = {
     this.google = typeof settings.google !== "undefined" ? settings.google : true;
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
 
-    this.firebase.auth().onAuthStateChanged(function (user) {
-      var isAuthenticated = user && user.uid ? true : false;
-      var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
-
-      if (isAuthenticated) {
-        // console.log("[ auth guard ]: authenticated user ID:", user.uid)
-
-        var emailVerified = user.emailVerified || false;
-        var domain = user.email.split("@")[1];
-
-        // check if email verification is always required or for some specific email domain(s) only
-        if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-          emailVerified = true;
-        }
-
-        // check if to show dialog
-        Vue.prototype.$authGuardSettings.dialog = !emailVerified;
-        this$1.showGuard = !emailVerified;
-      } else {
-        // console.log("[ auth guard ]: user NOT authenticated")
-        this$1.showGuard = true;
-        Vue.prototype.$authGuardSettings.dialog = true;
-      }
-    });
+    // monitor user auth state
+    this.firebase.auth().onAuthStateChanged(function () { return this$1.checkRouterWhenReady(); });
   },
 
   methods: {
+    //
+    checkRouterWhenReady: function checkRouterWhenReady() {
+      var this$1 = this;
+
+      this.$authGuardSettings.router.onReady(function () {
+        // disable auth guard dialog if the current route beforeEnter is undefined
+        this$1.showGuard = typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;
+      });
+    },
+
     //
     showSignInTab: function showSignInTab() {
       this.resetPassword = false;
@@ -4130,163 +4134,177 @@ var __vue_render__$6 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c(
-    "v-dialog",
-    {
-      attrs: {
-        value: _vm.showGuard,
-        persistent: "",
-        "overlay-opacity": "0.95",
-        "content-class": "elevation-0"
-      }
-    },
+    "div",
     [
       _c(
-        "v-container",
-        { staticClass: "mb-5", staticStyle: { "max-width": "500px" } },
+        "v-dialog",
+        {
+          attrs: {
+            persistent: "",
+            "overlay-opacity": "0.95",
+            "content-class": "elevation-0"
+          },
+          model: {
+            value: _vm.showGuard,
+            callback: function($$v) {
+              _vm.showGuard = $$v;
+            },
+            expression: "showGuard"
+          }
+        },
         [
           _c(
-            "v-card",
-            { attrs: { flat: "", outlined: "" } },
+            "v-container",
+            { staticClass: "mb-5", staticStyle: { "max-width": "500px" } },
             [
-              _c("v-progress-linear", {
-                attrs: { indeterminate: _vm.isLoading }
-              }),
-              _vm._v(" "),
-              _vm.emailVerificationRequired
-                ? _c(
-                    "div",
-                    [
-                      _c("EmailVerification", {
-                        attrs: {
-                          error: _vm.verificationError,
-                          "is-loading": _vm.isLoading
-                        },
-                        on: {
-                          sendEmail: _vm.sendVerificationEmail,
-                          signOut: _vm.signOut
-                        }
-                      })
-                    ],
-                    1
-                  )
-                : _c(
-                    "div",
-                    [
-                      _c(
-                        "v-tabs",
-                        {
-                          attrs: { grow: "" },
-                          model: {
-                            value: _vm.tab,
-                            callback: function($$v) {
-                              _vm.tab = $$v;
-                            },
-                            expression: "tab"
-                          }
-                        },
+              _c(
+                "v-card",
+                { attrs: { flat: "", outlined: "" } },
+                [
+                  _c("v-progress-linear", {
+                    attrs: { indeterminate: _vm.isLoading }
+                  }),
+                  _vm._v(" "),
+                  _vm.emailVerificationRequired
+                    ? _c(
+                        "div",
                         [
-                          _c("v-tab", { on: { click: _vm.showSignInTab } }, [
-                            _vm._v(" Sign In ")
-                          ]),
-                          _vm._v(" "),
-                          !_vm.resetPassword && _vm.registration
-                            ? _c("v-tab", [_vm._v(" Register ")])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.resetPassword || !_vm.registration
-                            ? _c("v-tab", [_vm._v(" Reset Password ")])
-                            : _vm._e()
+                          _c("EmailVerification", {
+                            attrs: {
+                              error: _vm.verificationError,
+                              "is-loading": _vm.isLoading
+                            },
+                            on: {
+                              sendEmail: _vm.sendVerificationEmail,
+                              signOut: _vm.signOut
+                            }
+                          })
                         ],
                         1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-tabs-items",
-                        {
-                          model: {
-                            value: _vm.tab,
-                            callback: function($$v) {
-                              _vm.tab = $$v;
-                            },
-                            expression: "tab"
-                          }
-                        },
+                      )
+                    : _c(
+                        "div",
                         [
                           _c(
-                            "v-tab-item",
-                            { staticClass: "pt-5" },
-                            [
-                              _c("Login", {
-                                attrs: {
-                                  firebase: _vm.firebase,
-                                  error: _vm.loginError,
-                                  "is-loading": _vm.isLoading
+                            "v-tabs",
+                            {
+                              attrs: { grow: "" },
+                              model: {
+                                value: _vm.tab,
+                                callback: function($$v) {
+                                  _vm.tab = $$v;
                                 },
-                                on: {
-                                  credentials: _vm.loginWithEmail,
-                                  resetPassword: _vm.emailPasswordResetLink
-                                }
-                              })
+                                expression: "tab"
+                              }
+                            },
+                            [
+                              _c(
+                                "v-tab",
+                                { on: { click: _vm.showSignInTab } },
+                                [_vm._v(" Sign In ")]
+                              ),
+                              _vm._v(" "),
+                              !_vm.resetPassword && _vm.registration
+                                ? _c("v-tab", [_vm._v(" Register ")])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.resetPassword || !_vm.registration
+                                ? _c("v-tab", [_vm._v(" Reset Password ")])
+                                : _vm._e()
                             ],
                             1
                           ),
                           _vm._v(" "),
-                          !_vm.resetPassword && _vm.registration
-                            ? _c(
+                          _c(
+                            "v-tabs-items",
+                            {
+                              model: {
+                                value: _vm.tab,
+                                callback: function($$v) {
+                                  _vm.tab = $$v;
+                                },
+                                expression: "tab"
+                              }
+                            },
+                            [
+                              _c(
                                 "v-tab-item",
                                 { staticClass: "pt-5" },
                                 [
-                                  _c("Register", {
-                                    attrs: {
-                                      error: _vm.registrationError,
-                                      "is-loading": _vm.isLoading
-                                    },
-                                    on: { registration: _vm.registerUser }
-                                  })
-                                ],
-                                1
-                              )
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.resetPassword || !_vm.registration
-                            ? _c(
-                                "v-tab-item",
-                                { staticClass: "pt-5" },
-                                [
-                                  _c("PasswordReset", {
+                                  _c("Login", {
                                     attrs: {
                                       firebase: _vm.firebase,
                                       error: _vm.loginError,
                                       "is-loading": _vm.isLoading
                                     },
-                                    on: { showSignInTab: _vm.showSignInTab }
+                                    on: {
+                                      credentials: _vm.loginWithEmail,
+                                      resetPassword: _vm.emailPasswordResetLink
+                                    }
                                   })
                                 ],
                                 1
-                              )
-                            : _vm._e()
+                              ),
+                              _vm._v(" "),
+                              !_vm.resetPassword && _vm.registration
+                                ? _c(
+                                    "v-tab-item",
+                                    { staticClass: "pt-5" },
+                                    [
+                                      _c("Register", {
+                                        attrs: {
+                                          error: _vm.registrationError,
+                                          "is-loading": _vm.isLoading
+                                        },
+                                        on: { registration: _vm.registerUser }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.resetPassword || !_vm.registration
+                                ? _c(
+                                    "v-tab-item",
+                                    { staticClass: "pt-5" },
+                                    [
+                                      _c("PasswordReset", {
+                                        attrs: {
+                                          firebase: _vm.firebase,
+                                          error: _vm.loginError,
+                                          "is-loading": _vm.isLoading
+                                        },
+                                        on: { showSignInTab: _vm.showSignInTab }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                : _vm._e()
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                  _vm._v(" "),
+                  !_vm.emailVerificationRequired
+                    ? _c(
+                        "v-card-actions",
+                        [
+                          _c("LoginWith3rdPartyProvider", {
+                            attrs: {
+                              google: _vm.google,
+                              facebook: _vm.facebook,
+                              phone: _vm.phone
+                            }
+                          })
                         ],
                         1
                       )
-                    ],
-                    1
-                  ),
-              _vm._v(" "),
-              !_vm.emailVerificationRequired
-                ? _c(
-                    "v-card-actions",
-                    [
-                      _c("LoginWith3rdPartyProvider", {
-                        attrs: {
-                          google: _vm.google,
-                          facebook: _vm.facebook,
-                          phone: _vm.phone
-                        }
-                      })
-                    ],
-                    1
-                  )
-                : _vm._e()
+                    : _vm._e()
+                ],
+                1
+              )
             ],
             1
           )
