@@ -3496,7 +3496,7 @@ var script$5 = {
     VDialog: VDialog
   },
 
-  props: ["firebase", "google", "facebook", "phone"],
+  props: ["google", "facebook", "phone"],
 
   data: function () { return ({
     step: 1,
@@ -3522,8 +3522,8 @@ var script$5 = {
       return validation
     },
 
-    alert: function alert() {
-      return Boolean(this.error)
+    firebase: function firebase() {
+      return Vue.prototype.$authGuardSettings.firebase
     },
   },
 
@@ -3563,7 +3563,6 @@ var script$5 = {
           this$1.codeAuth = res;
         })
         .catch(function (error) {
-          alert(error);
           this$1.step = 1;
         });
     },
@@ -3571,10 +3570,7 @@ var script$5 = {
     confirmCode: function confirmCode() {
       var this$1 = this;
 
-      this.codeAuth
-        .confirm(this.confirmationCode)
-        .then(function () { return (this$1.step = 1); })
-        .catch(function (err) { return alert(err); });
+      this.codeAuth.confirm(this.confirmationCode).then(function () { return (this$1.step = 1); });
     },
   }
 };
