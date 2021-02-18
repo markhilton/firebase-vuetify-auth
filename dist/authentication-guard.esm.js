@@ -1,5 +1,24 @@
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
 import Vue from 'vue';
+import Vuex from 'vuex';
+
+Vue.use(Vuex);
+
+var store = new Vuex.Store({
+  state: {
+    dialog: false,
+  },
+  getters: {
+    getDialog: function getDialog(state) {
+      return state.dialog
+    },
+  },
+  mutations: {
+    SET_DIALOG: function SET_DIALOG(state, val) {
+      state.dialog = val;
+    },
+  },
+});
 
 function authCheck () {
   var status = true;
@@ -25,7 +44,8 @@ function authCheck () {
     status = !emailVerified;
   }
 
-  // console.log("AUTH CHECK:", status)
+  store.commit("SET_DIALOG", status);
+  // console.log("AUTH CHECK:", store.getters.getDialog)
 
   return status
 }
@@ -962,9 +982,8 @@ __vue_render__$3._withStripped = true;
     undefined
   );
 
-// dummy auth guard
 function AuthGuardMiddleware (to, from, next) {
-  return next()
+  return authCheck() ? next(false) : next()
 }
 
 /*! *****************************************************************************
@@ -3990,6 +4009,7 @@ var script$6 = {
   },
 
   data: function () { return ({
+    persistent: true,
     showGuard: false,
 
     firebase: null,
@@ -4012,11 +4032,28 @@ var script$6 = {
     currentRoute: function currentRoute() {
       return this.$route.path
     },
+
+    dialog: function dialog() {
+      return store.getters.getDialog
+    },
   },
 
   watch: {
     currentRoute: function currentRoute(val) {
       this.checkRouterWhenReady();
+      // console.log("route", this.$route)
+    },
+
+    dialog: function dialog(status) {
+      this.showGuard = status;
+      this.persistent = false;
+    },
+
+    showGuard: function showGuard(status) {
+      if (!status) {
+        this.persistent = true;
+        store.commit("SET_DIALOG", false);
+      }
     },
   },
 
@@ -4033,7 +4070,10 @@ var script$6 = {
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
 
     // monitor user auth state
-    this.firebase.auth().onAuthStateChanged(function () { return this$1.checkRouterWhenReady(); });
+    this.firebase.auth().onAuthStateChanged(function (user) {
+      console.log("onAuthStateChanged", user);
+      this$1.checkRouterWhenReady();
+    });
   },
 
   methods: {
@@ -4042,8 +4082,12 @@ var script$6 = {
       var this$1 = this;
 
       this.$authGuardSettings.router.onReady(function () {
+        console.log("DIALOG CREATE:", this$1.dialog);
+
         // disable auth guard dialog if the current route beforeEnter is undefined
-        this$1.showGuard = typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;
+        this$1.showGuard =
+          this$1.$route.matched[0] && typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;
+        this$1.showGuard = this$1.dialog;
       });
     },
 
@@ -4140,7 +4184,7 @@ var __vue_render__$6 = function() {
         "v-dialog",
         {
           attrs: {
-            persistent: "",
+            persistent: _vm.persistent,
             "overlay-opacity": "0.95",
             "content-class": "elevation-0"
           },

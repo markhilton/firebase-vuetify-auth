@@ -1,12 +1,31 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vuetify/lib'), require('vue')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vuetify/lib', 'vue'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global['vuetify/lib'], global.vue));
-}(this, (function (exports, lib, Vue) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vuetify/lib'), require('vue'), require('vuex')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vuetify/lib', 'vue', 'vuex'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthenticationGuard = {}, global['vuetify/lib'], global.vue, global.vuex));
+}(this, (function (exports, lib, Vue, Vuex) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
+  var Vuex__default = /*#__PURE__*/_interopDefaultLegacy(Vuex);
+
+  Vue__default['default'].use(Vuex__default['default']);
+
+  var store = new Vuex__default['default'].Store({
+    state: {
+      dialog: false,
+    },
+    getters: {
+      getDialog: function getDialog(state) {
+        return state.dialog
+      },
+    },
+    mutations: {
+      SET_DIALOG: function SET_DIALOG(state, val) {
+        state.dialog = val;
+      },
+    },
+  });
 
   function authCheck () {
     var status = true;
@@ -32,7 +51,8 @@
       status = !emailVerified;
     }
 
-    // console.log("AUTH CHECK:", status)
+    store.commit("SET_DIALOG", status);
+    // console.log("AUTH CHECK:", store.getters.getDialog)
 
     return status
   }
@@ -969,9 +989,8 @@
       undefined
     );
 
-  // dummy auth guard
   function AuthGuardMiddleware (to, from, next) {
-    return next()
+    return authCheck() ? next(false) : next()
   }
 
   /*! *****************************************************************************
@@ -3997,6 +4016,7 @@
     },
 
     data: function () { return ({
+      persistent: true,
       showGuard: false,
 
       firebase: null,
@@ -4019,11 +4039,28 @@
       currentRoute: function currentRoute() {
         return this.$route.path
       },
+
+      dialog: function dialog() {
+        return store.getters.getDialog
+      },
     },
 
     watch: {
       currentRoute: function currentRoute(val) {
         this.checkRouterWhenReady();
+        // console.log("route", this.$route)
+      },
+
+      dialog: function dialog(status) {
+        this.showGuard = status;
+        this.persistent = false;
+      },
+
+      showGuard: function showGuard(status) {
+        if (!status) {
+          this.persistent = true;
+          store.commit("SET_DIALOG", false);
+        }
       },
     },
 
@@ -4040,7 +4077,10 @@
       this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
 
       // monitor user auth state
-      this.firebase.auth().onAuthStateChanged(function () { return this$1.checkRouterWhenReady(); });
+      this.firebase.auth().onAuthStateChanged(function (user) {
+        console.log("onAuthStateChanged", user);
+        this$1.checkRouterWhenReady();
+      });
     },
 
     methods: {
@@ -4049,8 +4089,12 @@
         var this$1 = this;
 
         this.$authGuardSettings.router.onReady(function () {
+          console.log("DIALOG CREATE:", this$1.dialog);
+
           // disable auth guard dialog if the current route beforeEnter is undefined
-          this$1.showGuard = typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;
+          this$1.showGuard =
+            this$1.$route.matched[0] && typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;
+          this$1.showGuard = this$1.dialog;
         });
       },
 
@@ -4147,7 +4191,7 @@
           "v-dialog",
           {
             attrs: {
-              persistent: "",
+              persistent: _vm.persistent,
               "overlay-opacity": "0.95",
               "content-class": "elevation-0"
             },

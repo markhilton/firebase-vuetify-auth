@@ -11,13 +11,14 @@ export default {
     exports: "named",
     globals: {
       vue: "vue",
+      vuex: "vuex",
       firebase: "firebase",
       "@mdi/font": "@mdi/font",
       "vuetify/lib": "vuetify/lib",
       "@/middleware": "./src/middleware",
     },
   },
-  external: ["vue", "vuetify/lib", "@mdi/font", "firebase"],
+  external: ["vue", "vuex", "vuetify/lib", "@mdi/font", "firebase"],
   plugins: [
     resolve(),
     commonjs({

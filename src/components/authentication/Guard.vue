@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="showGuard" persistent overlay-opacity="0.95" content-class="elevation-0">
+    <v-dialog v-model="showGuard" :persistent="persistent" overlay-opacity="0.95" content-class="elevation-0">
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
           <v-progress-linear :indeterminate="isLoading" />
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import Vue from "vue"
+import store from "../../store"
 import authCheck from "./authcheck"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
@@ -75,6 +75,7 @@ export default {
   },
 
   data: () => ({
+    persistent: true,
     showGuard: false,
 
     firebase: null,
@@ -97,11 +98,28 @@ export default {
     currentRoute() {
       return this.$route.path
     },
+
+    dialog() {
+      return store.getters.getDialog
+    },
   },
 
   watch: {
     currentRoute(val) {
       this.checkRouterWhenReady()
+      // console.log("route", this.$route)
+    },
+
+    dialog(status) {
+      this.showGuard = status
+      this.persistent = false
+    },
+
+    showGuard(status) {
+      if (!status) {
+        this.persistent = true
+        store.commit("SET_DIALOG", false)
+      }
     },
   },
 
@@ -116,15 +134,22 @@ export default {
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
 
     // monitor user auth state
-    this.firebase.auth().onAuthStateChanged(() => this.checkRouterWhenReady())
+    this.firebase.auth().onAuthStateChanged((user) => {
+      console.log("onAuthStateChanged", user)
+      this.checkRouterWhenReady()
+    })
   },
 
   methods: {
     //
     checkRouterWhenReady() {
       this.$authGuardSettings.router.onReady(() => {
+        console.log("DIALOG CREATE:", this.dialog)
+
         // disable auth guard dialog if the current route beforeEnter is undefined
-        this.showGuard = typeof this.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false
+        this.showGuard =
+          this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false
+        this.showGuard = this.dialog
       })
     },
 

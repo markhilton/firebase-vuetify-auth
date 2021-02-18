@@ -8,7 +8,7 @@
       <v-spacer />
 
       <!-- sign in / sign out button -->
-      <v-btn v-if="!user" outlined @click="$router.push('/').catch(() => {})"> Sign In </v-btn>
+      <v-btn v-if="!user" outlined @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
       <v-btn v-else outlined @click="signOut()"> Sign Out </v-btn>
     </v-app-bar>
 
@@ -19,6 +19,8 @@
         <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
         <div class="my-4">
           <b>Try:</b>
+          <router-link to="/"> Home </router-link>
+          |
           <router-link to="/public"> Public Route </router-link>
           |
           <router-link to="/protected"> Protected Route </router-link>

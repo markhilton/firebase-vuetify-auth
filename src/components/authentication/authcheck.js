@@ -1,4 +1,5 @@
 import Vue from "vue"
+import store from "../../store"
 
 export default () => {
   let status = true
@@ -24,7 +25,8 @@ export default () => {
     status = !emailVerified
   }
 
-  // console.log("AUTH CHECK:", status)
+  store.commit("SET_DIALOG", status)
+  // console.log("AUTH CHECK:", store.getters.getDialog)
 
   return status
 }
