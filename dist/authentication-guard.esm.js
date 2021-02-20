@@ -4066,10 +4066,7 @@ var script$6 = {
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
 
     // monitor user auth state
-    this.firebase.auth().onAuthStateChanged(function (user) {
-      console.log("onAuthStateChanged", user);
-      this$1.checkRouterWhenReady();
-    });
+    this.firebase.auth().onAuthStateChanged(function (user) { return this$1.checkRouterWhenReady(); });
   },
 
   methods: {
@@ -4078,8 +4075,6 @@ var script$6 = {
       var this$1 = this;
 
       this.$authGuardSettings.router.onReady(function () {
-        console.log("DIALOG CREATE:", this$1.dialog);
-
         // disable auth guard dialog if the current route beforeEnter is undefined
         this$1.showGuard =
           this$1.$route.matched[0] && typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;

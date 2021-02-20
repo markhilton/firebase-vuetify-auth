@@ -134,18 +134,13 @@ export default {
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
 
     // monitor user auth state
-    this.firebase.auth().onAuthStateChanged((user) => {
-      console.log("onAuthStateChanged", user)
-      this.checkRouterWhenReady()
-    })
+    this.firebase.auth().onAuthStateChanged((user) => this.checkRouterWhenReady())
   },
 
   methods: {
     //
     checkRouterWhenReady() {
       this.$authGuardSettings.router.onReady(() => {
-        console.log("DIALOG CREATE:", this.dialog)
-
         // disable auth guard dialog if the current route beforeEnter is undefined
         this.showGuard =
           this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false
