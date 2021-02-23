@@ -100,7 +100,7 @@ export default {
     },
 
     dialog() {
-      return store.getters.getDialog
+      return store.getters["auth/getDialog"]
     },
   },
 
@@ -118,7 +118,7 @@ export default {
     showGuard(status) {
       if (!status) {
         this.persistent = true
-        store.commit("SET_DIALOG", false)
+        store.commit("auth/SET_DIALOG", false)
       }
     },
   },

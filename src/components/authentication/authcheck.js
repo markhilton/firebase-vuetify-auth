@@ -25,8 +25,8 @@ export default () => {
     status = !emailVerified
   }
 
-  store.commit("SET_DIALOG", status)
-  // console.log("AUTH CHECK:", store.getters.getDialog)
+  store.commit("auth/SET_DIALOG", status)
+  // console.log("AUTH CHECK:", store.getters["auth/getDialog"])
 
   return status
 }
