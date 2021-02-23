@@ -1,5 +1,4 @@
 import Vue from "vue"
-import store from "../../store"
 
 export default () => {
   let status = true
@@ -25,8 +24,7 @@ export default () => {
     status = !emailVerified
   }
 
-  store.commit("auth/SET_DIALOG", status)
-  // console.log("AUTH CHECK:", store.getters["auth/getDialog"])
+  Vue.prototype.$authGuardSettings.dialog = status
 
   return status
 }

@@ -57,7 +57,6 @@
 </template>
 
 <script>
-import store from "../../store"
 import authCheck from "./authcheck"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
@@ -75,6 +74,8 @@ export default {
   },
 
   data: () => ({
+    dialog: false,
+
     persistent: true,
     showGuard: false,
 
@@ -98,16 +99,11 @@ export default {
     currentRoute() {
       return this.$route.path
     },
-
-    dialog() {
-      return store.getters["auth/getDialog"]
-    },
   },
 
   watch: {
     currentRoute(val) {
       this.checkRouterWhenReady()
-      // console.log("route", this.$route)
     },
 
     dialog(status) {
@@ -118,12 +114,14 @@ export default {
     showGuard(status) {
       if (!status) {
         this.persistent = true
-        store.commit("auth/SET_DIALOG", false)
+        this.$authGuardSettings.dialog = false
       }
     },
   },
 
   created() {
+    setInterval(() => (this.dialog = this.$authGuardSettings.dialog), 100)
+
     // read package config settings
     const settings = this.$authGuardSettings
 

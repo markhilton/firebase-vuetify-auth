@@ -25,8 +25,6 @@ Vue.use(AuthGuard, authGuardSettings)
 
 // reload VUE app on Firebase auth state change
 firebase.auth().onAuthStateChanged(() => {
-  console.log("vue load")
-
   new Vue({
     router,
     vuetify,
