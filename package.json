@@ -1,6 +1,6 @@
 {
   "name": "@nerd305/firebase-vuetify-auth",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Firebase user auth guard with Vuetify templates",
   "author": "Mark Hilton <nerd305@gmail.com>",
   "license": "MIT",
@@ -22,14 +22,13 @@
     "build:es": "rollup --config build/rollup.config.js --format es --file dist/authentication-guard.esm.js",
     "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/authentication-guard.min.js"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@mdi/font": "5.x.x",
     "firebase": "8.x.x",
     "vue": "2.x.x",
     "vuetify": "2.x.x"
   },
   "devDependencies": {
-    "@mdi/font": "^5.x.x",
     "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.1.0",
@@ -47,18 +46,15 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-vue": "^7.5.0",
-    "firebase": "^8.x.x",
     "prettier": "^2.2.1",
     "rollup": "^2.38.0",
     "rollup-plugin-vue": "^6.0.0",
     "rollup-plugin-vuetify": "^0.2.3",
     "sass": "^1.32.4",
     "sass-loader": "^10.1.1",
-    "vue": "^2.x.x",
     "vue-cli-plugin-vuetify": "^2.1.0",
     "vue-router": "^3.5.1",
     "vue-template-compiler": "^2.6.12",
-    "vuetify": "^2.x.x",
     "vuetify-loader": "^1.7.1"
   },
   "browserslist": [
