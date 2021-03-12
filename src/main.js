@@ -10,7 +10,7 @@ Vue.config.productionTip = false
 const authGuardSettings = {
   router: router, // routes
   firebase: firebase, // pass on firebase middleware app init
-  verification: false, // require user email to be verified before granting access
+  verification: true, // require user email to be verified before granting access
   registration: true, // allow new user registrations
   phone: false, // allow authentication with phone
   google: true, // allow authentication with gmail account

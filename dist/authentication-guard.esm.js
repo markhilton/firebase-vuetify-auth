@@ -2,7 +2,7 @@ import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, 
 import Vue from 'vue';
 
 function authCheck () {
-  var status = true;
+  var allowRoute = false;
 
   var settings = Vue.prototype.$authGuardSettings;
   var firebase = settings.firebase || null;
@@ -10,24 +10,51 @@ function authCheck () {
   var isAuthenticated = user && user.uid ? true : false;
   var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
 
+  // console.log("[ auth guard ]: email verification required: [", verification, "]", settings)
+
   if (isAuthenticated) {
     // console.log("[ auth guard ]: authenticated user ID:", user.uid)
 
     var emailVerified = user.emailVerified || false;
     var domain = user.email.split("@")[1];
 
+    // console.log("[ auth guard ]: user email verified: [", emailVerified, "]")
+
     // check if email verification is always required or for some specific email domain(s) only
     if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-      emailVerified = true;
+      // console.log("[ auth guard ]: user email verified or does not require verification")
+
+      allowRoute = true;
     }
 
     // check if to show dialog
-    status = !emailVerified;
+    allowRoute = emailVerified;
+
+    if (allowRoute) {
+      Vue.prototype.$authGuardSettings.showAuthGuardDialog = false;
+      Vue.prototype.$authGuardSettings.emailVerificationRequired = false;
+    } else {
+      Vue.prototype.$authGuardSettings.showAuthGuardDialog = true;
+      Vue.prototype.$authGuardSettings.emailVerificationRequired = true;
+    }
   }
 
-  Vue.prototype.$authGuardSettings.dialog = status;
+  // not authenticated users get persistent login dialog
+  else {
+    Vue.prototype.$authGuardSettings.showAuthGuardDialog = true;
+    Vue.prototype.$authGuardSettings.emailVerificationRequired = false;
+  }
 
-  return status
+  /**
+   * this has to handle 3 scenarios:
+   * - user is on public route and wants to navigate to protected: (1. block nav, 2. show non persistent dialog)
+   * - user opens app on protected route: (1. show persistent dialog)
+   *
+   */
+
+  // console.log("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!")
+
+  return allowRoute
 }
 
 var script$6 = {
@@ -962,8 +989,18 @@ __vue_render__$3._withStripped = true;
     undefined
   );
 
+/**
+ * use cases:
+ * - user navigates to protected route, when user authenticated but email not verified
+ * - user navigates to protected route, when user authenticated and email not verified
+ * - user navigates to protected route, when user not authenticated
+ * - user navigates to public route
+ * - user navigates to root (redirections)
+ * - user opens app on specific route
+ */
+
 function AuthGuardMiddleware (to, from, next) {
-  return authCheck() ? next(false) : next()
+  return authCheck() ? next() : null
 }
 
 /*! *****************************************************************************
@@ -3976,9 +4013,7 @@ var script = {
 
   data: function () { return ({
     dialog: false,
-
     persistent: true,
-    showGuard: false,
 
     firebase: null,
     registration: true,
@@ -4003,27 +4038,29 @@ var script = {
   },
 
   watch: {
-    currentRoute: function currentRoute(val) {
+    currentRoute: function currentRoute(before, after) {
+      // console.log("triggering [ checkRouterWhenReady ] because of current route change!", before, after)
       this.checkRouterWhenReady();
     },
 
-    dialog: function dialog(status) {
-      this.showGuard = status;
-      this.persistent = false;
+    dialog: function dialog(state) {
+      // console.log("dialog(state)", state)
+      this.$authGuardSettings.showAuthGuardDialog = state;
     },
 
-    showGuard: function showGuard(status) {
-      if (!status) {
-        this.persistent = true;
-        this.$authGuardSettings.dialog = false;
-      }
+    persistent: function persistent(state) {
+      // console.log("persistent(state)", state)
+      this.$authGuardSettings.persistent = state;
     },
   },
 
   created: function created() {
     var this$1 = this;
 
-    setInterval(function () { return (this$1.dialog = this$1.$authGuardSettings.dialog); }, 100);
+    // setup reactive watch for auth guard state
+    var config = this.$authGuardSettings;
+    setInterval(function () { return (this$1.dialog = config.showAuthGuardDialog ? true : false); }, 100);
+    setInterval(function () { return (this$1.emailVerificationRequired = config.emailVerificationRequired ? true : false); }, 100);
 
     // read package config settings
     var settings = this.$authGuardSettings;
@@ -4035,7 +4072,10 @@ var script = {
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
 
     // monitor user auth state
-    this.firebase.auth().onAuthStateChanged(function (user) { return this$1.checkRouterWhenReady(); });
+    this.firebase.auth().onAuthStateChanged(function () {
+      // console.log("triggering [ checkRouterWhenReady ] because of auth change!")
+      this$1.checkRouterWhenReady();
+    });
   },
 
   methods: {
@@ -4044,10 +4084,15 @@ var script = {
       var this$1 = this;
 
       this.$authGuardSettings.router.onReady(function () {
-        // disable auth guard dialog if the current route beforeEnter is undefined
-        this$1.showGuard =
-          this$1.$route.matched[0] && typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false;
-        this$1.showGuard = this$1.dialog;
+        // if the current route beforeEnter is undefined - it means its public
+        this$1.persistent =
+          this$1.$route.matched[0] && typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? true : false;
+
+        // run authCheck only on non-public routes, so when the persistent dialog if true
+        if (this$1.persistent) { authCheck(); }
+
+        // console.log("checkRouterWhenReady persistent dialog: [", this.persistent, "]")
+        // console.log("this.$route.matched[0]", this.$route.matched[0])
       });
     },
 
@@ -4149,11 +4194,11 @@ var __vue_render__ = function() {
             "content-class": "elevation-0"
           },
           model: {
-            value: _vm.showGuard,
+            value: _vm.dialog,
             callback: function($$v) {
-              _vm.showGuard = $$v;
+              _vm.dialog = $$v;
             },
-            expression: "showGuard"
+            expression: "dialog"
           }
         },
         [

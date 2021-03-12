@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="showGuard" :persistent="persistent" overlay-opacity="0.95" content-class="elevation-0">
+    <v-dialog v-model="dialog" :persistent="persistent" overlay-opacity="0.95" content-class="elevation-0">
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
           <v-progress-linear :indeterminate="isLoading" />
@@ -57,6 +57,9 @@
 </template>
 
 <script>
+/**
+ * the auth guard has to watch user auth status & router current route changes
+ */
 import authCheck from "./authcheck"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
@@ -75,9 +78,7 @@ export default {
 
   data: () => ({
     dialog: false,
-
     persistent: true,
-    showGuard: false,
 
     firebase: null,
     registration: true,
@@ -102,25 +103,27 @@ export default {
   },
 
   watch: {
-    currentRoute(val) {
+    currentRoute(before, after) {
+      // console.log("triggering [ checkRouterWhenReady ] because of current route change!", before, after)
       this.checkRouterWhenReady()
     },
 
-    dialog(status) {
-      this.showGuard = status
-      this.persistent = false
+    dialog(state) {
+      // console.log("dialog(state)", state)
+      this.$authGuardSettings.showAuthGuardDialog = state
     },
 
-    showGuard(status) {
-      if (!status) {
-        this.persistent = true
-        this.$authGuardSettings.dialog = false
-      }
+    persistent(state) {
+      // console.log("persistent(state)", state)
+      this.$authGuardSettings.persistent = state
     },
   },
 
   created() {
-    setInterval(() => (this.dialog = this.$authGuardSettings.dialog), 100)
+    // setup reactive watch for auth guard state
+    const config = this.$authGuardSettings
+    setInterval(() => (this.dialog = config.showAuthGuardDialog ? true : false), 100)
+    setInterval(() => (this.emailVerificationRequired = config.emailVerificationRequired ? true : false), 100)
 
     // read package config settings
     const settings = this.$authGuardSettings
@@ -132,17 +135,25 @@ export default {
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
 
     // monitor user auth state
-    this.firebase.auth().onAuthStateChanged((user) => this.checkRouterWhenReady())
+    this.firebase.auth().onAuthStateChanged(() => {
+      // console.log("triggering [ checkRouterWhenReady ] because of auth change!")
+      this.checkRouterWhenReady()
+    })
   },
 
   methods: {
     //
     checkRouterWhenReady() {
       this.$authGuardSettings.router.onReady(() => {
-        // disable auth guard dialog if the current route beforeEnter is undefined
-        this.showGuard =
-          this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter !== "undefined" ? authCheck() : false
-        this.showGuard = this.dialog
+        // if the current route beforeEnter is undefined - it means its public
+        this.persistent =
+          this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter !== "undefined" ? true : false
+
+        // run authCheck only on non-public routes, so when the persistent dialog if true
+        if (this.persistent) authCheck()
+
+        // console.log("checkRouterWhenReady persistent dialog: [", this.persistent, "]")
+        // console.log("this.$route.matched[0]", this.$route.matched[0])
       })
     },
 
