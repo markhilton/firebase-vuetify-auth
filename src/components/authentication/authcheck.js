@@ -1,4 +1,5 @@
 import Vue from "vue"
+import debug from "./debug"
 
 export default () => {
   let allowRoute = false
@@ -7,28 +8,28 @@ export default () => {
   const firebase = settings.firebase || null
   const user = firebase.auth().currentUser
   const isAuthenticated = user && user.uid ? true : false
-  const verification = typeof settings.verification !== "undefined" ? settings.verification : true
+  const verification = typeof settings.verification !== "undefined" ? Boolean(settings.verification) : true
 
-  // console.log("[ auth guard ]: email verification required: [", verification, "]", settings)
+  debug("[ auth guard ]: email verification required: [", verification, "]")
 
   if (isAuthenticated) {
-    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+    debug("[ auth guard ]: authenticated user ID:", user.uid)
 
     let emailVerified = user.emailVerified || false
     const domain = user.email.split("@")[1]
 
-    // console.log("[ auth guard ]: user email verified: [", emailVerified, "]")
+    debug("[ auth guard ]: user email verified: [", emailVerified, "]")
 
     // check if email verification is always required or for some specific email domain(s) only
     if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-      // console.log("[ auth guard ]: user email verified or does not require verification")
+      debug("[ auth guard ]: user email verified or does not require verification")
 
       allowRoute = true
     }
 
     // for authenticated use without verified email
     else {
-      // console.log("[ auth guard ]: user email NOT verified")
+      debug("[ auth guard ]: user email NOT verified")
     }
 
     // check if to show dialog
@@ -45,6 +46,8 @@ export default () => {
 
   // not authenticated users get persistent login dialog
   else {
+    debug("[ auth guard ]: user NOT authenticated")
+
     Vue.prototype.$authGuardSettings.showAuthGuardDialog = true
     Vue.prototype.$authGuardSettings.emailVerificationRequired = false
   }
@@ -56,7 +59,7 @@ export default () => {
    *
    */
 
-  // console.log("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!")
+  debug("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!")
 
   return allowRoute
 }

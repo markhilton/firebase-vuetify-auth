@@ -1,14 +1,30 @@
 /**
  * use cases:
- * - user navigates to protected route, when user authenticated but email not verified
- * - user navigates to protected route, when user authenticated and email not verified
- * - user navigates to protected route, when user not authenticated
- * - user navigates to public route
- * - user navigates to root (redirections)
- * - user opens app on specific route
+ * 1. NOT authenticated user:
+ * - user opens app on public route
+ * - user opens app on protected route
+ * - user navigates from public route to protected route
+ *
+ * 2. authenticated user, without confirmed email:
+ * - user opens app on public route
+ * - user opens app on protected route
+ * - user navigates from public route to protected route
+ * - user navigates from protected route to public route
+ *
+ * 3. authenticated user with confirmed email
+ * - user opens app on public route
+ * - user opens app on protected route
+ * - user navigates from public route to protected route
+ * - user navigates from protected route to public route
+ *
  */
+import debug from "./debug"
 import authCheck from "./authcheck"
 
 export default (to, from, next) => {
-  return authCheck() ? next() : null
+  const allowRoute = authCheck()
+
+  debug("[ authGuard ]:", allowRoute)
+
+  return allowRoute ? next() : null
 }

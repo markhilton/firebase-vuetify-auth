@@ -8,6 +8,7 @@ import AuthGuard from "./wrapper"
 Vue.config.productionTip = false
 
 const authGuardSettings = {
+  debug: true,
   router: router, // routes
   firebase: firebase, // pass on firebase middleware app init
   verification: true, // require user email to be verified before granting access

@@ -60,6 +60,7 @@
 /**
  * the auth guard has to watch user auth status & router current route changes
  */
+import debug from "./debug"
 import authCheck from "./authcheck"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
@@ -97,24 +98,26 @@ export default {
   }),
 
   computed: {
-    currentRoute() {
+    currentRoute(after, before) {
+      // if (typeof before === "undefined") return
+      debug("[ this.$route.path (before, after) ]:", before, after)
       return this.$route.path
     },
   },
 
   watch: {
-    currentRoute(before, after) {
-      // console.log("triggering [ checkRouterWhenReady ] because of current route change!", before, after)
-      this.checkRouterWhenReady()
+    currentRoute() {
+      debug("triggering [ checkRouterWhenReady ] because of current route change!")
+      this.isCurrentRoutePublic()
     },
 
     dialog(state) {
-      // console.log("dialog(state)", state)
+      debug("dialog(state)", state)
       this.$authGuardSettings.showAuthGuardDialog = state
     },
 
     persistent(state) {
-      // console.log("persistent(state)", state)
+      debug("persistent(state)", state)
       this.$authGuardSettings.persistent = state
     },
   },
@@ -134,27 +137,41 @@ export default {
     this.google = typeof settings.google !== "undefined" ? settings.google : true
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
 
-    // monitor user auth state
-    this.firebase.auth().onAuthStateChanged(() => {
-      // console.log("triggering [ checkRouterWhenReady ] because of auth change!")
-      this.checkRouterWhenReady()
+    // check current route when router is ready
+    this.$authGuardSettings.router.onReady(() => {
+      debug("[ router ]: READY!")
+
+      this.isCurrentRoutePublic()
+
+      // monitor user auth state
+      this.firebase.auth().onAuthStateChanged(() => {
+        debug("triggering [ authCheck ] because of onAuthStateChanged!")
+
+        // run authCheck only if on non public route
+        if (!this.isCurrentRoutePublic()) authCheck()
+        // hide login dialog for public routes
+        else {
+          debug("DISABLING DIALOG")
+          config.showAuthGuardDialog = false
+        }
+      })
     })
   },
 
   methods: {
-    //
-    checkRouterWhenReady() {
-      this.$authGuardSettings.router.onReady(() => {
-        // if the current route beforeEnter is undefined - it means its public
-        this.persistent =
-          this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter !== "undefined" ? true : false
+    // check if the current route is public to set negative persisten dialog
+    isCurrentRoutePublic() {
+      const publicRoute =
+        this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter === "undefined" ? true : false
 
-        // run authCheck only on non-public routes, so when the persistent dialog if true
-        if (this.persistent) authCheck()
+      this.persistent = !publicRoute
 
-        // console.log("checkRouterWhenReady persistent dialog: [", this.persistent, "]")
-        // console.log("this.$route.matched[0]", this.$route.matched[0])
-      })
+      if (!publicRoute) debug("[ matched route ]:", this.$route.matched[0])
+      else this.$authGuardSettings
+
+      debug("[ isCurrentRoutePublic ]:", publicRoute)
+
+      return publicRoute
     },
 
     //

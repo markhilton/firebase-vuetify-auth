@@ -53,7 +53,8 @@
         <!-- allow to log out in case user cannot confirm the email address -->
         <v-container>
           <div class="caption mb-2">- or -</div>
-          <v-btn color="primary" outlined @click="signOut"> Signout </v-btn>
+          <v-btn v-if="isAuthenticated" color="primary" outlined @click="signOut"> SignOut </v-btn>
+          <v-btn v-else color="primary" outlined @click="signIn"> SignIn </v-btn>
         </v-container>
       </div>
     </v-card>
@@ -70,6 +71,13 @@ export default {
     emailSent: false,
   }),
 
+  computed: {
+    isAuthenticated() {
+      const user = firebase.auth().currentUser
+      return user && user.uid ? true : false
+    },
+  },
+
   methods: {
     resendVerificationEmail() {
       this.emailSent = true
@@ -77,6 +85,10 @@ export default {
     },
     goToLogin() {
       this.$emit("signOut")
+    },
+    signIn() {
+      this.$authGuardSettings.showAuthGuardDialog = true
+      this.$authGuardSettings.emailVerificationRequired = false
     },
     signOut() {
       firebase.auth().signOut()
