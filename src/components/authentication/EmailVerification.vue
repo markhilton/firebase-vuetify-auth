@@ -84,6 +84,7 @@ export default {
       this.$emit("sendEmail")
     },
     goToLogin() {
+      this.$authGuardSettings.emailVerificationRequired = false
       this.$emit("signOut")
     },
     signIn() {
@@ -92,6 +93,8 @@ export default {
     },
     signOut() {
       firebase.auth().signOut()
+      this.$authGuardSettings.showAuthGuardDialog = true
+      this.$authGuardSettings.emailVerificationRequired = false
     },
   },
 }
