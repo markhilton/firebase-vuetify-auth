@@ -8,7 +8,7 @@ export default () => {
   const firebase = settings.firebase || null
   const user = firebase.auth().currentUser
   const isAuthenticated = user && user.uid ? true : false
-  const verification = typeof settings.verification !== "undefined" ? Boolean(settings.verification) : true
+  const verification = typeof settings.verification !== "undefined" ? settings.verification : true
 
   debug("[ auth guard ]: email verification required: [", verification, "]")
 
