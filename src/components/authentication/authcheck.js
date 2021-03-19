@@ -20,6 +20,9 @@ export default () => {
 
     debug("[ auth guard ]: user email verified: [", emailVerified, "]")
 
+    // check if to show dialog
+    allowRoute = emailVerified
+
     // check if email verification is always required or for some specific email domain(s) only
     if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
       debug("[ auth guard ]: user email verified or does not require verification")
@@ -31,9 +34,6 @@ export default () => {
     else {
       debug("[ auth guard ]: user email NOT verified")
     }
-
-    // check if to show dialog
-    allowRoute = emailVerified
 
     if (allowRoute) {
       Vue.prototype.$authGuardSettings.showAuthGuardDialog = false

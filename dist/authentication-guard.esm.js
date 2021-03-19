@@ -1,6 +1,18 @@
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCardText, VBtn, VCardActions, VForm, VCard, VContainer, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
 import Vue from 'vue';
 
+var this$1 = undefined;
+
+// https://stackoverflow.com/questions/4116608/pass-unknown-number-of-arguments-into-javascript-function
+function debug () {
+  var text = [], len = arguments.length;
+  while ( len-- ) text[ len ] = arguments[ len ];
+
+  if (!Boolean(Vue.prototype.$authGuardSettings.debug)) { return }
+
+  console.log.apply(this$1, text);
+}
+
 function authCheck () {
   var allowRoute = false;
 
@@ -10,25 +22,30 @@ function authCheck () {
   var isAuthenticated = user && user.uid ? true : false;
   var verification = typeof settings.verification !== "undefined" ? settings.verification : true;
 
-  // console.log("[ auth guard ]: email verification required: [", verification, "]", settings)
+  debug("[ auth guard ]: email verification required: [", verification, "]");
 
   if (isAuthenticated) {
-    // console.log("[ auth guard ]: authenticated user ID:", user.uid)
+    debug("[ auth guard ]: authenticated user ID:", user.uid);
 
     var emailVerified = user.emailVerified || false;
     var domain = user.email.split("@")[1];
 
-    // console.log("[ auth guard ]: user email verified: [", emailVerified, "]")
+    debug("[ auth guard ]: user email verified: [", emailVerified, "]");
+
+    // check if to show dialog
+    allowRoute = emailVerified;
 
     // check if email verification is always required or for some specific email domain(s) only
     if (verification === false || (Array.isArray(verification) && !verification.includes(domain))) {
-      // console.log("[ auth guard ]: user email verified or does not require verification")
+      debug("[ auth guard ]: user email verified or does not require verification");
 
       allowRoute = true;
     }
 
-    // check if to show dialog
-    allowRoute = emailVerified;
+    // for authenticated use without verified email
+    else {
+      debug("[ auth guard ]: user email NOT verified");
+    }
 
     if (allowRoute) {
       Vue.prototype.$authGuardSettings.showAuthGuardDialog = false;
@@ -41,6 +58,8 @@ function authCheck () {
 
   // not authenticated users get persistent login dialog
   else {
+    debug("[ auth guard ]: user NOT authenticated");
+
     Vue.prototype.$authGuardSettings.showAuthGuardDialog = true;
     Vue.prototype.$authGuardSettings.emailVerificationRequired = false;
   }
@@ -52,7 +71,7 @@ function authCheck () {
    *
    */
 
-  // console.log("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!")
+  debug("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!");
 
   return allowRoute
 }
@@ -991,16 +1010,31 @@ __vue_render__$3._withStripped = true;
 
 /**
  * use cases:
- * - user navigates to protected route, when user authenticated but email not verified
- * - user navigates to protected route, when user authenticated and email not verified
- * - user navigates to protected route, when user not authenticated
- * - user navigates to public route
- * - user navigates to root (redirections)
- * - user opens app on specific route
+ * 1. NOT authenticated user:
+ * - user opens app on public route
+ * - user opens app on protected route
+ * - user navigates from public route to protected route
+ *
+ * 2. authenticated user, without confirmed email:
+ * - user opens app on public route
+ * - user opens app on protected route
+ * - user navigates from public route to protected route
+ * - user navigates from protected route to public route
+ *
+ * 3. authenticated user with confirmed email
+ * - user opens app on public route
+ * - user opens app on protected route
+ * - user navigates from public route to protected route
+ * - user navigates from protected route to public route
+ *
  */
 
 function AuthGuardMiddleware (to, from, next) {
-  return authCheck() ? next() : null
+  var allowRoute = authCheck();
+
+  debug("[ authGuard ]:", allowRoute);
+
+  return allowRoute ? next() : null
 }
 
 /*! *****************************************************************************
@@ -3266,16 +3300,30 @@ var script$2 = {
     emailSent: false,
   }); },
 
+  computed: {
+    isAuthenticated: function isAuthenticated() {
+      var user = firebase.auth().currentUser;
+      return user && user.uid ? true : false
+    },
+  },
+
   methods: {
     resendVerificationEmail: function resendVerificationEmail() {
       this.emailSent = true;
       this.$emit("sendEmail");
     },
     goToLogin: function goToLogin() {
+      this.$authGuardSettings.emailVerificationRequired = false;
       this.$emit("signOut");
+    },
+    signIn: function signIn() {
+      this.$authGuardSettings.showAuthGuardDialog = true;
+      this.$authGuardSettings.emailVerificationRequired = false;
     },
     signOut: function signOut() {
       firebase.auth().signOut();
+      this.$authGuardSettings.showAuthGuardDialog = true;
+      this.$authGuardSettings.emailVerificationRequired = false;
     },
   }
 };
@@ -3437,14 +3485,23 @@ var __vue_render__$2 = function() {
                       _vm._v("- or -")
                     ]),
                     _vm._v(" "),
-                    _c(
-                      "v-btn",
-                      {
-                        attrs: { color: "primary", outlined: "" },
-                        on: { click: _vm.signOut }
-                      },
-                      [_vm._v(" Signout ")]
-                    )
+                    _vm.isAuthenticated
+                      ? _c(
+                          "v-btn",
+                          {
+                            attrs: { color: "primary", outlined: "" },
+                            on: { click: _vm.signOut }
+                          },
+                          [_vm._v(" SignOut ")]
+                        )
+                      : _c(
+                          "v-btn",
+                          {
+                            attrs: { color: "primary", outlined: "" },
+                            on: { click: _vm.signIn }
+                          },
+                          [_vm._v(" SignIn ")]
+                        )
                   ],
                   1
                 )
@@ -4032,24 +4089,26 @@ var script = {
   }); },
 
   computed: {
-    currentRoute: function currentRoute() {
+    currentRoute: function currentRoute(after, before) {
+      // if (typeof before === "undefined") return
+      debug("[ this.$route.path (before, after) ]:", before, after);
       return this.$route.path
     },
   },
 
   watch: {
-    currentRoute: function currentRoute(before, after) {
-      // console.log("triggering [ checkRouterWhenReady ] because of current route change!", before, after)
-      this.checkRouterWhenReady();
+    currentRoute: function currentRoute() {
+      debug("triggering [ checkRouterWhenReady ] because of current route change!");
+      this.isCurrentRoutePublic();
     },
 
     dialog: function dialog(state) {
-      // console.log("dialog(state)", state)
+      debug("dialog(state)", state);
       this.$authGuardSettings.showAuthGuardDialog = state;
     },
 
     persistent: function persistent(state) {
-      // console.log("persistent(state)", state)
+      debug("persistent(state)", state);
       this.$authGuardSettings.persistent = state;
     },
   },
@@ -4071,29 +4130,41 @@ var script = {
     this.google = typeof settings.google !== "undefined" ? settings.google : true;
     this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false;
 
-    // monitor user auth state
-    this.firebase.auth().onAuthStateChanged(function () {
-      // console.log("triggering [ checkRouterWhenReady ] because of auth change!")
-      this$1.checkRouterWhenReady();
+    // check current route when router is ready
+    this.$authGuardSettings.router.onReady(function () {
+      debug("[ router ]: READY!");
+
+      this$1.isCurrentRoutePublic();
+
+      // monitor user auth state
+      this$1.firebase.auth().onAuthStateChanged(function () {
+        debug("triggering [ authCheck ] because of onAuthStateChanged!");
+
+        // run authCheck only if on non public route
+        if (!this$1.isCurrentRoutePublic()) { authCheck(); }
+        // hide login dialog for public routes
+        else {
+          debug("DISABLING DIALOG");
+          config.showAuthGuardDialog = false;
+        }
+      });
     });
   },
 
   methods: {
-    //
-    checkRouterWhenReady: function checkRouterWhenReady() {
-      var this$1 = this;
+    // check if the current route is public to set negative persisten dialog
+    isCurrentRoutePublic: function isCurrentRoutePublic() {
+      var publicRoute =
+        this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter === "undefined" ? true : false;
 
-      this.$authGuardSettings.router.onReady(function () {
-        // if the current route beforeEnter is undefined - it means its public
-        this$1.persistent =
-          this$1.$route.matched[0] && typeof this$1.$route.matched[0].beforeEnter !== "undefined" ? true : false;
+      this.persistent = !publicRoute;
 
-        // run authCheck only on non-public routes, so when the persistent dialog if true
-        if (this$1.persistent) { authCheck(); }
+      if (!publicRoute) { debug("[ matched route ]:", this.$route.matched[0]); }
+      else { this.$authGuardSettings; }
 
-        // console.log("checkRouterWhenReady persistent dialog: [", this.persistent, "]")
-        // console.log("this.$route.matched[0]", this.$route.matched[0])
-      });
+      debug("[ isCurrentRoutePublic ]:", publicRoute);
+
+      return publicRoute
     },
 
     //
