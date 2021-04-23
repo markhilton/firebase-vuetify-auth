@@ -16,7 +16,7 @@ export default () => {
     debug("[ auth guard ]: authenticated user ID:", user.uid)
 
     let emailVerified = user.emailVerified || false
-    const domain = user.email.split("@")[1]
+    const domain = user.email ? user.email.split("@")[1] : ""
 
     debug("[ auth guard ]: user email verified: [", emailVerified, "]")
 
