@@ -139,6 +139,12 @@ export default {
 
     loginWithGoogle() {
       const provider = new firebase.auth.GoogleAuthProvider()
+
+      // add custom scopes
+      provider.addScope("https://www.googleapis.com/auth/adwords")
+      provider.addScope("https://www.googleapis.com/auth/analytics.readonly")
+
+      this.firebase.auth().useDeviceLanguage()
       this.firebase.auth().signInWithRedirect(provider)
     },
 

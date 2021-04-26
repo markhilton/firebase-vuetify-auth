@@ -48,7 +48,7 @@
           </div>
 
           <v-card-actions v-if="!emailVerificationRequired">
-            <LoginWith3rdPartyProvider :google="google" :facebook="facebook" :phone="phone" />
+            <LoginWithProvider :google="google" :facebook="facebook" :phone="phone" />
           </v-card-actions>
         </v-card>
       </v-container>
@@ -66,7 +66,7 @@ import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
 import EmailVerification from "./EmailVerification.vue"
-import LoginWith3rdPartyProvider from "./LoginWith3rdPartyProvider.vue"
+import LoginWithProvider from "./LoginWithProvider.vue"
 
 export default {
   components: {
@@ -74,7 +74,7 @@ export default {
     Register,
     PasswordReset,
     EmailVerification,
-    LoginWith3rdPartyProvider,
+    LoginWithProvider,
   },
 
   data: () => ({
