@@ -13,7 +13,7 @@ export default () => {
   debug("[ auth guard ]: email verification required: [", verification, "]")
 
   // anonymous authenticated user
-  if (verification && user.isAnonymous) {
+  if (verification && user && user.isAnonymous) {
     debug("[ auth guard ]: anonymous user BLOCKED unable to verify email!")
 
     Vue.prototype.$authGuardSettings.showAuthGuardDialog = true
