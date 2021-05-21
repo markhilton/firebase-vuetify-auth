@@ -62,6 +62,8 @@
 </template>
 
 <script>
+import debug from "./debug"
+
 export default {
   props: ["error", "isLoading"],
 
@@ -73,7 +75,10 @@ export default {
     isAuthenticated() {
       const firebase = this.$authGuardSettings.firebase
       const user = firebase.auth().currentUser
-      return user && user.uid ? true : false
+
+      debug("[ EmailVerification.vue isAuthenticated ]:", firebase)
+
+      return user ? true : false
     },
   },
 
