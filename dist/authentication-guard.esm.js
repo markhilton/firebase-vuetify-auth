@@ -1,7 +1,5 @@
 import Vue, { resolveComponent, openBlock, createBlock, withCtx, createVNode, createTextVNode, toDisplayString, withModifiers, createCommentVNode, Fragment, resolveDirective, mergeProps, toHandlers, withDirectives } from 'vue';
 
-var this$1 = undefined;
-
 // https://stackoverflow.com/questions/4116608/pass-unknown-number-of-arguments-into-javascript-function
 function debug () {
   var text = [], len = arguments.length;
@@ -9,7 +7,7 @@ function debug () {
 
   if (!Boolean(Vue.prototype.$authGuardSettings.debug)) { return }
 
-  console.log.apply(this$1, text);
+  console.log.apply(console, text);
 }
 
 function authCheck () {

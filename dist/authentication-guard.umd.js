@@ -8,8 +8,6 @@
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
 
-  var this$1 = undefined;
-
   // https://stackoverflow.com/questions/4116608/pass-unknown-number-of-arguments-into-javascript-function
   function debug () {
     var text = [], len = arguments.length;
@@ -17,7 +15,7 @@
 
     if (!Boolean(Vue__default['default'].prototype.$authGuardSettings.debug)) { return }
 
-    console.log.apply(this$1, text);
+    console.log.apply(console, text);
   }
 
   function authCheck () {
