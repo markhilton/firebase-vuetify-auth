@@ -4,5 +4,5 @@ import Vue from "vue"
 export default (...text) => {
   if (!Boolean(Vue.prototype.$authGuardSettings.debug)) return
 
-  console.log.apply(this, text)
+  console.log.apply(console, text)
 }

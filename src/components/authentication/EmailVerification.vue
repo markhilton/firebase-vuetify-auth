@@ -62,8 +62,6 @@
 </template>
 
 <script>
-import { firebase } from "../../middleware"
-
 export default {
   props: ["error", "isLoading"],
 
@@ -73,6 +71,7 @@ export default {
 
   computed: {
     isAuthenticated() {
+      const firebase = this.$authGuardSettings.firebase
       const user = firebase.auth().currentUser
       return user && user.uid ? true : false
     },
@@ -92,6 +91,7 @@ export default {
       this.$authGuardSettings.emailVerificationRequired = false
     },
     signOut() {
+      const firebase = this.$authGuardSettings.firebase
       firebase.auth().signOut()
       this.$authGuardSettings.showAuthGuardDialog = true
       this.$authGuardSettings.emailVerificationRequired = false

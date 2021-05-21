@@ -2,13 +2,13 @@
   <v-app>
     <v-app-bar app dark>
       <v-toolbar-title>
-        User: <v-chip>{{ displayName }}</v-chip>
+        User: <v-chip>{{ getDisplayName }}</v-chip>
       </v-toolbar-title>
 
       <v-spacer />
 
       <!-- sign in / sign out button -->
-      <v-btn v-if="!user" outlined @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
+      <v-btn v-if="!getCurrentUser" outlined @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
       <v-btn v-else outlined @click="signOut()"> Sign Out </v-btn>
     </v-app-bar>
 
@@ -39,34 +39,17 @@
 </template>
 
 <script>
-import { firebase } from "@/middleware"
+import { mapGetters, mapActions } from "vuex"
 
 export default {
   name: "App",
 
   computed: {
-    user() {
-      return firebase.auth().currentUser
-    },
-
-    displayName() {
-      if (!this.user) return null
-
-      const userEmail = (this.user && this.user.email) || null
-      const displayName = (this.user && this.user.displayName) || null
-
-      return displayName ? displayName : userEmail
-    },
+    ...mapGetters("auth", ["getCurrentUser", "getDisplayName"]),
   },
 
   methods: {
-    signOut() {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => console.log("User signed out!"))
-        .catch((error) => console.error("Failed to sign out the user!"))
-    },
+    ...mapActions("auth", ["signOut"]),
   },
 }
 </script>

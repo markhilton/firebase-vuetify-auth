@@ -57,6 +57,8 @@
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
+
 /**
  * the auth guard has to watch user auth status & router current route changes
  */
@@ -98,6 +100,8 @@ export default {
   }),
 
   computed: {
+    ...mapGetters("auth", ["isCurrentRoutePublic"]),
+
     currentRoute(after, before) {
       // if (typeof before === "undefined") return
       debug("[ this.$route.path (before, after) ]:", before, after)
@@ -108,7 +112,7 @@ export default {
   watch: {
     currentRoute() {
       debug("triggering [ checkRouterWhenReady ] because of current route change!")
-      this.isCurrentRoutePublic()
+      this.isCurrentRoutePublic
     },
 
     dialog(state) {
@@ -123,95 +127,17 @@ export default {
   },
 
   created() {
-    // setup reactive watch for auth guard state
-    const config = this.$authGuardSettings
-    setInterval(() => (this.dialog = config.showAuthGuardDialog ? true : false), 100)
-    setInterval(() => (this.emailVerificationRequired = config.emailVerificationRequired ? true : false), 100)
-
-    // read package config settings
-    const settings = this.$authGuardSettings
-
-    this.firebase = settings.firebase || null
-    this.registration = typeof settings.registration !== "undefined" ? settings.registration : true
-    this.phone = typeof settings.phone !== "undefined" ? settings.phone : false
-    this.google = typeof settings.google !== "undefined" ? settings.google : true
-    this.facebook = typeof settings.facebook !== "undefined" ? settings.facebook : false
-
-    // check current route when router is ready
-    this.$authGuardSettings.router.onReady(() => {
-      debug("[ router ]: READY!")
-
-      this.isCurrentRoutePublic()
-
-      // monitor user auth state
-      this.firebase.auth().onAuthStateChanged(() => {
-        debug("triggering [ authCheck ] because of onAuthStateChanged!")
-
-        // run authCheck only if on non public route
-        if (!this.isCurrentRoutePublic()) authCheck()
-        // hide login dialog for public routes
-        else {
-          debug("DISABLING DIALOG")
-          config.showAuthGuardDialog = false
-        }
-      })
-    })
+    this.init()
   },
 
   methods: {
-    // check if the current route is public to set negative persisten dialog
-    isCurrentRoutePublic() {
-      const publicRoute =
-        this.$route.matched[0] && typeof this.$route.matched[0].beforeEnter === "undefined" ? true : false
-
-      this.persistent = !publicRoute
-
-      if (!publicRoute) debug("[ matched route ]:", this.$route.matched[0])
-      else this.$authGuardSettings
-
-      debug("[ isCurrentRoutePublic ]:", publicRoute)
-
-      return publicRoute
-    },
+    ...mapActions("auth", ["init", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
+    ...mapMutations("auth", ["SET_USER", "SET_DIALOG_SHARE", "SET_DIALOG_CREATE_REPORT"]),
 
     //
     showSignInTab() {
       this.resetPassword = false
       this.tab = 0
-    },
-
-    //
-    async loginWithEmail({ email, password }) {
-      this.isLoading = true
-
-      this.firebase.auth().signOut()
-
-      this.firebase
-        .auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
-          // this is needed to reload route that was not loaded if user was not authenticated
-          if (this.$router.currentRoute.name === null) this.$router.push(this.$router.currentRoute.path)
-        })
-        .catch((error) => (this.loginError = error))
-        .finally(() => (this.isLoading = false))
-    },
-
-    //
-    async registerUser(registration) {
-      this.isLoading = true
-
-      try {
-        await this.firebase.auth().createUserWithEmailAndPassword(registration.email, registration.password)
-        await this.firebase.auth().signInWithEmailAndPassword(registration.email, registration.password)
-        await this.firebase.auth().currentUser.updateProfile({ displayName: registration.name })
-        await this.firebase.auth().currentUser.sendEmailVerification()
-
-        this.isLoading = false
-      } catch (error) {
-        this.isLoading = false
-        this.registrationError = error
-      }
     },
 
     //
@@ -226,22 +152,6 @@ export default {
       // }).catch(function(error) {
       //   // An error happened.
       // });
-    },
-
-    //
-    signOut() {
-      this.firebase.auth().signOut()
-    },
-
-    //
-    sendVerificationEmail() {
-      this.isLoading = true
-
-      this.firebase
-        .auth()
-        .currentUser.sendEmailVerification()
-        .catch((error) => (this.verificationError = error))
-        .finally(() => (this.isLoading = false))
     },
   },
 }

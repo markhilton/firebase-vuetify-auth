@@ -8,6 +8,8 @@ import AuthGuardMiddleware from "./components/authentication/authguard"
 
 // Declare install function executed by Vue.use()
 const install = (Vue, options) => {
+  console.log("INSTALL", options)
+
   if (install.installed) return
 
   install.installed = true
