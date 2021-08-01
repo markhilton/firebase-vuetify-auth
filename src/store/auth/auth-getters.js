@@ -1,8 +1,8 @@
 import debug from "@/components/authentication/debug"
 
 export default {
-  getConfig(state) {
-    return state.config
+  getSessionPersistence(state) {
+    return state.is_session_persistant
   },
   getCurrentUser(state) {
     const { firebase } = state.config
@@ -34,7 +34,7 @@ export default {
   },
   isAuthenticated(state, getters) {
     const user = getters.getCurrentUser
-    return user && user.uid ? true : false
+    return user ? true : false
   },
   isLoading(state) {
     return state.is_loading
@@ -52,13 +52,11 @@ export default {
   isCurrentRoutePublic(state) {
     const { router } = state.config
     const route = router.currentRoute
-    const publicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
+    const isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
 
-    if (!publicRoute) debug("[ matched route ]:", route.matched[0])
+    debug("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]")
 
-    debug("[ isCurrentRoutePublic ]:", publicRoute)
-
-    return publicRoute
+    return isPublicRoute
   },
 
   isAuthGuardDialogShown(state) {

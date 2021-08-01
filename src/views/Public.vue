@@ -6,7 +6,5 @@
 </template>
 
 <script>
-export default {
-  name: "Public",
-}
+export default {}
 </script>

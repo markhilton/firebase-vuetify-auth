@@ -5,7 +5,7 @@
       :persistent="isAuthGuardDialogPersistent"
       overlay-opacity="0.95"
       content-class="elevation-0"
-      @change="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
+      @input="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
     >
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
+import { mapGetters, mapMutations, mapActions } from "vuex"
 
 /**
  * the auth guard has to watch user auth status & router current route changes
@@ -97,7 +97,7 @@ export default {
     ]),
 
     currentRoute(after, before) {
-      // if (typeof before === "undefined") return
+      if (typeof before === "undefined") return
       debug("[ this.$route.path (before, after) ]:", before, after)
       return this.$route.path
     },
@@ -111,12 +111,12 @@ export default {
   },
 
   created() {
-    this.$store.dispatch("auth/init")
+    this.authGuardInit()
   },
 
   methods: {
-    ...mapActions("auth", ["init", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
-    ...mapMutations("auth", ["SET_USER", "SET_DIALOG_SHARE", "SET_DIALOG_CREATE_REPORT"]),
+    ...mapActions("auth", ["authGuardInit", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
+    ...mapMutations("auth", ["SET_AUTH_GUARD_DIALOG_SHOWN"]),
 
     //
     showSignInTab() {

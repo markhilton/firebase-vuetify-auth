@@ -2,8 +2,8 @@
   <v-container>
     <v-card flat>
       <!-- error alerrts -->
-      <v-alert v-if="Boolean(getError)" type="error" dismissible @click="clearError()">
-        {{ error.message }}
+      <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+        {{ getError.message }}
       </v-alert>
 
       <!-- application branding -->
@@ -23,13 +23,14 @@
           prepend-icon="mdi-lock"
         />
 
-        <!-- <v-checkbox
-							value="1"
-							name="remember"
-							class="ml-4 pl-2"
-							v-model="remember"
-							label="Remember Me"
-                        />-->
+        <v-checkbox
+          v-model="remember"
+          dense
+          class="ml-8"
+          name="remember"
+          label="remember me"
+          @change="SET_SESSION_PERSISTANCE(remember)"
+        />
       </v-card-text>
 
       <div class="text-center pb-4">
@@ -44,7 +45,7 @@
           color="primary"
           type="submit"
           :disabled="isLoading"
-          @click="loginWithEmail(email, password)"
+          @click="loginWithEmail({ email, password })"
         >
           Login
         </v-btn>
@@ -54,8 +55,8 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 import Branding from "./Branding.vue"
+import { mapGetters, mapMutations, mapActions } from "vuex"
 
 export default {
   components: { Branding },
@@ -63,15 +64,20 @@ export default {
   data: () => ({
     email: "",
     password: "",
-    remember: false,
+    remember: true,
   }),
 
   computed: {
-    ...mapGetters("auth", ["isLoading", "getError", "clearError"]),
+    ...mapGetters("auth", ["getSessionPersistence", "isLoading", "getError"]),
+  },
+
+  created() {
+    this.remember = this.getSessionPersistence
   },
 
   methods: {
     ...mapActions("auth", ["loginWithEmail"]),
+    ...mapMutations("auth", ["SET_SESSION_PERSISTANCE", "SET_ERROR"]),
   },
 }
 </script>

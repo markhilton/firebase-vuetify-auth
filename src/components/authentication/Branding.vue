@@ -18,11 +18,11 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
 export default {
   computed: {
-    config() {
-      return this.$store.getters["auth/getConfig"]
-    },
+    ...mapState("auth", ["config"]),
   },
 }
 </script>

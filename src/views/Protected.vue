@@ -55,8 +55,6 @@
 
 <script>
 export default {
-  name: "Protected",
-
   data: () => ({
     form: {
       name: "",
@@ -92,8 +90,7 @@ export default {
   },
 
   created() {
-    const { firebase } = this.store.getters["auth/getConfig"]
-    const { currentUser } = firebase.auth().currentUser
+    const currentUser = this.$store.getters["auth/getCurrentUser"]
 
     this.form.name = (currentUser && currentUser.displayName) || null
   },

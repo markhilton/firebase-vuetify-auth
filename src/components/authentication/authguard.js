@@ -18,13 +18,10 @@
  * - user navigates from protected route to public route
  *
  */
-import debug from "./debug"
 import authCheck from "./authcheck"
 
 export default (to, from, next) => {
   const allowRoute = authCheck()
-
-  debug("[ authGuard ]:", allowRoute)
 
   return allowRoute ? next() : null
 }

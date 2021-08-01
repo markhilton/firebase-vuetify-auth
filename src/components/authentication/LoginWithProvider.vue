@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import Vue from "vue"
+import { mapState } from "vuex"
 import firebase from "firebase/app"
 
 export default {
@@ -111,6 +111,8 @@ export default {
   }),
 
   computed: {
+    ...mapState("auth", ["config"]),
+
     rules() {
       const validation = {
         email: this.form.email == "" ? "Email cannot be empty" : true,
@@ -121,7 +123,7 @@ export default {
     },
 
     firebase() {
-      return this.$store.getters["auth/getConfig"].firebase
+      return this.config.firebase
     },
   },
 
