@@ -18,6 +18,6 @@ module.exports = {
     "comma-dangle": ["error", "always-multiline"],
   },
   parserOptions: {
-    parser: "babel-eslint",
+    parser: "@babel/eslint-parser",
   },
 }
