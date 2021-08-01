@@ -3,8 +3,8 @@
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="register()">
         <!-- error alerts -->
-        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
-          {{ error.message }}
+        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+          {{ getError.message }}
         </v-alert>
 
         <!-- application branding -->
@@ -13,16 +13,16 @@
         <!-- registration form -->
         <v-card-text class="mb-0 pb-0">
           <v-text-field
-            v-model="form.name"
+            v-model="displayName"
             required
             class="mr-2"
             label="Name"
             prepend-icon="mdi-account"
-            :rules="[rules.name]"
+            :rules="[rules.displayName]"
           />
 
           <v-text-field
-            v-model="form.email"
+            v-model="email"
             required
             class="mr-2"
             label="Email"
@@ -31,7 +31,7 @@
           />
 
           <v-text-field
-            v-model="form.password"
+            v-model="password"
             autocomplete="off"
             required
             class="mr-2"
@@ -42,7 +42,7 @@
           />
 
           <v-text-field
-            v-model="form.confirm"
+            v-model="confirm"
             autocomplete="off"
             required
             class="mr-2"
@@ -63,57 +63,41 @@
 
 <script>
 import Branding from "./Branding.vue"
+import { mapGetters, mapMutations, mapActions } from "vuex"
 
 export default {
-  name: "Register",
-
   components: { Branding },
 
-  props: ["error", "isLoading"],
-
   data: () => ({
-    form: {
-      name: "",
-      email: "",
-      password: "",
-      confirm: "",
-      agree: true,
-    },
+    email: "",
+    password: "",
+    confirm: "",
+    displayName: "",
     valid: false,
   }),
 
   computed: {
+    ...mapGetters("auth", ["isLoading", "getError"]),
+
     rules() {
       const validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
-        password: this.form.password == "" ? "Password cannot be empty" : true,
-        name: this.form.name == "" ? "Name cannot be empty" : true,
-        // agree: this.form.agree !== true ? "You must accept Terms of Service to continue" : true,
-        confirm: this.form.password !== this.form.confirm ? "Passwords do not match" : true,
-      }
-
-      if (this.error) {
-        if (this.error.code == "auth/invalid-email") {
-          validation.email = this.error.message
-        }
-        if (this.error.code == "auth/weak-password") {
-          validation.password = this.error.message
-        }
+        email: this.email == "" ? "Email cannot be empty" : true,
+        password: this.password == "" ? "Password cannot be empty" : true,
+        displayName: this.displayName == "" ? "Name cannot be empty" : true,
+        confirm: this.password !== this.confirm ? "Passwords do not match" : true,
       }
 
       return validation
     },
-
-    alert() {
-      return Boolean(this.error)
-    },
   },
 
   methods: {
+    ...mapActions("auth", ["registerUser"]),
+    ...mapMutations("auth", ["SET_ERROR"]),
+
     register() {
-      if (this.$refs.form.validate()) {
-        this.$emit("registration", this.form)
-      }
+      const { displayName, email, password } = this
+      if (this.$refs.form.validate()) this.registerUser({ displayName, email, password })
     },
   },
 }

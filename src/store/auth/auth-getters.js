@@ -1,6 +1,9 @@
 import debug from "@/components/authentication/debug"
 
 export default {
+  getError(state) {
+    return state.error
+  },
   getSessionPersistence(state) {
     return state.is_session_persistant
   },
@@ -32,12 +35,12 @@ export default {
     const user = getters.getCurrentUser
     return user ? user.metadata : null
   },
+  isLoading(state) {
+    return state.is_loading
+  },
   isAuthenticated(state, getters) {
     const user = getters.getCurrentUser
     return user ? true : false
-  },
-  isLoading(state) {
-    return state.is_loading
   },
   isAnonymous(state, getters) {
     const user = getters.getCurrentUser
@@ -47,37 +50,31 @@ export default {
     const user = getters.getCurrentUser
     return user ? user.emailVerified : null
   },
-
   // check if the current route is public to set negative persisten dialog
   isCurrentRoutePublic(state) {
     const { router } = state.config
     const route = router.currentRoute
-    const isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
+
+    let isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
+
+    if (route.matched[0] && route.matched[0].path !== window.location.pathname) isPublicRoute = false
 
     debug("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]")
 
     return isPublicRoute
   },
-
   isAuthGuardDialogShown(state) {
     return state.is_authguard_dialog_shown
   },
   isAuthGuardDialogPersistent(state) {
     return state.is_authguard_dialog_persistent
   },
-
   isUserRegistrationAllowed(state) {
     return state.config.registration
   },
-
   isEmailVerificationRequired(state) {
     return state.config.verification
   },
-
-  getError(state) {
-    return state.error
-  },
-
   isEmailVerificationRequired(state) {
     return state.config.verification
   },

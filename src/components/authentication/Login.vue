@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card flat>
-      <!-- error alerrts -->
+      <!-- error alerts -->
       <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
         {{ getError.message }}
       </v-alert>

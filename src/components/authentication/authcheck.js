@@ -10,7 +10,7 @@ export default () => {
   const isAuthenticated = store.getters["auth/isAuthenticated"]
   const verification = store.getters["auth/isEmailVerificationRequired"]
 
-  debug("[ auth check ]: email verification required: [", verification, "]")
+  if (verification) debug("[ auth check ]: email verification required: [", verification, "]")
 
   // anonymous authenticated currentUser
   if (verification && currentUser && currentUser.isAnonymous) {
@@ -64,15 +64,7 @@ export default () => {
     debug("[ auth check ]: currentUser is NOT authenticated")
 
     store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
   }
-
-  /**
-   * this has to handle 3 scenarios:
-   * - currentUser is on public route and wants to navigate to protected: (1. block nav, 2. show non persistent dialog)
-   * - currentUser opens app on protected route: (1. show persistent dialog)
-   *
-   */
 
   debug("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!")
 

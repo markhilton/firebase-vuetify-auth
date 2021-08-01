@@ -13,6 +13,7 @@ const authGuardSettings = {
   store,
   router,
   firebase,
+  phone: true,
   google: true,
   facebook: true,
 }

@@ -12,12 +12,7 @@
           <v-progress-linear :indeterminate="isLoading" />
 
           <div v-if="isEmailVerificationRequired">
-            <EmailVerification
-              :error="verificationError"
-              :is-loading="isLoading"
-              @sendEmail="sendVerificationEmail"
-              @signOut="signOut"
-            />
+            <EmailVerification />
           </div>
 
           <div v-else>
@@ -29,20 +24,15 @@
 
             <v-tabs-items v-model="tab">
               <v-tab-item class="pt-5">
-                <Login
-                  :error="loginError"
-                  :is-loading="isLoading"
-                  @credentials="loginWithEmail"
-                  @resetPassword="emailPasswordResetLink"
-                />
+                <Login />
               </v-tab-item>
 
               <v-tab-item v-if="!resetPassword && isUserRegistrationAllowed" class="pt-5">
-                <Register :error="registrationError" :is-loading="isLoading" @registration="registerUser" />
+                <Register />
               </v-tab-item>
 
               <v-tab-item v-if="resetPassword || !isUserRegistrationAllowed" class="pt-5">
-                <PasswordReset :error="loginError" :is-loading="isLoading" @showSignInTab="showSignInTab" />
+                <PasswordReset />
               </v-tab-item>
             </v-tabs-items>
           </div>
@@ -57,12 +47,14 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from "vuex"
+import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 
 /**
  * the auth guard has to watch user auth status & router current route changes
  */
 import debug from "./debug"
+import authcheck from "./authcheck"
+
 import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
@@ -80,43 +72,62 @@ export default {
 
   data: () => ({
     tab: 0,
-    isLoading: false,
     loginError: null,
     resetPassword: false,
-    registrationError: null,
-    verificationError: null,
   }),
 
   computed: {
+    ...mapState("auth", ["config"]),
     ...mapGetters("auth", [
+      "isLoading",
       "isAuthGuardDialogShown",
       "isAuthGuardDialogPersistent",
-      "isCurrentRoutePublic",
       "isUserRegistrationAllowed",
       "isEmailVerificationRequired",
     ]),
 
-    currentRoute(after, before) {
-      if (typeof before === "undefined") return
-      debug("[ this.$route.path (before, after) ]:", before, after)
+    currentRoute() {
       return this.$route.path
+    },
+
+    firebase() {
+      return this.config.firebase
     },
   },
 
   watch: {
-    currentRoute() {
-      debug("triggering [ checkRouterWhenReady ] because of current route change!")
-      this.isCurrentRoutePublic
+    currentRoute(after, before) {
+      if (typeof before === "undefined") return
+
+      debug("[ auth guard ]: vue router current route change: [", before, "] -> [", after, "]")
+      this.revalidateAuthGuard()
     },
   },
 
   created() {
-    this.authGuardInit()
+    // important to use onAuthStateChanged to mutate config state
+    // in order to prevent vuex from not recognizing firebase changes
+    this.firebase.auth().onAuthStateChanged(() => {
+      debug("[ auth guard ]: firebase auth state changed")
+
+      const config = this.config
+
+      this.$store.commit("auth/SET_CONFIG", null)
+      this.$store.commit("auth/SET_CONFIG", config)
+
+      this.revalidateAuthGuard()
+    })
   },
 
   methods: {
-    ...mapActions("auth", ["authGuardInit", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
-    ...mapMutations("auth", ["SET_AUTH_GUARD_DIALOG_SHOWN"]),
+    ...mapActions("auth", [
+      "revalidateAuthGuard",
+      "loginWithEmail",
+      "registerUser",
+      "signOut",
+      "sendVerificationEmail",
+    ]),
+    ...mapMutations("auth", ["SET_USER", "SET_AUTH_GUARD_DIALOG_SHOWN"]),
 
     //
     showSignInTab() {

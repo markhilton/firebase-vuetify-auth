@@ -1,21 +1,28 @@
+import firebaseProvider from "firebase/app"
 import debug from "../../components/authentication/debug"
+import authcheck from "../../components/authentication/authcheck"
 
 export default {
-  authGuardInit({ state, getters, commit }) {
-    debug("[ auth guard ]: initialization")
+  revalidateAuthGuard({ state, getters, commit }) {
+    debug("[ auth guard ]: revalidate request after state change")
 
     const { router } = state.config
+
+    authcheck()
 
     // check current route when router is ready
     router.onReady(() => {
       debug("[ auth guard ]: vue router ready")
+      debug("[ auth guard ]: isCurrentRoutePublic: [", getters.isCurrentRoutePublic, "]")
 
-      commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", !getters.isCurrentRoutePublic)
-
-      // run authCheck only if on non public route
-      // hide login dialog for public routes
-      if (this.isCurrentRoutePublic) {
+      if (getters.isCurrentRoutePublic) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", false)
+        commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+      } else if (!getters.isAuthenticated) {
+        debug("[ auth guard ]: isAuthenticated: [", getters.isAuthenticated, "]")
+
+        commit("SET_AUTH_GUARD_DIALOG_SHOWN", true)
+        commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
       }
     })
   },
@@ -52,7 +59,54 @@ export default {
   },
 
   //
-  async registerUser({ state, getters, commit }, { email, password, displayName }) {
+  loginWithGoogle({ state }) {
+    const { firebase } = state.config
+    const provider = new firebaseProvider.auth.GoogleAuthProvider()
+
+    firebase.auth().useDeviceLanguage()
+    firebase.auth().signInWithRedirect(provider)
+  },
+
+  //
+  loginWithFacebook({ state }) {
+    const { firebase } = state.config
+    const provider = new firebaseProvider.auth.FacebookAuthProvider()
+
+    firebase.auth().useDeviceLanguage()
+    firebase.auth().signInWithRedirect(provider)
+  },
+
+  //
+  loginWithPhone({ state }) {
+    const { firebase } = state.config
+
+    // Turn off phone auth app verification.
+    firebase.auth().settings.appVerificationDisabledForTesting = true
+  },
+
+  //
+  sendCode({ state }, {}) {
+    const { firebase } = state.config
+
+    firebase
+      .auth()
+      .signInWithPhoneNumber("+1" + phoneNumber, this.recaptchaVerifier)
+      .then((res) => {
+        this.step = 3
+        this.codeAuth = res
+      })
+      .catch((error) => {
+        this.step = 1
+      })
+  },
+
+  //
+  confirmCode() {
+    this.codeAuth.confirm(this.confirmationCode).then(() => (this.step = 1))
+  },
+
+  //
+  async registerUser({ state, getters, commit }, { displayName, email, password }) {
     try {
       commit("SET_LOADING", true)
 

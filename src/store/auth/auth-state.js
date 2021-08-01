@@ -4,6 +4,6 @@ export default {
 
   is_loading: false,
   is_session_persistant: true,
-  is_authguard_dialog_shown: false, // login dialog
-  is_authguard_dialog_persistent: false, // login dialog persistent option
+  is_authguard_dialog_shown: true, // login dialog
+  is_authguard_dialog_persistent: true, // login dialog persistent option
 }

@@ -8,8 +8,8 @@
       <v-spacer />
 
       <!-- sign in / sign out button -->
-      <v-btn v-if="!getCurrentUser" outlined @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
-      <v-btn v-else outlined @click="signOut()"> Sign Out </v-btn>
+      <v-btn v-if="isAuthenticated" outlined @click="signOut()"> Sign Out </v-btn>
+      <v-btn v-else outlined @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -45,7 +45,7 @@ export default {
   name: "App",
 
   computed: {
-    ...mapGetters("auth", ["getCurrentUser", "getDisplayName"]),
+    ...mapGetters("auth", ["isAuthenticated", "getDisplayName"]),
   },
 
   methods: {

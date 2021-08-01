@@ -63,8 +63,6 @@
 
 <script>
 export default {
-  props: ["error", "isLoading"],
-
   data: () => ({
     emailSent: false,
   }),

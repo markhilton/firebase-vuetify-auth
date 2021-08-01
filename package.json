@@ -23,15 +23,16 @@
     "build:unpkg": "rollup --config build/rollup.config.js --format iife --file dist/authentication-guard.min.js",
     "build:script": "vue-cli-service build --mode production --dest dist --inline-vue --name insights"
   },
-  "peerDependencies": {
+  "dependencies": {
     "@mdi/font": "^5.9.55",
-    "firebase": "^8.5.0",
+    "firebase": "^8.6.1",
     "vue": "^2.6.12",
+    "vuetify": "^2.5.0",
+    "vue-router": "^3.5.1",
     "vuex": "^3.6.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.9",
-    "@mdi/font": "^5.9.55",
     "@rollup/plugin-buble": "^0.21.3",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-node-resolve": "^13.0.0",
@@ -48,7 +49,6 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-vue": "^7.9.0",
-    "firebase": "^8.6.1",
     "postcss": "^8.2.15",
     "prettier": "^2.3.0",
     "rollup": "^2.47.0",
@@ -56,13 +56,9 @@
     "rollup-plugin-vuetify": "^0.2.3",
     "sass": "^1.32.13",
     "sass-loader": "^10.1.1",
-    "vue": "^2.6.12",
     "vue-cli-plugin-vuetify": "^2.4.0",
-    "vue-router": "^3.5.1",
     "vue-template-compiler": "^2.6.12",
-    "vuetify": "^2.5.0",
-    "vuetify-loader": "^1.7.1",
-    "vuex": "^3.6.2"
+    "vuetify-loader": "^1.7.1"
   },
   "browserslist": [
     "> 1%",
@@ -74,6 +70,5 @@
   },
   "engines": {
     "node": "12"
-  },
-  "dependencies": {}
+  }
 }
