@@ -121,7 +121,7 @@ export default {
     },
 
     firebase() {
-      return Vue.prototype.$authGuardSettings.firebase
+      return this.$store.getters["auth/getConfig"].firebase
     },
   },
 

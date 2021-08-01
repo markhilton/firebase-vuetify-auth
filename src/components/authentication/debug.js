@@ -1,8 +1,10 @@
-import Vue from "vue"
+import store from "../../store"
 
 // https://stackoverflow.com/questions/4116608/pass-unknown-number-of-arguments-into-javascript-function
 export default (...text) => {
-  if (!Boolean(Vue.prototype.$authGuardSettings.debug)) return
+  const { debug } = store.getters["auth/getConfig"]
+
+  if (!Boolean(debug)) return
 
   console.log.apply(console, text)
 }

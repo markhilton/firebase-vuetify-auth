@@ -2,21 +2,13 @@ import Vue from "vue"
 import debug from "@/components/authentication/debug"
 
 export default {
-  init({ commit, dispatch }) {
-    const config = Vue.prototype.$authGuardSettings
-
-    config.firebase = config.firebase || null
-    config.phone = typeof config.phone !== "undefined" ? config.phone : false
-    config.google = typeof config.google !== "undefined" ? config.google : false
-    config.facebook = typeof config.facebook !== "undefined" ? config.facebook : false
-    config.registration = typeof config.registration !== "undefined" ? config.registration : true
-
-    commit("SET_CONFIG", config)
+  init({ state, commit, dispatch }) {
+    const { router } = state.config
 
     // commit("isAuthGuardDialogShown", true)
 
     // check current route when router is ready
-    config.router.onReady(() => {
+    router.onReady(() => {
       debug("[ router ]: READY!")
 
       const publicRouteCheck = this.isCurrentRoutePublic
@@ -36,11 +28,11 @@ export default {
     })
   },
 
-  authCheck({ commit, getters }) {
+  authCheck({ state, getters, commit }) {
     let allowRoute = false
 
     const user = getters.currentUser
-    const { verification } = getters.config
+    const { verification } = state.config
 
     debug("[ auth guard ]: email verification required: [", verification, "]")
 

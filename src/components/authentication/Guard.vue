@@ -1,11 +1,17 @@
 <template>
   <div>
-    <v-dialog v-model="dialog" :persistent="persistent" overlay-opacity="0.95" content-class="elevation-0">
+    <v-dialog
+      :value="isAuthGuardDialogShown"
+      :persistent="isAuthGuardDialogPersistent"
+      overlay-opacity="0.95"
+      content-class="elevation-0"
+      @change="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
+    >
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
           <v-progress-linear :indeterminate="isLoading" />
 
-          <div v-if="emailVerificationRequired">
+          <div v-if="isEmailVerificationRequired">
             <EmailVerification
               :error="verificationError"
               :is-loading="isLoading"
@@ -17,14 +23,13 @@
           <div v-else>
             <v-tabs v-model="tab" grow>
               <v-tab @click="showSignInTab"> Sign In </v-tab>
-              <v-tab v-if="!resetPassword && registration"> Register </v-tab>
-              <v-tab v-if="resetPassword || !registration"> Reset Password </v-tab>
+              <v-tab v-if="!resetPassword && isUserRegistrationAllowed"> Register </v-tab>
+              <v-tab v-if="resetPassword || !isUserRegistrationAllowed"> Reset Password </v-tab>
             </v-tabs>
 
             <v-tabs-items v-model="tab">
               <v-tab-item class="pt-5">
                 <Login
-                  :firebase="firebase"
                   :error="loginError"
                   :is-loading="isLoading"
                   @credentials="loginWithEmail"
@@ -32,23 +37,18 @@
                 />
               </v-tab-item>
 
-              <v-tab-item v-if="!resetPassword && registration" class="pt-5">
+              <v-tab-item v-if="!resetPassword && isUserRegistrationAllowed" class="pt-5">
                 <Register :error="registrationError" :is-loading="isLoading" @registration="registerUser" />
               </v-tab-item>
 
-              <v-tab-item v-if="resetPassword || !registration" class="pt-5">
-                <PasswordReset
-                  :firebase="firebase"
-                  :error="loginError"
-                  :is-loading="isLoading"
-                  @showSignInTab="showSignInTab"
-                />
+              <v-tab-item v-if="resetPassword || !isUserRegistrationAllowed" class="pt-5">
+                <PasswordReset :error="loginError" :is-loading="isLoading" @showSignInTab="showSignInTab" />
               </v-tab-item>
             </v-tabs-items>
           </div>
 
-          <v-card-actions v-if="!emailVerificationRequired">
-            <LoginWithProvider :google="google" :facebook="facebook" :phone="phone" />
+          <v-card-actions v-if="!isEmailVerificationRequired">
+            <LoginWithProvider />
           </v-card-actions>
         </v-card>
       </v-container>
@@ -63,7 +63,6 @@ import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
  * the auth guard has to watch user auth status & router current route changes
  */
 import debug from "./debug"
-import authCheck from "./authcheck"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
@@ -80,27 +79,22 @@ export default {
   },
 
   data: () => ({
-    dialog: false,
-    persistent: true,
-
-    firebase: null,
-    registration: true,
-    verification: true,
-    google: false,
-    facebook: false,
-    phone: false,
-
     tab: 0,
     isLoading: false,
     loginError: null,
     resetPassword: false,
     registrationError: null,
     verificationError: null,
-    emailVerificationRequired: false,
   }),
 
   computed: {
-    ...mapGetters("auth", ["isCurrentRoutePublic"]),
+    ...mapGetters("auth", [
+      "isAuthGuardDialogShown",
+      "isAuthGuardDialogPersistent",
+      "isCurrentRoutePublic",
+      "isUserRegistrationAllowed",
+      "isEmailVerificationRequired",
+    ]),
 
     currentRoute(after, before) {
       // if (typeof before === "undefined") return
@@ -114,20 +108,10 @@ export default {
       debug("triggering [ checkRouterWhenReady ] because of current route change!")
       this.isCurrentRoutePublic
     },
-
-    dialog(state) {
-      debug("dialog(state)", state)
-      this.$authGuardSettings.showAuthGuardDialog = state
-    },
-
-    persistent(state) {
-      debug("persistent(state)", state)
-      this.$authGuardSettings.persistent = state
-    },
   },
 
   created() {
-    this.init()
+    this.$store.dispatch("auth/init")
   },
 
   methods: {

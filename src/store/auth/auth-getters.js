@@ -1,9 +1,11 @@
-import Vue from "vue"
 import debug from "@/components/authentication/debug"
 
 export default {
+  getConfig(state) {
+    return state.config
+  },
   getCurrentUser(state) {
-    const { firebase } = Vue.prototype.$authGuardSettings
+    const { firebase } = state.config
     return firebase.auth().currentUser
   },
   getUid(state, getters) {
@@ -34,6 +36,9 @@ export default {
     const user = getters.getCurrentUser
     return user && user.uid ? true : false
   },
+  isLoading(state) {
+    return state.is_loading
+  },
   isAnonymous(state, getters) {
     const user = getters.getCurrentUser
     return user ? user.isAnonymous : null
@@ -44,8 +49,8 @@ export default {
   },
 
   // check if the current route is public to set negative persisten dialog
-  isCurrentRoutePublic() {
-    const { router } = Vue.prototype.$authGuardSettings
+  isCurrentRoutePublic(state) {
+    const { router } = state.config
     const route = router.currentRoute
     const publicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
 
@@ -57,9 +62,25 @@ export default {
   },
 
   isAuthGuardDialogShown(state) {
-    return state.isAuthGuardDialogShown
+    return state.is_authguard_dialog_shown
   },
   isAuthGuardDialogPersistent(state) {
-    return state.isAuthGuardDialogPersistent
+    return state.is_authguard_dialog_persistent
+  },
+
+  isUserRegistrationAllowed(state) {
+    return state.config.registration
+  },
+
+  isEmailVerificationRequired(state) {
+    return state.config.verification
+  },
+
+  getError(state) {
+    return state.error
+  },
+
+  isEmailVerificationRequired(state) {
+    return state.config.verification
   },
 }

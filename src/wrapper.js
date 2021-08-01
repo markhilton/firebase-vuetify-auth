@@ -1,4 +1,5 @@
-/* eslint-env node */
+// default npm package init config
+import defaultSettings from "./store/defaultSettings"
 
 // Import vue component
 import AuthGuard from "./components/authentication/Guard.vue"
@@ -8,12 +9,22 @@ import AuthGuardMiddleware from "./components/authentication/authguard"
 
 // Declare install function executed by Vue.use()
 const install = (Vue, options) => {
-  console.log("INSTALL", options)
-
   if (install.installed) return
 
   install.installed = true
-  Vue.prototype.$authGuardSettings = options
+
+  // merge default settings with user settings
+  const config = { ...defaultSettings, ...options }
+  const { store, router, firebase } = config
+
+  // verify if required dependency instances are passed to this package config
+  if (store == null) console.error("ERROR: vuex store instance missing in AuthenticationGuard config!")
+  if (router == null) console.error("ERROR: vue router instance missing in AuthenticationGuard config!")
+  if (firebase == null) console.error("ERROR: firebase instance missing in AuthenticationGuard config!")
+
+  // commit npm package config to vuex store
+  store.commit("auth/SET_CONFIG", config)
+
   Vue.component("AuthenticationGuard", AuthGuard)
 }
 

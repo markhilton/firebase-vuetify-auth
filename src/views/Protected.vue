@@ -92,10 +92,10 @@ export default {
   },
 
   created() {
-    const firebase = this.$authGuardSettings.firebase
-    const user = firebase.auth().currentUser
+    const { firebase } = this.store.getters["auth/getConfig"]
+    const { currentUser } = firebase.auth().currentUser
 
-    this.form.name = (user && user.displayName) || null
+    this.form.name = (currentUser && currentUser.displayName) || null
   },
 
   methods: {
