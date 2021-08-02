@@ -11,7 +11,9 @@ import AuthGuard from "./components/authentication/Guard.vue"
 import AuthGuardMiddleware from "./components/authentication/authguard"
 
 // Declare install function executed by Vue.use()
-const install = (Vue, options) => {
+export function install(Vue, options = {}) {
+  console.log("$authGuardStore @!!!!!!!!!!!!", options)
+
   if (install.installed) return
 
   install.installed = true
@@ -19,6 +21,8 @@ const install = (Vue, options) => {
   // merge default settings with user settings
   const config = { ...defaultSettings, ...options }
   const { store, router, firebase } = config
+
+  Vue.prototype.$authGuardStore = store
 
   // verify if required dependency instances are passed to this package config
   if (store == null) console.error("ERROR: vuex store instance missing in AuthenticationGuard config!")
@@ -38,19 +42,16 @@ const plugin = {
 
 // Auto-install when vue is found (eg. in browser via <script> tag)
 let GlobalVue = null
-
 if (typeof window !== "undefined") {
   GlobalVue = window.Vue
 } else if (typeof global !== "undefined") {
   GlobalVue = global.Vue
 }
-
-if (GlobalVue) GlobalVue.use(plugin)
-
-// To allow use as module (npm/webpack/etc.) export component
-export default {
-  install,
+if (GlobalVue) {
+  GlobalVue.use(plugin)
 }
 
 export const AuthStore = AuthStoreNamespace
 export const AuthMiddleware = AuthGuardMiddleware
+
+export default AuthGuard

@@ -1,4 +1,5 @@
-import store from "../../store"
+// import store from "../../store"
+import Vue from "vue"
 
 const debug = (...text) => {
   const { debug } = store.state.auth.config
@@ -12,6 +13,8 @@ export default () => {
   debug("[ auth check ]: execution started...")
 
   let allowRoute = false // default state
+
+  const store = Vue.prototype.$authGuardStore
 
   const currentUser = store.getters["auth/getCurrentUser"]
   const isAuthenticated = store.getters["auth/isAuthenticated"]

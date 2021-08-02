@@ -76,4 +76,7 @@ export default {
   isEmailVerificationRequired(state) {
     return state.config.verification
   },
+  isEmailResetPasswordLinkSent(state) {
+    return state.is_email_reset_password_link_sent
+  },
 }

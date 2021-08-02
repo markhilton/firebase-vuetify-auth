@@ -121,17 +121,20 @@ export default {
     }
   },
 
-  emailPasswordResetLink() {
-    this.resetPassword = true
-    this.tab = 1
-    // const auth = firebase.auth();
-    // const emailAddress = "user@example.com";
+  async emailPasswordResetLink({ state, commit }, email) {
+    try {
+      commit("SET_LOADING", true)
 
-    // auth.sendPasswordResetEmail(emailAddress).then(function() {
-    //   // Email sent.
-    // }).catch(function(error) {
-    //   // An error happened.
-    // });
+      const { firebase } = state.config
+
+      await firebase.auth().sendPasswordResetEmail(email)
+
+      commit("SET_LOADING", false)
+      commit("SET_EMAIL_PASSWORD_RESET_LINK_SENT", true)
+    } catch (error) {
+      commit("SET_ERROR", error)
+      commit("SET_LOADING", false)
+    }
   },
 
   //

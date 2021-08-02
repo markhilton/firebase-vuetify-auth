@@ -3,11 +3,12 @@
     <!-- user with no email verification -->
     <v-card flat class="text-center pa-5">
       <!-- email error -->
-      <div v-if="error">
+      <div v-if="getError">
         <div class="display-1 grey--text mb-3">Error!</div>
 
-        <v-alert v-if="error" type="error">
-          {{ error }}
+        <!-- error alerts -->
+        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+          {{ getError.message }}
         </v-alert>
 
         <v-btn color="primary" @click="goToLogin"> Back to Login </v-btn>
@@ -16,13 +17,13 @@
       <!-- email verification -->
       <div v-else>
         <!-- email confirmation required message -->
-        <div v-if="!emailSent">
+        <div v-if="!isEmailResetPasswordLinkSent">
           <div class="display-1 grey--text mb-3">Verification Required</div>
           <v-icon size="100" color="grey" class="ma-4">mdi-account</v-icon>
         </div>
 
         <!-- email sent confirmation -->
-        <div v-if="emailSent">
+        <div v-if="isEmailResetPasswordLinkSent">
           <div class="display-1 grey--text mb-3">Email sent!</div>
           <v-icon size="100" color="grey" class="ma-4">mdi-email</v-icon>
         </div>
@@ -35,18 +36,16 @@
         </div>
 
         <!-- send verification email button -->
-        <div v-if="!emailSent">
+        <div v-if="!isEmailResetPasswordLinkSent">
           <p class="grey--text text--darken-2 mb-7 body-2">
             If you have not received verification email<br />click at the button below.
           </p>
 
-          <v-btn :disabled="isLoading" color="primary" @click="resendVerificationEmail">
-            Send Verification Email
-          </v-btn>
+          <v-btn :disabled="isLoading" color="primary" @click="sendVerificationEmail"> Send Verification Email </v-btn>
         </div>
 
         <!-- back to login page button -->
-        <div v-if="emailSent">
+        <div v-if="isEmailResetPasswordLinkSent">
           <v-btn color="primary" @click="goToLogin"> Back to Login </v-btn>
         </div>
 
@@ -62,37 +61,21 @@
 </template>
 
 <script>
+import { mapState, mapGetters, mapActions } from "vuex"
+
 export default {
-  data: () => ({
-    emailSent: false,
-  }),
+  data: () => ({}),
 
   computed: {
-    isAuthenticated() {
-      const firebase = this.$authGuardSettings.firebase
-      const user = firebase.auth().currentUser
-      return user && user.uid ? true : false
-    },
+    ...mapState("auth", ["config"]),
+    ...mapGetters("auth", ["isLoading", "isAuthenticated", "getError", "isEmailResetPasswordLinkSent"]),
   },
 
   methods: {
-    resendVerificationEmail() {
-      this.emailSent = true
-      this.$emit("sendEmail")
-    },
+    ...mapActions("auth", ["signIn", "signOut", "sendVerificationEmail"]),
+
     goToLogin() {
-      this.$authGuardSettings.emailVerificationRequired = false
       this.$emit("signOut")
-    },
-    signIn() {
-      this.$authGuardSettings.showAuthGuardDialog = true
-      this.$authGuardSettings.emailVerificationRequired = false
-    },
-    signOut() {
-      const firebase = this.$authGuardSettings.firebase
-      firebase.auth().signOut()
-      this.$authGuardSettings.showAuthGuardDialog = true
-      this.$authGuardSettings.emailVerificationRequired = false
     },
   },
 }

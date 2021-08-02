@@ -57,6 +57,8 @@ import EmailVerification from "./EmailVerification.vue"
 import LoginWithProvider from "./LoginWithProvider.vue"
 
 export default {
+  name: "AuthenticationGuard",
+
   components: {
     Login,
     Register,

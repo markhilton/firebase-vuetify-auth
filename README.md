@@ -63,13 +63,14 @@ import App from "@/App"
 import router from "@/router"
 import vuetify from "@/plugins/vuetify"
 import firebase from "@/middleware/firebase"
-import { AuthGuard } from "@nerd305/firebase-vuetify-auth"
+import AuthGuard from "@nerd305/firebase-vuetify-auth"
 
 Vue.config.productionTip = false
 
 const authGuardSettings = {
-  router: router, // routes
-  firebase: firebase, // pass on firebase middleware app init
+  debug: true, // enable debug messages in console log
+  router, // routes
+  firebase, // pass on firebase middleware app init
   verification: false, // require user email to be verified before granting access
   registration: true, // allow new user registrations
   phone: false, // allow authentication with phone

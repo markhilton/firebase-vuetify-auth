@@ -17,4 +17,7 @@ export default {
   SET_AUTH_GUARD_DIALOG_PERSISTENT(state, status) {
     state.is_authguard_dialog_persistent = status
   },
+  SET_EMAIL_PASSWORD_RESET_LINK_SENT(state, status) {
+    state.is_email_reset_password_link_sent = status
+  },
 }

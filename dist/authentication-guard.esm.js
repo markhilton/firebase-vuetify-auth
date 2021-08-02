@@ -1,5 +1,6 @@
-import Vue, { resolveComponent, openBlock, createBlock, withCtx, createVNode, createTextVNode, toDisplayString, createCommentVNode, Fragment, withModifiers, resolveDirective, mergeProps, toHandlers, withDirectives } from 'vue';
-import Vuex, { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VCard, VContainer, VForm, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
+import Vue from 'vue';
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 
 var state = {
   config: null, // package init configuration
@@ -9,6 +10,7 @@ var state = {
   is_session_persistant: true,
   is_authguard_dialog_shown: true, // login dialog
   is_authguard_dialog_persistent: true, // login dialog persistent option
+  is_email_reset_password_link_sent: false, // confirmation for successful reset password link email
 };
 
 var getters = {
@@ -92,34 +94,9 @@ var getters = {
   isEmailVerificationRequired: function isEmailVerificationRequired(state) {
     return state.config.verification
   },
-};
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
-var __assign = function() {
-    __assign = Object.assign || function __assign(t) {
-        var arguments$1 = arguments;
-
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments$1[i];
-            for (var p in s) { if (Object.prototype.hasOwnProperty.call(s, p)) { t[p] = s[p]; } }
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
+  isEmailResetPasswordLinkSent: function isEmailResetPasswordLinkSent(state) {
+    return state.is_email_reset_password_link_sent
+  },
 };
 
 /*! *****************************************************************************
@@ -151,6 +128,96 @@ function __extends(d, b) {
     extendStatics(d, b);
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        var arguments$1 = arguments;
+
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments$1[i];
+            for (var p in s) { if (Object.prototype.hasOwnProperty.call(s, p)) { t[p] = s[p]; } }
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) { throw t[1]; } return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) { throw new TypeError("Generator is already executing."); }
+        while (_) { try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) { return t; }
+            if (y = 0, t) { op = [op[0] & 2, t.value]; }
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) { _.ops.pop(); }
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; } }
+        if (op[0] & 5) { throw op[1]; } return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+function __values(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) { return m.call(o); }
+    if (o && typeof o.length === "number") { return {
+        next: function () {
+            if (o && i >= o.length) { o = void 0; }
+            return { value: o && o[i++], done: !o };
+        }
+    }; }
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) { return o; }
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) { ar.push(r.value); }
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) { m.call(i); }
+        }
+        finally { if (e) { throw e.error; } }
+    }
+    return ar;
+}
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) { for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) { ar = Array.prototype.slice.call(from, 0, i); }
+            ar[i] = from[i];
+        }
+    } }
+    return to.concat(ar || from);
 }
 
 /**
@@ -595,98 +662,6 @@ function implementsAnyMethods(obj, methods) {
 }
 function noop() {
     // do nothing
-}
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
-function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-}
-
-function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) { throw t[1]; } return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) { throw new TypeError("Generator is already executing."); }
-        while (_) { try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) { return t; }
-            if (y = 0, t) { op = [op[0] & 2, t.value]; }
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) { _.ops.pop(); }
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; } }
-        if (op[0] & 5) { throw op[1]; } return { value: op[0] ? op[1] : void 0, done: true };
-    }
-}
-
-function __values(o) {
-    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-    if (m) { return m.call(o); }
-    if (o && typeof o.length === "number") { return {
-        next: function () {
-            if (o && i >= o.length) { o = void 0; }
-            return { value: o && o[i++], done: !o };
-        }
-    }; }
-    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
-}
-
-function __read(o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) { return o; }
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) { ar.push(r.value); }
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) { m.call(i); }
-        }
-        finally { if (e) { throw e.error; } }
-    }
-    return ar;
-}
-
-function __spreadArray(to, from, pack) {
-    if (pack || arguments.length === 2) { for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) { ar = Array.prototype.slice.call(from, 0, i); }
-            ar[i] = from[i];
-        }
-    } }
-    return to.concat(ar || from);
 }
 
 /**
@@ -2277,17 +2252,24 @@ var actions = {
     }
   },
 
-  emailPasswordResetLink: function emailPasswordResetLink() {
-    this.resetPassword = true;
-    this.tab = 1;
-    // const auth = firebase.auth();
-    // const emailAddress = "user@example.com";
+  emailPasswordResetLink: async function emailPasswordResetLink(ref, email) {
+    var state = ref.state;
+    var commit = ref.commit;
 
-    // auth.sendPasswordResetEmail(emailAddress).then(function() {
-    //   // Email sent.
-    // }).catch(function(error) {
-    //   // An error happened.
-    // });
+    try {
+      commit("SET_LOADING", true);
+
+      var ref$1 = state.config;
+      var firebase = ref$1.firebase;
+
+      await firebase.auth().sendPasswordResetEmail(email);
+
+      commit("SET_LOADING", false);
+      commit("SET_EMAIL_PASSWORD_RESET_LINK_SENT", true);
+    } catch (error) {
+      commit("SET_ERROR", error);
+      commit("SET_LOADING", false);
+    }
   },
 
   //
@@ -2344,6 +2326,9 @@ var mutations = {
   SET_AUTH_GUARD_DIALOG_PERSISTENT: function SET_AUTH_GUARD_DIALOG_PERSISTENT(state, status) {
     state.is_authguard_dialog_persistent = status;
   },
+  SET_EMAIL_PASSWORD_RESET_LINK_SENT: function SET_EMAIL_PASSWORD_RESET_LINK_SENT(state, status) {
+    state.is_email_reset_password_link_sent = status;
+  },
 };
 
 var AuthStoreNamespace = {
@@ -2371,13 +2356,7 @@ var defaultSettings = {
   iconColor: "orange", // authentication prompt icon color
 };
 
-Vue.use(Vuex);
-
-var store = new Vuex.Store({
-  modules: {
-    auth: AuthStoreNamespace,
-  },
-});
+// import store from "../../store"
 
 var debug = function () {
   var text = [], len = arguments.length;
@@ -2395,6 +2374,8 @@ function authCheck () {
   debug("[ auth check ]: execution started...");
 
   var allowRoute = false; // default state
+
+  var store = Vue.prototype.$authGuardStore;
 
   var currentUser = store.getters["auth/getCurrentUser"];
   var isAuthenticated = store.getters["auth/isAuthenticated"];
@@ -2462,61 +2443,184 @@ function authCheck () {
 }
 
 var script$6 = {
-  computed: Object.assign({}, mapState("auth", ["config"])),
+  components: {
+    VIcon: VIcon,
+    VListItemTitle: VListItemTitle,
+    VListItemSubtitle: VListItemSubtitle,
+    VListItemContent: VListItemContent,
+    VListItem: VListItem,
+    VList: VList
+  },
+
+  computed: Object.assign({}, mapState("auth", ["config"]))
 };
 
-var _hoisted_1$6 = { class: "ml-1" };
-
-function render$6(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_icon = resolveComponent("v-icon");
-  var _component_v_list_item_title = resolveComponent("v-list-item-title");
-  var _component_v_list_item_subtitle = resolveComponent("v-list-item-subtitle");
-  var _component_v_list_item_content = resolveComponent("v-list-item-content");
-  var _component_v_list_item = resolveComponent("v-list-item");
-  var _component_v_list = resolveComponent("v-list");
-
-  return (openBlock(), createBlock(_component_v_list, { dense: "" }, {
-    default: withCtx(function () { return [
-      createVNode(_component_v_list_item, null, {
-        default: withCtx(function () { return [
-          createVNode(_component_v_list_item_content, null, {
-            default: withCtx(function () { return [
-              createVNode(_component_v_list_item_title, { class: "title" }, {
-                default: withCtx(function () { return [
-                  createVNode(_component_v_icon, {
-                    color: _ctx.config.iconColor
-                  }, {
-                    default: withCtx(function () { return [
-                      createTextVNode(toDisplayString(_ctx.config.icon), 1 /* TEXT */)
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["color"]),
-                  createTextVNode(" " + toDisplayString(_ctx.config.title), 1 /* TEXT */)
-                ]; }),
-                _: 1 /* STABLE */
-              }),
-              createVNode(_component_v_list_item_subtitle, null, {
-                default: withCtx(function () { return [
-                  createVNode("div", _hoisted_1$6, toDisplayString(_ctx.config.subtitle), 1 /* TEXT */)
-                ]; }),
-                _: 1 /* STABLE */
-              })
-            ]; }),
-            _: 1 /* STABLE */
-          })
-        ]; }),
-        _: 1 /* STABLE */
-      })
-    ]; }),
-    _: 1 /* STABLE */
-  }))
+function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+    if (typeof shadowMode !== 'boolean') {
+        createInjectorSSR = createInjector;
+        createInjector = shadowMode;
+        shadowMode = false;
+    }
+    // Vue.extend constructor export interop.
+    var options = typeof script === 'function' ? script.options : script;
+    // render functions
+    if (template && template.render) {
+        options.render = template.render;
+        options.staticRenderFns = template.staticRenderFns;
+        options._compiled = true;
+        // functional template
+        if (isFunctionalTemplate) {
+            options.functional = true;
+        }
+    }
+    // scopedId
+    if (scopeId) {
+        options._scopeId = scopeId;
+    }
+    var hook;
+    if (moduleIdentifier) {
+        // server build
+        hook = function (context) {
+            // 2.3 injection
+            context =
+                context || // cached call
+                    (this.$vnode && this.$vnode.ssrContext) || // stateful
+                    (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
+            // 2.2 with runInNewContext: true
+            if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+                context = __VUE_SSR_CONTEXT__;
+            }
+            // inject component styles
+            if (style) {
+                style.call(this, createInjectorSSR(context));
+            }
+            // register component module identifier for async chunk inference
+            if (context && context._registeredComponents) {
+                context._registeredComponents.add(moduleIdentifier);
+            }
+        };
+        // used by ssr in case component is cached and beforeCreate
+        // never gets called
+        options._ssrRegister = hook;
+    }
+    else if (style) {
+        hook = shadowMode
+            ? function (context) {
+                style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
+            }
+            : function (context) {
+                style.call(this, createInjector(context));
+            };
+    }
+    if (hook) {
+        if (options.functional) {
+            // register for functional component in vue file
+            var originalRender = options.render;
+            options.render = function renderWithStyleInjection(h, context) {
+                hook.call(context);
+                return originalRender(h, context);
+            };
+        }
+        else {
+            // inject component registration as beforeCreate hook
+            var existing = options.beforeCreate;
+            options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+        }
+    }
+    return script;
 }
 
-script$6.render = render$6;
-script$6.__file = "src/components/authentication/Branding.vue";
+/* script */
+var __vue_script__$6 = script$6;
+
+/* template */
+var __vue_render__$6 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "v-list",
+    { attrs: { dense: "" } },
+    [
+      _c(
+        "v-list-item",
+        [
+          _c(
+            "v-list-item-content",
+            [
+              _c(
+                "v-list-item-title",
+                { staticClass: "title" },
+                [
+                  _c("v-icon", { attrs: { color: _vm.config.iconColor } }, [
+                    _vm._v(_vm._s(_vm.config.icon))
+                  ]),
+                  _vm._v("\n\n        " + _vm._s(_vm.config.title) + "\n      ")
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c("v-list-item-subtitle", [
+                _c("div", { staticClass: "ml-1" }, [
+                  _vm._v(
+                    "\n          " + _vm._s(_vm.config.subtitle) + "\n        "
+                  )
+                ])
+              ])
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+};
+var __vue_staticRenderFns__$6 = [];
+__vue_render__$6._withStripped = true;
+
+  /* style */
+  var __vue_inject_styles__$6 = undefined;
+  /* scoped */
+  var __vue_scope_id__$6 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$6 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$6 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
+
+  
+  var __vue_component__$6 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+    __vue_inject_styles__$6,
+    __vue_script__$6,
+    __vue_scope_id__$6,
+    __vue_is_functional_template__$6,
+    __vue_module_identifier__$6,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 var script$5 = {
-  components: { Branding: script$6 },
+  components: {
+    Branding: __vue_component__$6,
+    VAlert: VAlert,
+    VTextField: VTextField,
+    VCheckbox: VCheckbox,
+    VCardText: VCardText,
+    VBtn: VBtn,
+    VCardActions: VCardActions,
+    VCard: VCard,
+    VContainer: VContainer
+  },
 
   data: function () { return ({
     email: "",
@@ -2528,126 +2632,200 @@ var script$5 = {
 
   created: function created() {
     this.remember = this.getSessionPersistence;
+    this.SET_EMAIL_PASSWORD_RESET_LINK_SENT(false);
   },
 
-  methods: Object.assign({}, mapActions("auth", ["loginWithEmail"]),
-    mapMutations("auth", ["SET_SESSION_PERSISTANCE", "SET_ERROR"])),
+  methods: Object.assign({}, mapActions("auth", ["loginWithEmail", "emailPasswordResetLink"]),
+    mapMutations("auth", ["SET_SESSION_PERSISTANCE", "SET_EMAIL_PASSWORD_RESET_LINK_SENT", "SET_ERROR"])),
 };
 
-var _hoisted_1$5 = { class: "text-center pb-4" };
-var _hoisted_2$4 = /*#__PURE__*/createTextVNode(" Forgot Password? ");
-var _hoisted_3$4 = /*#__PURE__*/createTextVNode(" Login ");
+/* script */
+var __vue_script__$5 = script$5;
 
-function render$5(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_alert = resolveComponent("v-alert");
-  var _component_branding = resolveComponent("branding");
-  var _component_v_text_field = resolveComponent("v-text-field");
-  var _component_v_checkbox = resolveComponent("v-checkbox");
-  var _component_v_card_text = resolveComponent("v-card-text");
-  var _component_v_btn = resolveComponent("v-btn");
-  var _component_v_card_actions = resolveComponent("v-card-actions");
-  var _component_v_card = resolveComponent("v-card");
-  var _component_v_container = resolveComponent("v-container");
+/* template */
+var __vue_render__$5 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "v-container",
+    [
+      _c(
+        "v-card",
+        { attrs: { flat: "" } },
+        [
+          Boolean(_vm.getError)
+            ? _c(
+                "v-alert",
+                {
+                  attrs: { type: "error", dismissible: "" },
+                  on: {
+                    click: function($event) {
+                      return _vm.SET_ERROR(null)
+                    }
+                  }
+                },
+                [_vm._v("\n      " + _vm._s(_vm.getError.message) + "\n    ")]
+              )
+            : _c("branding", { staticClass: "text-center" }),
+          _vm._v(" "),
+          _c(
+            "v-card-text",
+            { staticClass: "mb-0 pb-0" },
+            [
+              _c("v-text-field", {
+                staticClass: "mr-2",
+                attrs: {
+                  required: "",
+                  label: "Email",
+                  "prepend-icon": "mdi-account"
+                },
+                model: {
+                  value: _vm.email,
+                  callback: function($$v) {
+                    _vm.email = $$v;
+                  },
+                  expression: "email"
+                }
+              }),
+              _vm._v(" "),
+              _c("v-text-field", {
+                staticClass: "mr-2",
+                attrs: {
+                  autocomplete: "off",
+                  name: "password",
+                  type: "password",
+                  label: "Password",
+                  "prepend-icon": "mdi-lock"
+                },
+                model: {
+                  value: _vm.password,
+                  callback: function($$v) {
+                    _vm.password = $$v;
+                  },
+                  expression: "password"
+                }
+              }),
+              _vm._v(" "),
+              _c("v-checkbox", {
+                staticClass: "ml-8",
+                attrs: { dense: "", name: "remember", label: "remember me" },
+                on: {
+                  change: function($event) {
+                    return _vm.SET_SESSION_PERSISTANCE(_vm.remember)
+                  }
+                },
+                model: {
+                  value: _vm.remember,
+                  callback: function($$v) {
+                    _vm.remember = $$v;
+                  },
+                  expression: "remember"
+                }
+              })
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "text-center pb-4" },
+            [
+              _c(
+                "v-btn",
+                {
+                  attrs: { text: "", "x-small": "", color: "primary" },
+                  on: {
+                    click: function($event) {
+                      return _vm.emailPasswordResetLink(_vm.email)
+                    }
+                  }
+                },
+                [_vm._v(" Forgot Password? ")]
+              )
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-card-actions",
+            [
+              _c(
+                "v-btn",
+                {
+                  attrs: {
+                    depressed: "",
+                    block: "",
+                    large: "",
+                    color: "primary",
+                    type: "submit",
+                    disabled: _vm.isLoading
+                  },
+                  on: {
+                    click: function($event) {
+                      return _vm.loginWithEmail({
+                        email: _vm.email,
+                        password: _vm.password
+                      })
+                    }
+                  }
+                },
+                [_vm._v("\n        Login\n      ")]
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+};
+var __vue_staticRenderFns__$5 = [];
+__vue_render__$5._withStripped = true;
 
-  return (openBlock(), createBlock(_component_v_container, null, {
-    default: withCtx(function () { return [
-      createVNode(_component_v_card, { flat: "" }, {
-        default: withCtx(function () { return [
-          createCommentVNode(" error alerts "),
-          (Boolean(_ctx.getError))
-            ? (openBlock(), createBlock(_component_v_alert, {
-                key: 0,
-                type: "error",
-                dismissible: "",
-                onClick: _cache[1] || (_cache[1] = function ($event) { return (_ctx.SET_ERROR(null)); })
-              }, {
-                default: withCtx(function () { return [
-                  createTextVNode(toDisplayString(_ctx.getError.message), 1 /* TEXT */)
-                ]; }),
-                _: 1 /* STABLE */
-              }))
-            : (openBlock(), createBlock(Fragment, { key: 1 }, [
-                createCommentVNode(" application branding "),
-                createVNode(_component_branding, { class: "text-center" })
-              ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)),
-          createCommentVNode(" login form "),
-          createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
-            default: withCtx(function () { return [
-              createVNode(_component_v_text_field, {
-                modelValue: _ctx.email,
-                "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.email = $event); }),
-                required: "",
-                class: "mr-2",
-                label: "Email",
-                "prepend-icon": "mdi-account"
-              }, null, 8 /* PROPS */, ["modelValue"]),
-              createVNode(_component_v_text_field, {
-                modelValue: _ctx.password,
-                "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) { return (_ctx.password = $event); }),
-                autocomplete: "off",
-                class: "mr-2",
-                name: "password",
-                type: "password",
-                label: "Password",
-                "prepend-icon": "mdi-lock"
-              }, null, 8 /* PROPS */, ["modelValue"]),
-              createVNode(_component_v_checkbox, {
-                modelValue: _ctx.remember,
-                "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.remember = $event); }),
-                dense: "",
-                class: "ml-8",
-                name: "remember",
-                label: "remember me",
-                onChange: _cache[5] || (_cache[5] = function ($event) { return (_ctx.SET_SESSION_PERSISTANCE(_ctx.remember)); })
-              }, null, 8 /* PROPS */, ["modelValue"])
-            ]; }),
-            _: 1 /* STABLE */
-          }),
-          createVNode("div", _hoisted_1$5, [
-            createVNode(_component_v_btn, {
-              text: "",
-              "x-small": "",
-              color: "primary",
-              onClick: _cache[6] || (_cache[6] = function ($event) { return (_ctx.resetPassword()); })
-            }, {
-              default: withCtx(function () { return [
-                _hoisted_2$4
-              ]; }),
-              _: 1 /* STABLE */
-            })
-          ]),
-          createVNode(_component_v_card_actions, null, {
-            default: withCtx(function () { return [
-              createVNode(_component_v_btn, {
-                depressed: "",
-                block: "",
-                large: "",
-                color: "primary",
-                type: "submit",
-                disabled: _ctx.isLoading,
-                onClick: _cache[7] || (_cache[7] = function ($event) { return (_ctx.loginWithEmail({ email: _ctx.email, password: _ctx.password })); })
-              }, {
-                default: withCtx(function () { return [
-                  _hoisted_3$4
-                ]; }),
-                _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["disabled"])
-            ]; }),
-            _: 1 /* STABLE */
-          })
-        ]; }),
-        _: 1 /* STABLE */
-      })
-    ]; }),
-    _: 1 /* STABLE */
-  }))
-}
+  /* style */
+  var __vue_inject_styles__$5 = undefined;
+  /* scoped */
+  var __vue_scope_id__$5 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$5 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$5 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
 
-script$5.render = render$5;
-script$5.__file = "src/components/authentication/Login.vue";
+  
+  var __vue_component__$5 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    __vue_inject_styles__$5,
+    __vue_script__$5,
+    __vue_scope_id__$5,
+    __vue_is_functional_template__$5,
+    __vue_module_identifier__$5,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 var script$4 = {
-  components: { Branding: script$6 },
+  components: {
+    Branding: __vue_component__$6,
+    VAlert: VAlert,
+    VTextField: VTextField,
+    VCardText: VCardText,
+    VBtn: VBtn,
+    VCardActions: VCardActions,
+    VForm: VForm,
+    VCard: VCard,
+    VContainer: VContainer
+  },
 
   data: function () { return ({
     email: "",
@@ -2682,127 +2860,212 @@ var script$4 = {
     }}),
 };
 
-var _hoisted_1$4 = /*#__PURE__*/createTextVNode(" Register ");
+/* script */
+var __vue_script__$4 = script$4;
 
-function render$4(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_alert = resolveComponent("v-alert");
-  var _component_branding = resolveComponent("branding");
-  var _component_v_text_field = resolveComponent("v-text-field");
-  var _component_v_card_text = resolveComponent("v-card-text");
-  var _component_v_btn = resolveComponent("v-btn");
-  var _component_v_card_actions = resolveComponent("v-card-actions");
-  var _component_v_form = resolveComponent("v-form");
-  var _component_v_card = resolveComponent("v-card");
-  var _component_v_container = resolveComponent("v-container");
+/* template */
+var __vue_render__$4 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "v-container",
+    [
+      _c(
+        "v-card",
+        { attrs: { flat: "" } },
+        [
+          _c(
+            "v-form",
+            {
+              ref: "form",
+              on: {
+                submit: function($event) {
+                  $event.preventDefault();
+                  return _vm.register()
+                }
+              },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v;
+                },
+                expression: "valid"
+              }
+            },
+            [
+              Boolean(_vm.getError)
+                ? _c(
+                    "v-alert",
+                    {
+                      attrs: { type: "error", dismissible: "" },
+                      on: {
+                        click: function($event) {
+                          return _vm.SET_ERROR(null)
+                        }
+                      }
+                    },
+                    [
+                      _vm._v(
+                        "\n        " + _vm._s(_vm.getError.message) + "\n      "
+                      )
+                    ]
+                  )
+                : _c("branding", { staticClass: "text-center" }),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                { staticClass: "mb-0 pb-0" },
+                [
+                  _c("v-text-field", {
+                    staticClass: "mr-2",
+                    attrs: {
+                      required: "",
+                      label: "Name",
+                      "prepend-icon": "mdi-account",
+                      rules: [_vm.rules.displayName]
+                    },
+                    model: {
+                      value: _vm.displayName,
+                      callback: function($$v) {
+                        _vm.displayName = $$v;
+                      },
+                      expression: "displayName"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("v-text-field", {
+                    staticClass: "mr-2",
+                    attrs: {
+                      required: "",
+                      label: "Email",
+                      "prepend-icon": "mdi-email",
+                      rules: [_vm.rules.email]
+                    },
+                    model: {
+                      value: _vm.email,
+                      callback: function($$v) {
+                        _vm.email = $$v;
+                      },
+                      expression: "email"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("v-text-field", {
+                    staticClass: "mr-2",
+                    attrs: {
+                      autocomplete: "off",
+                      required: "",
+                      type: "password",
+                      label: "Password",
+                      "prepend-icon": "mdi-lock",
+                      rules: [_vm.rules.password]
+                    },
+                    model: {
+                      value: _vm.password,
+                      callback: function($$v) {
+                        _vm.password = $$v;
+                      },
+                      expression: "password"
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("v-text-field", {
+                    staticClass: "mr-2",
+                    attrs: {
+                      autocomplete: "off",
+                      required: "",
+                      type: "password",
+                      label: "Confirm password",
+                      "prepend-icon": "mdi-lock",
+                      rules: [_vm.rules.confirm]
+                    },
+                    model: {
+                      value: _vm.confirm,
+                      callback: function($$v) {
+                        _vm.confirm = $$v;
+                      },
+                      expression: "confirm"
+                    }
+                  })
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: {
+                        block: "",
+                        large: "",
+                        depressed: "",
+                        color: "primary",
+                        type: "submit",
+                        disabled: _vm.isLoading
+                      }
+                    },
+                    [_vm._v(" Register ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+};
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
 
-  return (openBlock(), createBlock(_component_v_container, null, {
-    default: withCtx(function () { return [
-      createVNode(_component_v_card, { flat: "" }, {
-        default: withCtx(function () { return [
-          createVNode(_component_v_form, {
-            ref: "form",
-            modelValue: _ctx.valid,
-            "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) { return (_ctx.valid = $event); }),
-            onSubmit: _cache[7] || (_cache[7] = withModifiers(function ($event) { return ($options.register()); }, ["prevent"]))
-          }, {
-            default: withCtx(function () { return [
-              createCommentVNode(" error alerts "),
-              (Boolean(_ctx.getError))
-                ? (openBlock(), createBlock(_component_v_alert, {
-                    key: 0,
-                    type: "error",
-                    dismissible: "",
-                    onClick: _cache[1] || (_cache[1] = function ($event) { return (_ctx.SET_ERROR(null)); })
-                  }, {
-                    default: withCtx(function () { return [
-                      createTextVNode(toDisplayString(_ctx.getError.message), 1 /* TEXT */)
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : (openBlock(), createBlock(Fragment, { key: 1 }, [
-                    createCommentVNode(" application branding "),
-                    createVNode(_component_branding, { class: "text-center" })
-                  ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)),
-              createCommentVNode(" registration form "),
-              createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
-                default: withCtx(function () { return [
-                  createVNode(_component_v_text_field, {
-                    modelValue: _ctx.displayName,
-                    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.displayName = $event); }),
-                    required: "",
-                    class: "mr-2",
-                    label: "Name",
-                    "prepend-icon": "mdi-account",
-                    rules: [$options.rules.displayName]
-                  }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                  createVNode(_component_v_text_field, {
-                    modelValue: _ctx.email,
-                    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) { return (_ctx.email = $event); }),
-                    required: "",
-                    class: "mr-2",
-                    label: "Email",
-                    "prepend-icon": "mdi-email",
-                    rules: [$options.rules.email]
-                  }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                  createVNode(_component_v_text_field, {
-                    modelValue: _ctx.password,
-                    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.password = $event); }),
-                    autocomplete: "off",
-                    required: "",
-                    class: "mr-2",
-                    type: "password",
-                    label: "Password",
-                    "prepend-icon": "mdi-lock",
-                    rules: [$options.rules.password]
-                  }, null, 8 /* PROPS */, ["modelValue", "rules"]),
-                  createVNode(_component_v_text_field, {
-                    modelValue: _ctx.confirm,
-                    "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) { return (_ctx.confirm = $event); }),
-                    autocomplete: "off",
-                    required: "",
-                    class: "mr-2",
-                    type: "password",
-                    label: "Confirm password",
-                    "prepend-icon": "mdi-lock",
-                    rules: [$options.rules.confirm]
-                  }, null, 8 /* PROPS */, ["modelValue", "rules"])
-                ]; }),
-                _: 1 /* STABLE */
-              }),
-              createVNode(_component_v_card_actions, null, {
-                default: withCtx(function () { return [
-                  createVNode(_component_v_btn, {
-                    block: "",
-                    large: "",
-                    depressed: "",
-                    color: "primary",
-                    type: "submit",
-                    disabled: _ctx.isLoading
-                  }, {
-                    default: withCtx(function () { return [
-                      _hoisted_1$4
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["disabled"])
-                ]; }),
-                _: 1 /* STABLE */
-              })
-            ]; }),
-            _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["modelValue"])
-        ]; }),
-        _: 1 /* STABLE */
-      })
-    ]; }),
-    _: 1 /* STABLE */
-  }))
-}
+  /* style */
+  var __vue_inject_styles__$4 = undefined;
+  /* scoped */
+  var __vue_scope_id__$4 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$4 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$4 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
 
-script$4.render = render$4;
-script$4.__file = "src/components/authentication/Register.vue";
+  
+  var __vue_component__$4 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    __vue_inject_styles__$4,
+    __vue_script__$4,
+    __vue_scope_id__$4,
+    __vue_is_functional_template__$4,
+    __vue_module_identifier__$4,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 var script$3 = {
-  components: { Branding: script$6 },
+  components: {
+    Branding: __vue_component__$6,
+    VAlert: VAlert,
+    VTextField: VTextField,
+    VCardText: VCardText,
+    VBtn: VBtn,
+    VCardActions: VCardActions,
+    VContainer: VContainer,
+    VForm: VForm,
+    VCard: VCard
+  },
 
   props: ["firebase", "isLoading"],
 
@@ -2849,356 +3112,473 @@ var script$3 = {
   },
 };
 
-var _hoisted_1$3 = { key: 2 };
-var _hoisted_2$3 = /*#__PURE__*/createVNode("div", { class: "mb-5" }, " Enter registered user email address and we will send you a link to reset your password. ", -1 /* HOISTED */);
-var _hoisted_3$3 = /*#__PURE__*/createTextVNode(" Email Password Reset Link ");
-var _hoisted_4$3 = /*#__PURE__*/createTextVNode(" Email has been sent! ");
-var _hoisted_5$3 = /*#__PURE__*/createTextVNode("Please check your inbox and follow the instructions in the email to reset your account password");
-var _hoisted_6$2 = /*#__PURE__*/createTextVNode(" Login ");
+/* script */
+var __vue_script__$3 = script$3;
 
-function render$3(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_alert = resolveComponent("v-alert");
-  var _component_branding = resolveComponent("branding");
-  var _component_v_text_field = resolveComponent("v-text-field");
-  var _component_v_card_text = resolveComponent("v-card-text");
-  var _component_v_btn = resolveComponent("v-btn");
-  var _component_v_card_actions = resolveComponent("v-card-actions");
-  var _component_v_container = resolveComponent("v-container");
-  var _component_v_form = resolveComponent("v-form");
-  var _component_v_card = resolveComponent("v-card");
-
-  return (openBlock(), createBlock(_component_v_container, null, {
-    default: withCtx(function () { return [
-      createVNode(_component_v_card, { flat: "" }, {
-        default: withCtx(function () { return [
-          createVNode(_component_v_form, {
-            ref: "form",
-            modelValue: _ctx.valid,
-            "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.valid = $event); }),
-            onSubmit: withModifiers($options.emailPasswordResetLink, ["prevent"])
-          }, {
-            default: withCtx(function () { return [
-              createCommentVNode(" error alerrts "),
-              ($options.alert)
-                ? (openBlock(), createBlock(_component_v_alert, {
-                    key: 0,
-                    modelValue: $options.alert,
-                    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return ($options.alert = $event); }),
-                    type: "error",
-                    dismissible: ""
-                  }, {
-                    default: withCtx(function () { return [
-                      createTextVNode(toDisplayString(_ctx.error.message), 1 /* TEXT */)
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["modelValue"]))
-                : (openBlock(), createBlock(Fragment, { key: 1 }, [
-                    createCommentVNode(" application branding "),
-                    createVNode(_component_branding, { class: "text-center" })
-                  ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)),
-              createCommentVNode(" login form "),
-              (!_ctx.success)
-                ? (openBlock(), createBlock("div", _hoisted_1$3, [
-                    createVNode(_component_v_card_text, { class: "mb-0 pb-0" }, {
-                      default: withCtx(function () { return [
-                        _hoisted_2$3,
-                        createVNode(_component_v_text_field, {
-                          modelValue: _ctx.form.email,
-                          "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.form.email = $event); }),
-                          required: "",
-                          error: $options.alert,
-                          class: "mr-2",
-                          label: "Email",
-                          "prepend-icon": "mdi-account",
-                          rules: [$options.rules.email]
-                        }, null, 8 /* PROPS */, ["modelValue", "error", "rules"])
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }),
-                    createVNode(_component_v_card_actions, null, {
-                      default: withCtx(function () { return [
-                        createVNode(_component_v_btn, {
-                          block: "",
-                          large: "",
-                          depressed: "",
-                          color: "primary",
-                          type: "submit",
-                          disabled: $props.isLoading
-                        }, {
-                          default: withCtx(function () { return [
-                            _hoisted_3$3
-                          ]; }),
-                          _: 1 /* STABLE */
-                        }, 8 /* PROPS */, ["disabled"])
-                      ]; }),
-                      _: 1 /* STABLE */
-                    })
-                  ]))
-                : createCommentVNode("v-if", true),
-              createCommentVNode(" success message "),
-              (_ctx.success)
-                ? (openBlock(), createBlock(_component_v_container, {
-                    key: 3,
-                    class: "pa-4 text-center"
-                  }, {
-                    default: withCtx(function () { return [
-                      createVNode(_component_v_card_text, { class: "text-h5" }, {
-                        default: withCtx(function () { return [
-                          _hoisted_4$3
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }),
-                      createVNode(_component_v_card_text, null, {
-                        default: withCtx(function () { return [
-                          _hoisted_5$3
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }),
-                      createVNode(_component_v_card_actions, null, {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_btn, {
-                            block: "",
-                            large: "",
-                            depressed: "",
-                            color: "primary",
-                            onClick: _cache[3] || (_cache[3] = function ($event) { return (_ctx.$emit('showSignInTab')); })
-                          }, {
-                            default: withCtx(function () { return [
-                              _hoisted_6$2
-                            ]; }),
-                            _: 1 /* STABLE */
+/* template */
+var __vue_render__$3 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "v-container",
+    [
+      _c(
+        "v-card",
+        { attrs: { flat: "" } },
+        [
+          _c(
+            "v-form",
+            {
+              ref: "form",
+              on: {
+                submit: function($event) {
+                  $event.preventDefault();
+                  return _vm.emailPasswordResetLink.apply(null, arguments)
+                }
+              },
+              model: {
+                value: _vm.valid,
+                callback: function($$v) {
+                  _vm.valid = $$v;
+                },
+                expression: "valid"
+              }
+            },
+            [
+              _vm.alert
+                ? _c(
+                    "v-alert",
+                    {
+                      attrs: { type: "error", dismissible: "" },
+                      model: {
+                        value: _vm.alert,
+                        callback: function($$v) {
+                          _vm.alert = $$v;
+                        },
+                        expression: "alert"
+                      }
+                    },
+                    [
+                      _vm._v(
+                        "\n        " + _vm._s(_vm.error.message) + "\n      "
+                      )
+                    ]
+                  )
+                : _c("branding", { staticClass: "text-center" }),
+              _vm._v(" "),
+              !_vm.success
+                ? _c(
+                    "div",
+                    [
+                      _c(
+                        "v-card-text",
+                        { staticClass: "mb-0 pb-0" },
+                        [
+                          _c("div", { staticClass: "mb-5" }, [
+                            _vm._v(
+                              "\n            Enter registered user email address and we will send you a link to reset your password.\n          "
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("v-text-field", {
+                            staticClass: "mr-2",
+                            attrs: {
+                              required: "",
+                              error: _vm.alert,
+                              label: "Email",
+                              "prepend-icon": "mdi-account",
+                              rules: [_vm.rules.email]
+                            },
+                            model: {
+                              value: _vm.form.email,
+                              callback: function($$v) {
+                                _vm.$set(_vm.form, "email", $$v);
+                              },
+                              expression: "form.email"
+                            }
                           })
-                        ]; }),
-                        _: 1 /* STABLE */
-                      })
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : createCommentVNode("v-if", true)
-            ]; }),
-            _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["modelValue", "onSubmit"])
-        ]; }),
-        _: 1 /* STABLE */
-      })
-    ]; }),
-    _: 1 /* STABLE */
-  }))
-}
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-actions",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                large: "",
+                                depressed: "",
+                                color: "primary",
+                                type: "submit",
+                                disabled: _vm.isLoading
+                              }
+                            },
+                            [
+                              _vm._v(
+                                "\n            Email Password Reset Link\n          "
+                              )
+                            ]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.success
+                ? _c(
+                    "v-container",
+                    { staticClass: "pa-4 text-center" },
+                    [
+                      _c("v-card-text", { staticClass: "text-h5" }, [
+                        _vm._v(" Email has been sent! ")
+                      ]),
+                      _vm._v(" "),
+                      _c("v-card-text", [
+                        _vm._v(
+                          "Please check your inbox and follow the instructions in the email to reset your account\n          password"
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-actions",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                block: "",
+                                large: "",
+                                depressed: "",
+                                color: "primary"
+                              },
+                              on: {
+                                click: function($event) {
+                                  return _vm.$emit("showSignInTab")
+                                }
+                              }
+                            },
+                            [_vm._v(" Login ")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e()
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+};
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
 
-script$3.render = render$3;
-script$3.__file = "src/components/authentication/PasswordReset.vue";
+  /* style */
+  var __vue_inject_styles__$3 = undefined;
+  /* scoped */
+  var __vue_scope_id__$3 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$3 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$3 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
+
+  
+  var __vue_component__$3 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    __vue_inject_styles__$3,
+    __vue_script__$3,
+    __vue_scope_id__$3,
+    __vue_is_functional_template__$3,
+    __vue_module_identifier__$3,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 var script$2 = {
-  data: function () { return ({
-    emailSent: false,
-  }); },
-
-  computed: {
-    isAuthenticated: function isAuthenticated() {
-      var firebase = this.$authGuardSettings.firebase;
-      var user = firebase.auth().currentUser;
-      return user && user.uid ? true : false
-    },
+  components: {
+    VAlert: VAlert,
+    VBtn: VBtn,
+    VIcon: VIcon,
+    VContainer: VContainer,
+    VCard: VCard
   },
 
-  methods: {
-    resendVerificationEmail: function resendVerificationEmail() {
-      this.emailSent = true;
-      this.$emit("sendEmail");
-    },
-    goToLogin: function goToLogin() {
-      this.$authGuardSettings.emailVerificationRequired = false;
+  data: function () { return ({}); },
+
+  computed: Object.assign({}, mapState("auth", ["config"]),
+    mapGetters("auth", ["isLoading", "isAuthenticated", "getError", "isEmailResetPasswordLinkSent"])),
+
+  methods: Object.assign({}, mapActions("auth", ["signIn", "signOut", "sendVerificationEmail"]),
+
+    {goToLogin: function goToLogin() {
       this.$emit("signOut");
-    },
-    signIn: function signIn() {
-      this.$authGuardSettings.showAuthGuardDialog = true;
-      this.$authGuardSettings.emailVerificationRequired = false;
-    },
-    signOut: function signOut() {
-      var firebase = this.$authGuardSettings.firebase;
-      firebase.auth().signOut();
-      this.$authGuardSettings.showAuthGuardDialog = true;
-      this.$authGuardSettings.emailVerificationRequired = false;
-    },
-  },
+    }})
 };
 
-var _hoisted_1$2 = { key: 0 };
-var _hoisted_2$2 = /*#__PURE__*/createVNode("div", { class: "display-1 grey--text mb-3" }, "Error!", -1 /* HOISTED */);
-var _hoisted_3$2 = /*#__PURE__*/createTextVNode(" Back to Login ");
-var _hoisted_4$2 = { key: 0 };
-var _hoisted_5$2 = /*#__PURE__*/createVNode("div", { class: "display-1 grey--text mb-3" }, "Verification Required", -1 /* HOISTED */);
-var _hoisted_6$1 = /*#__PURE__*/createTextVNode("mdi-account");
-var _hoisted_7$1 = { key: 1 };
-var _hoisted_8$1 = /*#__PURE__*/createVNode("div", { class: "display-1 grey--text mb-3" }, "Email sent!", -1 /* HOISTED */);
-var _hoisted_9$1 = /*#__PURE__*/createTextVNode("mdi-email");
-var _hoisted_10$1 = /*#__PURE__*/createVNode("div", { class: "grey--text text--darken-2 mb-7 body-2" }, [
-  /*#__PURE__*/createVNode("p", null, " Please check your email to verify your address. Click at the link in the email we've sent you to confirm your account access. ")
-], -1 /* HOISTED */);
-var _hoisted_11$1 = { key: 2 };
-var _hoisted_12$1 = /*#__PURE__*/createVNode("p", { class: "grey--text text--darken-2 mb-7 body-2" }, [
-  /*#__PURE__*/createTextVNode(" If you have not received verification email"),
-  /*#__PURE__*/createVNode("br"),
-  /*#__PURE__*/createTextVNode("click at the button below. ")
-], -1 /* HOISTED */);
-var _hoisted_13 = /*#__PURE__*/createTextVNode(" Send Verification Email ");
-var _hoisted_14 = { key: 3 };
-var _hoisted_15 = /*#__PURE__*/createTextVNode(" Back to Login ");
-var _hoisted_16 = /*#__PURE__*/createVNode("div", { class: "caption mb-2" }, "- or -", -1 /* HOISTED */);
-var _hoisted_17 = /*#__PURE__*/createTextVNode(" SignOut ");
-var _hoisted_18 = /*#__PURE__*/createTextVNode(" SignIn ");
+/* script */
+var __vue_script__$2 = script$2;
 
-function render$2(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_alert = resolveComponent("v-alert");
-  var _component_v_btn = resolveComponent("v-btn");
-  var _component_v_icon = resolveComponent("v-icon");
-  var _component_v_container = resolveComponent("v-container");
-  var _component_v_card = resolveComponent("v-card");
+/* template */
+var __vue_render__$2 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "v-container",
+    [
+      _c("v-card", { staticClass: "text-center pa-5", attrs: { flat: "" } }, [
+        _vm.getError
+          ? _c(
+              "div",
+              [
+                _c("div", { staticClass: "display-1 grey--text mb-3" }, [
+                  _vm._v("Error!")
+                ]),
+                _vm._v(" "),
+                Boolean(_vm.getError)
+                  ? _c(
+                      "v-alert",
+                      {
+                        attrs: { type: "error", dismissible: "" },
+                        on: {
+                          click: function($event) {
+                            return _vm.SET_ERROR(null)
+                          }
+                        }
+                      },
+                      [
+                        _vm._v(
+                          "\n        " +
+                            _vm._s(_vm.getError.message) +
+                            "\n      "
+                        )
+                      ]
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _c(
+                  "v-btn",
+                  { attrs: { color: "primary" }, on: { click: _vm.goToLogin } },
+                  [_vm._v(" Back to Login ")]
+                )
+              ],
+              1
+            )
+          : _c(
+              "div",
+              [
+                !_vm.isEmailResetPasswordLinkSent
+                  ? _c(
+                      "div",
+                      [
+                        _c(
+                          "div",
+                          { staticClass: "display-1 grey--text mb-3" },
+                          [_vm._v("Verification Required")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "v-icon",
+                          {
+                            staticClass: "ma-4",
+                            attrs: { size: "100", color: "grey" }
+                          },
+                          [_vm._v("mdi-account")]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.isEmailResetPasswordLinkSent
+                  ? _c(
+                      "div",
+                      [
+                        _c(
+                          "div",
+                          { staticClass: "display-1 grey--text mb-3" },
+                          [_vm._v("Email sent!")]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "v-icon",
+                          {
+                            staticClass: "ma-4",
+                            attrs: { size: "100", color: "grey" }
+                          },
+                          [_vm._v("mdi-email")]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "grey--text text--darken-2 mb-7 body-2" },
+                  [
+                    _c("p", [
+                      _vm._v(
+                        "\n          Please check your email to verify your address. Click at the link in the email we've sent you to confirm\n          your account access.\n        "
+                      )
+                    ])
+                  ]
+                ),
+                _vm._v(" "),
+                !_vm.isEmailResetPasswordLinkSent
+                  ? _c(
+                      "div",
+                      [
+                        _c(
+                          "p",
+                          {
+                            staticClass: "grey--text text--darken-2 mb-7 body-2"
+                          },
+                          [
+                            _vm._v(
+                              "\n          If you have not received verification email"
+                            ),
+                            _c("br"),
+                            _vm._v("click at the button below.\n        ")
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "v-btn",
+                          {
+                            attrs: {
+                              disabled: _vm.isLoading,
+                              color: "primary"
+                            },
+                            on: { click: _vm.sendVerificationEmail }
+                          },
+                          [_vm._v(" Send Verification Email ")]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.isEmailResetPasswordLinkSent
+                  ? _c(
+                      "div",
+                      [
+                        _c(
+                          "v-btn",
+                          {
+                            attrs: { color: "primary" },
+                            on: { click: _vm.goToLogin }
+                          },
+                          [_vm._v(" Back to Login ")]
+                        )
+                      ],
+                      1
+                    )
+                  : _vm._e(),
+                _vm._v(" "),
+                _c(
+                  "v-container",
+                  [
+                    _c("div", { staticClass: "caption mb-2" }, [
+                      _vm._v("- or -")
+                    ]),
+                    _vm._v(" "),
+                    _vm.isAuthenticated
+                      ? _c(
+                          "v-btn",
+                          {
+                            attrs: { color: "primary", outlined: "" },
+                            on: { click: _vm.signOut }
+                          },
+                          [_vm._v(" SignOut ")]
+                        )
+                      : _c(
+                          "v-btn",
+                          {
+                            attrs: { color: "primary", outlined: "" },
+                            on: { click: _vm.signIn }
+                          },
+                          [_vm._v(" SignIn ")]
+                        )
+                  ],
+                  1
+                )
+              ],
+              1
+            )
+      ])
+    ],
+    1
+  )
+};
+var __vue_staticRenderFns__$2 = [];
+__vue_render__$2._withStripped = true;
 
-  return (openBlock(), createBlock(_component_v_container, null, {
-    default: withCtx(function () { return [
-      createCommentVNode(" user with no email verification "),
-      createVNode(_component_v_card, {
-        flat: "",
-        class: "text-center pa-5"
-      }, {
-        default: withCtx(function () { return [
-          createCommentVNode(" email error "),
-          (_ctx.error)
-            ? (openBlock(), createBlock("div", _hoisted_1$2, [
-                _hoisted_2$2,
-                (_ctx.error)
-                  ? (openBlock(), createBlock(_component_v_alert, {
-                      key: 0,
-                      type: "error"
-                    }, {
-                      default: withCtx(function () { return [
-                        createTextVNode(toDisplayString(_ctx.error), 1 /* TEXT */)
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }))
-                  : createCommentVNode("v-if", true),
-                createVNode(_component_v_btn, {
-                  color: "primary",
-                  onClick: $options.goToLogin
-                }, {
-                  default: withCtx(function () { return [
-                    _hoisted_3$2
-                  ]; }),
-                  _: 1 /* STABLE */
-                }, 8 /* PROPS */, ["onClick"])
-              ]))
-            : (openBlock(), createBlock(Fragment, { key: 1 }, [
-                createCommentVNode(" email verification "),
-                createVNode("div", null, [
-                  createCommentVNode(" email confirmation required message "),
-                  (!_ctx.emailSent)
-                    ? (openBlock(), createBlock("div", _hoisted_4$2, [
-                        _hoisted_5$2,
-                        createVNode(_component_v_icon, {
-                          size: "100",
-                          color: "grey",
-                          class: "ma-4"
-                        }, {
-                          default: withCtx(function () { return [
-                            _hoisted_6$1
-                          ]; }),
-                          _: 1 /* STABLE */
-                        })
-                      ]))
-                    : createCommentVNode("v-if", true),
-                  createCommentVNode(" email sent confirmation "),
-                  (_ctx.emailSent)
-                    ? (openBlock(), createBlock("div", _hoisted_7$1, [
-                        _hoisted_8$1,
-                        createVNode(_component_v_icon, {
-                          size: "100",
-                          color: "grey",
-                          class: "ma-4"
-                        }, {
-                          default: withCtx(function () { return [
-                            _hoisted_9$1
-                          ]; }),
-                          _: 1 /* STABLE */
-                        })
-                      ]))
-                    : createCommentVNode("v-if", true),
-                  _hoisted_10$1,
-                  createCommentVNode(" send verification email button "),
-                  (!_ctx.emailSent)
-                    ? (openBlock(), createBlock("div", _hoisted_11$1, [
-                        _hoisted_12$1,
-                        createVNode(_component_v_btn, {
-                          disabled: _ctx.isLoading,
-                          color: "primary",
-                          onClick: $options.resendVerificationEmail
-                        }, {
-                          default: withCtx(function () { return [
-                            _hoisted_13
-                          ]; }),
-                          _: 1 /* STABLE */
-                        }, 8 /* PROPS */, ["disabled", "onClick"])
-                      ]))
-                    : createCommentVNode("v-if", true),
-                  createCommentVNode(" back to login page button "),
-                  (_ctx.emailSent)
-                    ? (openBlock(), createBlock("div", _hoisted_14, [
-                        createVNode(_component_v_btn, {
-                          color: "primary",
-                          onClick: $options.goToLogin
-                        }, {
-                          default: withCtx(function () { return [
-                            _hoisted_15
-                          ]; }),
-                          _: 1 /* STABLE */
-                        }, 8 /* PROPS */, ["onClick"])
-                      ]))
-                    : createCommentVNode("v-if", true),
-                  createCommentVNode(" allow to log out in case user cannot confirm the email address "),
-                  createVNode(_component_v_container, null, {
-                    default: withCtx(function () { return [
-                      _hoisted_16,
-                      ($options.isAuthenticated)
-                        ? (openBlock(), createBlock(_component_v_btn, {
-                            key: 0,
-                            color: "primary",
-                            outlined: "",
-                            onClick: $options.signOut
-                          }, {
-                            default: withCtx(function () { return [
-                              _hoisted_17
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }, 8 /* PROPS */, ["onClick"]))
-                        : (openBlock(), createBlock(_component_v_btn, {
-                            key: 1,
-                            color: "primary",
-                            outlined: "",
-                            onClick: $options.signIn
-                          }, {
-                            default: withCtx(function () { return [
-                              _hoisted_18
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }, 8 /* PROPS */, ["onClick"]))
-                    ]; }),
-                    _: 1 /* STABLE */
-                  })
-                ])
-              ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
-        ]; }),
-        _: 1 /* STABLE */
-      })
-    ]; }),
-    _: 1 /* STABLE */
-  }))
-}
+  /* style */
+  var __vue_inject_styles__$2 = undefined;
+  /* scoped */
+  var __vue_scope_id__$2 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$2 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$2 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
 
-script$2.render = render$2;
-script$2.__file = "src/components/authentication/EmailVerification.vue";
+  
+  var __vue_component__$2 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    __vue_inject_styles__$2,
+    __vue_script__$2,
+    __vue_scope_id__$2,
+    __vue_is_functional_template__$2,
+    __vue_module_identifier__$2,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 var script$1 = {
+  components: {
+    VIcon: VIcon,
+    VBtn: VBtn,
+    VTooltip: VTooltip,
+    VContainer: VContainer,
+    VCardTitle: VCardTitle,
+    VTextField: VTextField,
+    VCol: VCol,
+    VRow: VRow,
+    VCardText: VCardText,
+    VCard: VCard,
+    VDialog: VDialog
+  },
+
   props: ["google", "facebook", "phone"],
 
   data: function () { return ({
@@ -3235,308 +3615,446 @@ var script$1 = {
     // this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))
   },
 
-  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone"])),
+  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone"]))
 };
 
-var _hoisted_1$1 = /*#__PURE__*/createVNode("div", { class: "caption" }, "or login with", -1 /* HOISTED */);
-var _hoisted_2$1 = /*#__PURE__*/createTextVNode("mdi-google");
-var _hoisted_3$1 = /*#__PURE__*/createVNode("span", null, "Authenticate with Gmail Account", -1 /* HOISTED */);
-var _hoisted_4$1 = /*#__PURE__*/createTextVNode("mdi-facebook");
-var _hoisted_5$1 = /*#__PURE__*/createVNode("span", null, "Authenticate with Facebook Account", -1 /* HOISTED */);
-var _hoisted_6 = /*#__PURE__*/createTextVNode("mdi-cellphone");
-var _hoisted_7 = /*#__PURE__*/createVNode("span", null, "Authenticate with Text Message To Your Phone", -1 /* HOISTED */);
-var _hoisted_8 = /*#__PURE__*/createVNode("div", { id: "recaptcha-container" }, null, -1 /* HOISTED */);
-var _hoisted_9 = /*#__PURE__*/createTextVNode(" Enter Phone Number ");
-var _hoisted_10 = /*#__PURE__*/createTextVNode(" Send Code ");
-var _hoisted_11 = /*#__PURE__*/createTextVNode(" Enter Confirm Code ");
-var _hoisted_12 = /*#__PURE__*/createTextVNode(" Confirm Code ");
+/* script */
+var __vue_script__$1 = script$1;
 
-function render$1(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_icon = resolveComponent("v-icon");
-  var _component_v_btn = resolveComponent("v-btn");
-  var _component_v_tooltip = resolveComponent("v-tooltip");
-  var _component_v_container = resolveComponent("v-container");
-  var _component_v_card_title = resolveComponent("v-card-title");
-  var _component_v_text_field = resolveComponent("v-text-field");
-  var _component_v_col = resolveComponent("v-col");
-  var _component_v_row = resolveComponent("v-row");
-  var _component_v_card_text = resolveComponent("v-card-text");
-  var _component_v_card = resolveComponent("v-card");
-  var _component_v_dialog = resolveComponent("v-dialog");
-  var _directive_mask = resolveDirective("mask");
+/* template */
+var __vue_render__$1 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _vm.config.google || _vm.config.facebook || _vm.config.phone
+    ? _c(
+        "v-container",
+        { staticClass: "text-center ma-0 pa-0" },
+        [
+          _c("div", { staticClass: "caption" }, [_vm._v("or login with")]),
+          _vm._v(" "),
+          _c(
+            "v-container",
+            [
+              _vm.config.google
+                ? _c(
+                    "v-tooltip",
+                    {
+                      attrs: { top: "" },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on;
+                              var attrs = ref.attrs;
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        staticClass: "mr-2",
+                                        attrs: {
+                                          color: "#db3236",
+                                          fab: "",
+                                          dark: "",
+                                          small: ""
+                                        },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.loginWithGoogle()
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-google")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ],
+                        null,
+                        false,
+                        1615720320
+                      )
+                    },
+                    [
+                      _vm._v(" "),
+                      _c("span", [_vm._v("Authenticate with Gmail Account")])
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.config.facebook
+                ? _c(
+                    "v-tooltip",
+                    {
+                      attrs: { top: "" },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on;
+                              var attrs = ref.attrs;
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        staticClass: "mr-2",
+                                        attrs: {
+                                          color: "#3b5998",
+                                          fab: "",
+                                          dark: "",
+                                          small: ""
+                                        },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.loginWithFacebook()
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-facebook")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ],
+                        null,
+                        false,
+                        1465959198
+                      )
+                    },
+                    [
+                      _vm._v(" "),
+                      _c("span", [_vm._v("Authenticate with Facebook Account")])
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.config.phone
+                ? _c(
+                    "v-tooltip",
+                    {
+                      attrs: { top: "" },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "activator",
+                            fn: function(ref) {
+                              var on = ref.on;
+                              var attrs = ref.attrs;
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        attrs: {
+                                          color: "primary",
+                                          fab: "",
+                                          dark: "",
+                                          small: ""
+                                        },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.loginWithPhone()
+                                          }
+                                        }
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [_c("v-icon", [_vm._v("mdi-cellphone")])],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ],
+                        null,
+                        false,
+                        4126551563
+                      )
+                    },
+                    [
+                      _vm._v(" "),
+                      _c("span", [
+                        _vm._v("Authenticate with Text Message To Your Phone")
+                      ])
+                    ]
+                  )
+                : _vm._e()
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "v-dialog",
+            {
+              attrs: { width: "500" },
+              model: {
+                value: _vm.dialog,
+                callback: function($$v) {
+                  _vm.dialog = $$v;
+                },
+                expression: "dialog"
+              }
+            },
+            [
+              _c("div", { attrs: { id: "recaptcha-container" } }),
+              _vm._v(" "),
+              _vm.step === 2
+                ? _c(
+                    "v-card",
+                    [
+                      _c(
+                        "v-card-title",
+                        { staticClass: "body-1 primary white--text" },
+                        [_vm._v(" Enter Phone Number ")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-text",
+                        [
+                          _c(
+                            "v-container",
+                            { attrs: { fluid: "" } },
+                            [
+                              _c(
+                                "v-row",
+                                {
+                                  attrs: { align: "center", justify: "center" }
+                                },
+                                [
+                                  _c(
+                                    "v-col",
+                                    [
+                                      _c("v-text-field", {
+                                        directives: [
+                                          {
+                                            name: "mask",
+                                            rawName: "v-mask",
+                                            value: _vm.phoneMask,
+                                            expression: "phoneMask"
+                                          }
+                                        ],
+                                        attrs: {
+                                          autocomplete: "off",
+                                          label: "Phone Number",
+                                          "prepend-icon": "mdi-cellphone"
+                                        },
+                                        model: {
+                                          value: _vm.phoneNumber,
+                                          callback: function($$v) {
+                                            _vm.phoneNumber = $$v;
+                                          },
+                                          expression: "phoneNumber"
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-col",
+                                    [
+                                      _c(
+                                        "v-btn",
+                                        {
+                                          attrs: {
+                                            color: "primary",
+                                            outlined: "",
+                                            disabled: _vm.progress
+                                          },
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.sendCode()
+                                            }
+                                          }
+                                        },
+                                        [_vm._v(" Send Code ")]
+                                      )
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.step === 3
+                ? _c(
+                    "v-card",
+                    [
+                      _c(
+                        "v-card-title",
+                        { staticClass: "body-1 primary white--text" },
+                        [_vm._v(" Enter Confirm Code ")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-text",
+                        [
+                          _c(
+                            "v-container",
+                            { attrs: { fluid: "" } },
+                            [
+                              _c(
+                                "v-row",
+                                {
+                                  attrs: { align: "center", justify: "center" }
+                                },
+                                [
+                                  _c(
+                                    "v-col",
+                                    [
+                                      _c("v-text-field", {
+                                        directives: [
+                                          {
+                                            name: "mask",
+                                            rawName: "v-mask",
+                                            value: _vm.codeMask,
+                                            expression: "codeMask"
+                                          }
+                                        ],
+                                        attrs: {
+                                          autocomplete: "off",
+                                          label: "Confirmation Code"
+                                        },
+                                        model: {
+                                          value: _vm.confirmationCode,
+                                          callback: function($$v) {
+                                            _vm.confirmationCode = $$v;
+                                          },
+                                          expression: "confirmationCode"
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-col",
+                                    [
+                                      _c(
+                                        "v-btn",
+                                        {
+                                          attrs: {
+                                            color: "primary",
+                                            outlined: "",
+                                            disabled: _vm.progress
+                                          },
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.confirmCode()
+                                            }
+                                          }
+                                        },
+                                        [_vm._v(" Confirm Code ")]
+                                      )
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                : _vm._e()
+            ],
+            1
+          )
+        ],
+        1
+      )
+    : _vm._e()
+};
+var __vue_staticRenderFns__$1 = [];
+__vue_render__$1._withStripped = true;
 
-  return (_ctx.config.google || _ctx.config.facebook || _ctx.config.phone)
-    ? (openBlock(), createBlock(_component_v_container, {
-        key: 0,
-        class: "text-center ma-0 pa-0"
-      }, {
-        default: withCtx(function () { return [
-          _hoisted_1$1,
-          createVNode(_component_v_container, null, {
-            default: withCtx(function () { return [
-              (_ctx.config.google)
-                ? (openBlock(), createBlock(_component_v_tooltip, {
-                    key: 0,
-                    top: ""
-                  }, {
-                    activator: withCtx(function (ref) {
-                      var on = ref.on;
-                      var attrs = ref.attrs;
+  /* style */
+  var __vue_inject_styles__$1 = undefined;
+  /* scoped */
+  var __vue_scope_id__$1 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$1 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$1 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
 
-                      return [
-                      createVNode(_component_v_btn, mergeProps({
-                        color: "#db3236",
-                        class: "mr-2"
-                      }, attrs, {
-                        fab: "",
-                        dark: "",
-                        small: ""
-                      }, toHandlers(on), {
-                        onClick: _cache[1] || (_cache[1] = function ($event) { return (_ctx.loginWithGoogle()); })
-                      }), {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_icon, null, {
-                            default: withCtx(function () { return [
-                              _hoisted_2$1
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]; }),
-                        _: 2 /* DYNAMIC */
-                      }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
-                    ];
-              }),
-                    default: withCtx(function () { return [
-                      _hoisted_3$1
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : createCommentVNode("v-if", true),
-              (_ctx.config.facebook)
-                ? (openBlock(), createBlock(_component_v_tooltip, {
-                    key: 1,
-                    top: ""
-                  }, {
-                    activator: withCtx(function (ref) {
-                      var on = ref.on;
-                      var attrs = ref.attrs;
-
-                      return [
-                      createVNode(_component_v_btn, mergeProps({
-                        color: "#3b5998",
-                        class: "mr-2"
-                      }, attrs, {
-                        fab: "",
-                        dark: "",
-                        small: ""
-                      }, toHandlers(on), {
-                        onClick: _cache[2] || (_cache[2] = function ($event) { return (_ctx.loginWithFacebook()); })
-                      }), {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_icon, null, {
-                            default: withCtx(function () { return [
-                              _hoisted_4$1
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]; }),
-                        _: 2 /* DYNAMIC */
-                      }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
-                    ];
-              }),
-                    default: withCtx(function () { return [
-                      _hoisted_5$1
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : createCommentVNode("v-if", true),
-              (_ctx.config.phone)
-                ? (openBlock(), createBlock(_component_v_tooltip, {
-                    key: 2,
-                    top: ""
-                  }, {
-                    activator: withCtx(function (ref) {
-                      var on = ref.on;
-                      var attrs = ref.attrs;
-
-                      return [
-                      createVNode(_component_v_btn, mergeProps({ color: "primary" }, attrs, {
-                        fab: "",
-                        dark: "",
-                        small: ""
-                      }, toHandlers(on), {
-                        onClick: _cache[3] || (_cache[3] = function ($event) { return (_ctx.loginWithPhone()); })
-                      }), {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_icon, null, {
-                            default: withCtx(function () { return [
-                              _hoisted_6
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]; }),
-                        _: 2 /* DYNAMIC */
-                      }, 1040 /* FULL_PROPS, DYNAMIC_SLOTS */)
-                    ];
-              }),
-                    default: withCtx(function () { return [
-                      _hoisted_7
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : createCommentVNode("v-if", true)
-            ]; }),
-            _: 1 /* STABLE */
-          }),
-          createVNode(_component_v_dialog, {
-            modelValue: _ctx.dialog,
-            "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) { return (_ctx.dialog = $event); }),
-            width: "500"
-          }, {
-            default: withCtx(function () { return [
-              _hoisted_8,
-              createCommentVNode(" phone authentication provider: enter phone number "),
-              (_ctx.step === 2)
-                ? (openBlock(), createBlock(_component_v_card, { key: 0 }, {
-                    default: withCtx(function () { return [
-                      createVNode(_component_v_card_title, { class: "body-1 primary white--text" }, {
-                        default: withCtx(function () { return [
-                          _hoisted_9
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }),
-                      createVNode(_component_v_card_text, null, {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_container, { fluid: "" }, {
-                            default: withCtx(function () { return [
-                              createVNode(_component_v_row, {
-                                align: "center",
-                                justify: "center"
-                              }, {
-                                default: withCtx(function () { return [
-                                  createVNode(_component_v_col, null, {
-                                    default: withCtx(function () { return [
-                                      withDirectives(createVNode(_component_v_text_field, {
-                                        modelValue: _ctx.phoneNumber,
-                                        "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) { return (_ctx.phoneNumber = $event); }),
-                                        autocomplete: "off",
-                                        label: "Phone Number",
-                                        "prepend-icon": "mdi-cellphone"
-                                      }, null, 8 /* PROPS */, ["modelValue"]), [
-                                        [_directive_mask, _ctx.phoneMask]
-                                      ])
-                                    ]; }),
-                                    _: 1 /* STABLE */
-                                  }),
-                                  createVNode(_component_v_col, null, {
-                                    default: withCtx(function () { return [
-                                      createVNode(_component_v_btn, {
-                                        color: "primary",
-                                        outlined: "",
-                                        disabled: _ctx.progress,
-                                        onClick: _cache[5] || (_cache[5] = function ($event) { return (_ctx.sendCode()); })
-                                      }, {
-                                        default: withCtx(function () { return [
-                                          _hoisted_10
-                                        ]; }),
-                                        _: 1 /* STABLE */
-                                      }, 8 /* PROPS */, ["disabled"])
-                                    ]; }),
-                                    _: 1 /* STABLE */
-                                  })
-                                ]; }),
-                                _: 1 /* STABLE */
-                              })
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]; }),
-                        _: 1 /* STABLE */
-                      })
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : createCommentVNode("v-if", true),
-              createCommentVNode(" phone authentication provider: enter phone number "),
-              (_ctx.step === 3)
-                ? (openBlock(), createBlock(_component_v_card, { key: 1 }, {
-                    default: withCtx(function () { return [
-                      createVNode(_component_v_card_title, { class: "body-1 primary white--text" }, {
-                        default: withCtx(function () { return [
-                          _hoisted_11
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }),
-                      createVNode(_component_v_card_text, null, {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_container, { fluid: "" }, {
-                            default: withCtx(function () { return [
-                              createVNode(_component_v_row, {
-                                align: "center",
-                                justify: "center"
-                              }, {
-                                default: withCtx(function () { return [
-                                  createVNode(_component_v_col, null, {
-                                    default: withCtx(function () { return [
-                                      withDirectives(createVNode(_component_v_text_field, {
-                                        modelValue: _ctx.confirmationCode,
-                                        "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) { return (_ctx.confirmationCode = $event); }),
-                                        autocomplete: "off",
-                                        label: "Confirmation Code"
-                                      }, null, 8 /* PROPS */, ["modelValue"]), [
-                                        [_directive_mask, _ctx.codeMask]
-                                      ])
-                                    ]; }),
-                                    _: 1 /* STABLE */
-                                  }),
-                                  createVNode(_component_v_col, null, {
-                                    default: withCtx(function () { return [
-                                      createVNode(_component_v_btn, {
-                                        color: "primary",
-                                        outlined: "",
-                                        disabled: _ctx.progress,
-                                        onClick: _cache[7] || (_cache[7] = function ($event) { return (_ctx.confirmCode()); })
-                                      }, {
-                                        default: withCtx(function () { return [
-                                          _hoisted_12
-                                        ]; }),
-                                        _: 1 /* STABLE */
-                                      }, 8 /* PROPS */, ["disabled"])
-                                    ]; }),
-                                    _: 1 /* STABLE */
-                                  })
-                                ]; }),
-                                _: 1 /* STABLE */
-                              })
-                            ]; }),
-                            _: 1 /* STABLE */
-                          })
-                        ]; }),
-                        _: 1 /* STABLE */
-                      })
-                    ]; }),
-                    _: 1 /* STABLE */
-                  }))
-                : createCommentVNode("v-if", true)
-            ]; }),
-            _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["modelValue"])
-        ]; }),
-        _: 1 /* STABLE */
-      }))
-    : createCommentVNode("v-if", true)
-}
-
-script$1.render = render$1;
-script$1.__file = "src/components/authentication/LoginWithProvider.vue";
+  
+  var __vue_component__$1 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+    __vue_inject_styles__$1,
+    __vue_script__$1,
+    __vue_scope_id__$1,
+    __vue_is_functional_template__$1,
+    __vue_module_identifier__$1,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 var script = {
+  name: "AuthenticationGuard",
+
   components: {
-    Login: script$5,
-    Register: script$4,
-    PasswordReset: script$3,
-    EmailVerification: script$2,
-    LoginWithProvider: script$1,
+    Login: __vue_component__$5,
+    Register: __vue_component__$4,
+    PasswordReset: __vue_component__$3,
+    EmailVerification: __vue_component__$2,
+    LoginWithProvider: __vue_component__$1,
+    VProgressLinear: VProgressLinear,
+    VTab: VTab,
+    VTabs: VTabs,
+    VTabItem: VTabItem,
+    VTabsItems: VTabsItems,
+    VCardActions: VCardActions,
+    VCard: VCard,
+    VContainer: VContainer,
+    VDialog: VDialog
   },
 
   data: function () { return ({
@@ -3622,143 +4140,174 @@ var script = {
     }}),
 };
 
-var _hoisted_1 = { key: 0 };
-var _hoisted_2 = { key: 1 };
-var _hoisted_3 = /*#__PURE__*/createTextVNode(" Sign In ");
-var _hoisted_4 = /*#__PURE__*/createTextVNode(" Register ");
-var _hoisted_5 = /*#__PURE__*/createTextVNode(" Reset Password ");
+/* script */
+var __vue_script__ = script;
 
-function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_v_progress_linear = resolveComponent("v-progress-linear");
-  var _component_EmailVerification = resolveComponent("EmailVerification");
-  var _component_v_tab = resolveComponent("v-tab");
-  var _component_v_tabs = resolveComponent("v-tabs");
-  var _component_Login = resolveComponent("Login");
-  var _component_v_tab_item = resolveComponent("v-tab-item");
-  var _component_Register = resolveComponent("Register");
-  var _component_PasswordReset = resolveComponent("PasswordReset");
-  var _component_v_tabs_items = resolveComponent("v-tabs-items");
-  var _component_LoginWithProvider = resolveComponent("LoginWithProvider");
-  var _component_v_card_actions = resolveComponent("v-card-actions");
-  var _component_v_card = resolveComponent("v-card");
-  var _component_v_container = resolveComponent("v-container");
-  var _component_v_dialog = resolveComponent("v-dialog");
+/* template */
+var __vue_render__ = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "div",
+    [
+      _c(
+        "v-dialog",
+        {
+          attrs: {
+            value: _vm.isAuthGuardDialogShown,
+            persistent: _vm.isAuthGuardDialogPersistent,
+            "overlay-opacity": "0.95",
+            "content-class": "elevation-0"
+          },
+          on: {
+            input: function($event) {
+              return _vm.SET_AUTH_GUARD_DIALOG_SHOWN($event)
+            }
+          }
+        },
+        [
+          _c(
+            "v-container",
+            { staticClass: "mb-5", staticStyle: { "max-width": "500px" } },
+            [
+              _c(
+                "v-card",
+                { attrs: { flat: "", outlined: "" } },
+                [
+                  _c("v-progress-linear", {
+                    attrs: { indeterminate: _vm.isLoading }
+                  }),
+                  _vm._v(" "),
+                  _vm.isEmailVerificationRequired
+                    ? _c("div", [_c("EmailVerification")], 1)
+                    : _c(
+                        "div",
+                        [
+                          _c(
+                            "v-tabs",
+                            {
+                              attrs: { grow: "" },
+                              model: {
+                                value: _vm.tab,
+                                callback: function($$v) {
+                                  _vm.tab = $$v;
+                                },
+                                expression: "tab"
+                              }
+                            },
+                            [
+                              _c(
+                                "v-tab",
+                                { on: { click: _vm.showSignInTab } },
+                                [_vm._v(" Sign In ")]
+                              ),
+                              _vm._v(" "),
+                              !_vm.resetPassword &&
+                              _vm.isUserRegistrationAllowed
+                                ? _c("v-tab", [_vm._v(" Register ")])
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.resetPassword ||
+                              !_vm.isUserRegistrationAllowed
+                                ? _c("v-tab", [_vm._v(" Reset Password ")])
+                                : _vm._e()
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-tabs-items",
+                            {
+                              model: {
+                                value: _vm.tab,
+                                callback: function($$v) {
+                                  _vm.tab = $$v;
+                                },
+                                expression: "tab"
+                              }
+                            },
+                            [
+                              _c(
+                                "v-tab-item",
+                                { staticClass: "pt-5" },
+                                [_c("Login")],
+                                1
+                              ),
+                              _vm._v(" "),
+                              !_vm.resetPassword &&
+                              _vm.isUserRegistrationAllowed
+                                ? _c(
+                                    "v-tab-item",
+                                    { staticClass: "pt-5" },
+                                    [_c("Register")],
+                                    1
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.resetPassword ||
+                              !_vm.isUserRegistrationAllowed
+                                ? _c(
+                                    "v-tab-item",
+                                    { staticClass: "pt-5" },
+                                    [_c("PasswordReset")],
+                                    1
+                                  )
+                                : _vm._e()
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      ),
+                  _vm._v(" "),
+                  !_vm.isEmailVerificationRequired
+                    ? _c("v-card-actions", [_c("LoginWithProvider")], 1)
+                    : _vm._e()
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+};
+var __vue_staticRenderFns__ = [];
+__vue_render__._withStripped = true;
 
-  return (openBlock(), createBlock("div", null, [
-    createVNode(_component_v_dialog, {
-      value: _ctx.isAuthGuardDialogShown,
-      persistent: _ctx.isAuthGuardDialogPersistent,
-      "overlay-opacity": "0.95",
-      "content-class": "elevation-0",
-      onInput: _cache[3] || (_cache[3] = function ($event) { return (_ctx.SET_AUTH_GUARD_DIALOG_SHOWN($event)); })
-    }, {
-      default: withCtx(function () { return [
-        createVNode(_component_v_container, {
-          style: {"max-width":"500px"},
-          class: "mb-5"
-        }, {
-          default: withCtx(function () { return [
-            createVNode(_component_v_card, {
-              flat: "",
-              outlined: ""
-            }, {
-              default: withCtx(function () { return [
-                createVNode(_component_v_progress_linear, { indeterminate: _ctx.isLoading }, null, 8 /* PROPS */, ["indeterminate"]),
-                (_ctx.isEmailVerificationRequired)
-                  ? (openBlock(), createBlock("div", _hoisted_1, [
-                      createVNode(_component_EmailVerification)
-                    ]))
-                  : (openBlock(), createBlock("div", _hoisted_2, [
-                      createVNode(_component_v_tabs, {
-                        modelValue: _ctx.tab,
-                        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) { return (_ctx.tab = $event); }),
-                        grow: ""
-                      }, {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_tab, { onClick: $options.showSignInTab }, {
-                            default: withCtx(function () { return [
-                              _hoisted_3
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }, 8 /* PROPS */, ["onClick"]),
-                          (!_ctx.resetPassword && _ctx.isUserRegistrationAllowed)
-                            ? (openBlock(), createBlock(_component_v_tab, { key: 0 }, {
-                                default: withCtx(function () { return [
-                                  _hoisted_4
-                                ]; }),
-                                _: 1 /* STABLE */
-                              }))
-                            : createCommentVNode("v-if", true),
-                          (_ctx.resetPassword || !_ctx.isUserRegistrationAllowed)
-                            ? (openBlock(), createBlock(_component_v_tab, { key: 1 }, {
-                                default: withCtx(function () { return [
-                                  _hoisted_5
-                                ]; }),
-                                _: 1 /* STABLE */
-                              }))
-                            : createCommentVNode("v-if", true)
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }, 8 /* PROPS */, ["modelValue"]),
-                      createVNode(_component_v_tabs_items, {
-                        modelValue: _ctx.tab,
-                        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) { return (_ctx.tab = $event); })
-                      }, {
-                        default: withCtx(function () { return [
-                          createVNode(_component_v_tab_item, { class: "pt-5" }, {
-                            default: withCtx(function () { return [
-                              createVNode(_component_Login)
-                            ]; }),
-                            _: 1 /* STABLE */
-                          }),
-                          (!_ctx.resetPassword && _ctx.isUserRegistrationAllowed)
-                            ? (openBlock(), createBlock(_component_v_tab_item, {
-                                key: 0,
-                                class: "pt-5"
-                              }, {
-                                default: withCtx(function () { return [
-                                  createVNode(_component_Register)
-                                ]; }),
-                                _: 1 /* STABLE */
-                              }))
-                            : createCommentVNode("v-if", true),
-                          (_ctx.resetPassword || !_ctx.isUserRegistrationAllowed)
-                            ? (openBlock(), createBlock(_component_v_tab_item, {
-                                key: 1,
-                                class: "pt-5"
-                              }, {
-                                default: withCtx(function () { return [
-                                  createVNode(_component_PasswordReset)
-                                ]; }),
-                                _: 1 /* STABLE */
-                              }))
-                            : createCommentVNode("v-if", true)
-                        ]; }),
-                        _: 1 /* STABLE */
-                      }, 8 /* PROPS */, ["modelValue"])
-                    ])),
-                (!_ctx.isEmailVerificationRequired)
-                  ? (openBlock(), createBlock(_component_v_card_actions, { key: 2 }, {
-                      default: withCtx(function () { return [
-                        createVNode(_component_LoginWithProvider)
-                      ]; }),
-                      _: 1 /* STABLE */
-                    }))
-                  : createCommentVNode("v-if", true)
-              ]; }),
-              _: 1 /* STABLE */
-            })
-          ]; }),
-          _: 1 /* STABLE */
-        })
-      ]; }),
-      _: 1 /* STABLE */
-    }, 8 /* PROPS */, ["value", "persistent"])
-  ]))
-}
+  /* style */
+  var __vue_inject_styles__ = undefined;
+  /* scoped */
+  var __vue_scope_id__ = undefined;
+  /* module identifier */
+  var __vue_module_identifier__ = undefined;
+  /* functional template */
+  var __vue_is_functional_template__ = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
 
-script.render = render;
-script.__file = "src/components/authentication/Guard.vue";
+  
+  var __vue_component__ = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+    __vue_inject_styles__,
+    __vue_script__,
+    __vue_scope_id__,
+    __vue_is_functional_template__,
+    __vue_module_identifier__,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
 
 /**
  * use cases:
@@ -3790,7 +4339,11 @@ function AuthGuardMiddleware (to, from, next) {
 // vuex store namespace
 
 // Declare install function executed by Vue.use()
-var install = function (Vue, options) {
+function install(Vue, options) {
+  if ( options === void 0 ) options = {};
+
+  console.log("$authGuardStore @!!!!!!!!!!!!", options);
+
   if (install.installed) { return }
 
   install.installed = true;
@@ -3801,6 +4354,8 @@ var install = function (Vue, options) {
   var router = config.router;
   var firebase = config.firebase;
 
+  Vue.prototype.$authGuardStore = store;
+
   // verify if required dependency instances are passed to this package config
   if (store == null) { console.error("ERROR: vuex store instance missing in AuthenticationGuard config!"); }
   if (router == null) { console.error("ERROR: vue router instance missing in AuthenticationGuard config!"); }
@@ -3809,8 +4364,8 @@ var install = function (Vue, options) {
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config);
 
-  Vue.component("AuthenticationGuard", script);
-};
+  Vue.component("AuthenticationGuard", __vue_component__);
+}
 
 // Create module definition for Vue.use()
 var plugin = {
@@ -3819,21 +4374,16 @@ var plugin = {
 
 // Auto-install when vue is found (eg. in browser via <script> tag)
 var GlobalVue = null;
-
 if (typeof window !== "undefined") {
   GlobalVue = window.Vue;
 } else if (typeof global !== "undefined") {
   GlobalVue = global.Vue;
 }
-
-if (GlobalVue) { GlobalVue.use(plugin); }
-
-// To allow use as module (npm/webpack/etc.) export component
-var wrapper = {
-  install: install,
-};
+if (GlobalVue) {
+  GlobalVue.use(plugin);
+}
 
 var AuthStore = AuthStoreNamespace;
 var AuthMiddleware = AuthGuardMiddleware;
 
-export { AuthMiddleware, AuthStore, wrapper as default };
+export { AuthMiddleware, AuthStore, __vue_component__ as default, install };
