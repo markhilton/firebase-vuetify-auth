@@ -162,6 +162,7 @@ After following implementation instruction requests to protected views, should r
 
 | Prop         | Type             | Default                                       | Description                                                                             |
 | ------------ | ---------------- | --------------------------------------------- | --------------------------------------------------------------------------------------- |
+| store        | Object           | null                                          | VueX store                                                                              |
 | router       | Object           | null                                          | VUE router                                                                              |
 | firebase     | Object           | null                                          | Firebase middleware                                                                     |
 | verification | Boolean or array | true                                          | require email verification to sign in for all accounts or for specific domains in array |
