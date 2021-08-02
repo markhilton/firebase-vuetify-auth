@@ -1,3 +1,6 @@
+// vuex store namespace
+import AuthStoreNamespace from "./store/auth"
+
 // default npm package init config
 import defaultSettings from "./store/defaultSettings"
 
@@ -49,4 +52,5 @@ export default {
   install,
 }
 
+export const AuthStore = AuthStoreNamespace
 export const AuthMiddleware = AuthGuardMiddleware
