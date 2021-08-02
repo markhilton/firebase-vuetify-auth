@@ -1,25 +1,21 @@
 import firebaseProvider from "firebase/app"
-import debug from "../../components/authentication/debug"
-import authcheck from "../../components/authentication/authcheck"
 
 export default {
   revalidateAuthGuard({ state, getters, commit }) {
-    debug("[ auth guard ]: revalidate request after state change")
+    const { router, debug } = state.config
 
-    const { router } = state.config
-
-    authcheck()
+    if (debug) console.log("[ auth guard ]: revalidate request after state change")
 
     // check current route when router is ready
     router.onReady(() => {
-      debug("[ auth guard ]: vue router ready")
-      debug("[ auth guard ]: isCurrentRoutePublic: [", getters.isCurrentRoutePublic, "]")
+      if (debug)
+        console.log("[ auth guard ]: vue router ready, isCurrentRoutePublic: [", getters.isCurrentRoutePublic, "]")
 
       if (getters.isCurrentRoutePublic) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", false)
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
       } else if (!getters.isAuthenticated) {
-        debug("[ auth guard ]: isAuthenticated: [", getters.isAuthenticated, "]")
+        if (debug) console.log("[ auth guard ]: isAuthenticated: [", getters.isAuthenticated, "]")
 
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", true)
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true)

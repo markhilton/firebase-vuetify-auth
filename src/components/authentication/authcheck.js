@@ -1,5 +1,12 @@
-import debug from "./debug"
 import store from "../../store"
+
+const debug = (...text) => {
+  const { debug } = store.state.auth.config
+
+  if (!Boolean(debug)) return
+
+  console.log.apply(console, text)
+}
 
 export default () => {
   debug("[ auth check ]: execution started...")

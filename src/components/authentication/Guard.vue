@@ -47,13 +47,8 @@
 </template>
 
 <script>
+import authcheck from "../../components/authentication/authcheck"
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
-
-/**
- * the auth guard has to watch user auth status & router current route changes
- */
-import debug from "./debug"
-import authcheck from "./authcheck"
 
 import Login from "./Login.vue"
 import Register from "./Register.vue"
@@ -93,13 +88,18 @@ export default {
     firebase() {
       return this.config.firebase
     },
+
+    debug() {
+      return this.config.debug
+    },
   },
 
   watch: {
     currentRoute(after, before) {
       if (typeof before === "undefined") return
+      if (this.debug) console.log("[ auth guard ]: vue router current route change: [", before, "] -> [", after, "]")
 
-      debug("[ auth guard ]: vue router current route change: [", before, "] -> [", after, "]")
+      authcheck()
       this.revalidateAuthGuard()
     },
   },
@@ -108,13 +108,14 @@ export default {
     // important to use onAuthStateChanged to mutate config state
     // in order to prevent vuex from not recognizing firebase changes
     this.firebase.auth().onAuthStateChanged(() => {
-      debug("[ auth guard ]: firebase auth state changed")
+      if (this.debug) console.log("[ auth guard ]: firebase auth state changed")
 
       const config = this.config
 
       this.$store.commit("auth/SET_CONFIG", null)
       this.$store.commit("auth/SET_CONFIG", config)
 
+      authcheck()
       this.revalidateAuthGuard()
     })
   },

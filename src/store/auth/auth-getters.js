@@ -1,5 +1,3 @@
-import debug from "@/components/authentication/debug"
-
 export default {
   getError(state) {
     return state.error
@@ -52,14 +50,14 @@ export default {
   },
   // check if the current route is public to set negative persisten dialog
   isCurrentRoutePublic(state) {
-    const { router } = state.config
+    const { router, debug } = state.config
     const route = router.currentRoute
 
     let isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
 
     if (route.matched[0] && route.matched[0].path !== window.location.pathname) isPublicRoute = false
 
-    debug("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]")
+    if (debug) console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]")
 
     return isPublicRoute
   },
