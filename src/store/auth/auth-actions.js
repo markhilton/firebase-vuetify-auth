@@ -1,5 +1,5 @@
 import firebaseProvider from "firebase/app"
-import authcheck from "../../components/authentication/authcheck"
+import authcheck from "../../components/authcheck"
 
 export default {
   revalidateAuthGuard({ state, getters, commit }) {

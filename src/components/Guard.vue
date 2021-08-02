@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import authcheck from "../../components/authentication/authcheck"
+import authcheck from "../components/authcheck"
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 
 import Login from "./Login.vue"

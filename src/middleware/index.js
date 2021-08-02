@@ -1,4 +1,4 @@
-import guard from "../components/authentication/authguard"
+import guard from "../components/authguard"
 import firebase from "./firebase"
 
 export { guard, firebase }

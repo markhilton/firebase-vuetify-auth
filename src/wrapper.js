@@ -7,10 +7,10 @@ import AuthStore from "./store/auth"
 import defaultSettings from "./store/defaultSettings"
 
 // Import vue component
-import AuthGuard from "./components/authentication/Guard.vue"
+import AuthGuard from "./components/Guard.vue"
 
 // Import router middleware
-import AuthGuardMiddleware from "./components/authentication/authguard"
+import AuthGuardMiddleware from "./components/authguard"
 
 // Declare install function executed by Vue.use()
 export function install(Vue, options = {}) {
