@@ -20,7 +20,7 @@ export default {
       "@/middleware": "./src/middleware",
     },
   },
-  external: ["vue", "vuex", "vuetify/lib", "@mdi/font", "v-mask", "firebase", "firebase/app"],
+  external: ["vue", "vuex", "vuetify/lib", "firebase", "firebase/app"],
   plugins: [
     resolve(),
     commonjs({

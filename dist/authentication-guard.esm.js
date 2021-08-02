@@ -1,15 +1,511 @@
-import firebaseProvider from 'firebase/app';
 import Vue from 'vue';
-import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VCard, VContainer, VForm, VTooltip, VCardTitle, VCol, VRow, VDialog, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems } from 'vuetify/lib';
-import { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+import Vuex, { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
+import firebaseProvider from 'firebase/app';
+import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VCard, VContainer, VForm, VCol, VRow, VTooltip, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems, VDialog } from 'vuetify/lib';
+
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) { symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    }); }
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  var arguments$1 = arguments;
+
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments$1[i] != null ? arguments$1[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
+var placeholderChar = '_';
+var strFunction = 'function';
+
+var emptyArray = [];
+function convertMaskToPlaceholder() {
+  var mask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyArray;
+  var placeholderChar$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : placeholderChar;
+
+  if (!isArray(mask)) {
+    throw new Error('Text-mask:convertMaskToPlaceholder; The mask property must be an array.');
+  }
+
+  if (mask.indexOf(placeholderChar$1) !== -1) {
+    throw new Error('Placeholder character must not be used as part of the mask. Please specify a character ' + 'that is not present in your mask as your placeholder character.\n\n' + "The placeholder character that was received is: ".concat(JSON.stringify(placeholderChar$1), "\n\n") + "The mask that was received is: ".concat(JSON.stringify(mask)));
+  }
+
+  return mask.map(function (char) {
+    return char instanceof RegExp ? placeholderChar$1 : char;
+  }).join('');
+}
+function isArray(value) {
+  return Array.isArray && Array.isArray(value) || value instanceof Array;
+}
+var strCaretTrap = '[]';
+function processCaretTraps(mask) {
+  var indexes = [];
+  var indexOfCaretTrap;
+
+  while (indexOfCaretTrap = mask.indexOf(strCaretTrap), indexOfCaretTrap !== -1) {
+    indexes.push(indexOfCaretTrap);
+    mask.splice(indexOfCaretTrap, 1);
+  }
+
+  return {
+    maskWithoutCaretTraps: mask,
+    indexes: indexes
+  };
+}
+
+var emptyArray$1 = [];
+var emptyString = '';
+function conformToMask() {
+  var rawValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyString;
+  var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : emptyArray$1;
+  var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  if (!isArray(mask)) {
+    if (_typeof(mask) === strFunction) {
+      mask = mask(rawValue, config);
+      mask = processCaretTraps(mask).maskWithoutCaretTraps;
+    } else {
+      throw new Error('Text-mask:conformToMask; The mask property must be an array.');
+    }
+  }
+
+  var _config$guide = config.guide,
+      guide = _config$guide === void 0 ? true : _config$guide,
+      _config$previousConfo = config.previousConformedValue,
+      previousConformedValue = _config$previousConfo === void 0 ? emptyString : _config$previousConfo,
+      _config$placeholderCh = config.placeholderChar,
+      placeholderChar$1 = _config$placeholderCh === void 0 ? placeholderChar : _config$placeholderCh,
+      _config$placeholder = config.placeholder,
+      placeholder = _config$placeholder === void 0 ? convertMaskToPlaceholder(mask, placeholderChar$1) : _config$placeholder,
+      currentCaretPosition = config.currentCaretPosition,
+      keepCharPositions = config.keepCharPositions;
+  var suppressGuide = guide === false && previousConformedValue !== undefined;
+  var rawValueLength = rawValue.length;
+  var previousConformedValueLength = previousConformedValue.length;
+  var placeholderLength = placeholder.length;
+  var maskLength = mask.length;
+  var editDistance = rawValueLength - previousConformedValueLength;
+  var isAddition = editDistance > 0;
+  var indexOfFirstChange = currentCaretPosition + (isAddition ? -editDistance : 0);
+  var indexOfLastChange = indexOfFirstChange + Math.abs(editDistance);
+
+  if (keepCharPositions === true && !isAddition) {
+    var compensatingPlaceholderChars = emptyString;
+
+    for (var i = indexOfFirstChange; i < indexOfLastChange; i++) {
+      if (placeholder[i] === placeholderChar$1) {
+        compensatingPlaceholderChars += placeholderChar$1;
+      }
+    }
+
+    rawValue = rawValue.slice(0, indexOfFirstChange) + compensatingPlaceholderChars + rawValue.slice(indexOfFirstChange, rawValueLength);
+  }
+
+  var rawValueArr = rawValue.split(emptyString).map(function (char, i) {
+    return {
+      char: char,
+      isNew: i >= indexOfFirstChange && i < indexOfLastChange
+    };
+  });
+
+  for (var _i = rawValueLength - 1; _i >= 0; _i--) {
+    var char = rawValueArr[_i].char;
+
+    if (char !== placeholderChar$1) {
+      var shouldOffset = _i >= indexOfFirstChange && previousConformedValueLength === maskLength;
+
+      if (char === placeholder[shouldOffset ? _i - editDistance : _i]) {
+        rawValueArr.splice(_i, 1);
+      }
+    }
+  }
+
+  var conformedValue = emptyString;
+  var someCharsRejected = false;
+
+  placeholderLoop: for (var _i2 = 0; _i2 < placeholderLength; _i2++) {
+    var charInPlaceholder = placeholder[_i2];
+
+    if (charInPlaceholder === placeholderChar$1) {
+      if (rawValueArr.length > 0) {
+        while (rawValueArr.length > 0) {
+          var _rawValueArr$shift = rawValueArr.shift(),
+              rawValueChar = _rawValueArr$shift.char,
+              isNew = _rawValueArr$shift.isNew;
+
+          if (rawValueChar === placeholderChar$1 && suppressGuide !== true) {
+            conformedValue += placeholderChar$1;
+            continue placeholderLoop;
+          } else if (mask[_i2].test(rawValueChar)) {
+            if (keepCharPositions !== true || isNew === false || previousConformedValue === emptyString || guide === false || !isAddition) {
+              conformedValue += rawValueChar;
+            } else {
+              var rawValueArrLength = rawValueArr.length;
+              var indexOfNextAvailablePlaceholderChar = null;
+
+              for (var _i3 = 0; _i3 < rawValueArrLength; _i3++) {
+                var charData = rawValueArr[_i3];
+
+                if (charData.char !== placeholderChar$1 && charData.isNew === false) {
+                  break;
+                }
+
+                if (charData.char === placeholderChar$1) {
+                  indexOfNextAvailablePlaceholderChar = _i3;
+                  break;
+                }
+              }
+
+              if (indexOfNextAvailablePlaceholderChar !== null) {
+                conformedValue += rawValueChar;
+                rawValueArr.splice(indexOfNextAvailablePlaceholderChar, 1);
+              } else {
+                _i2--;
+              }
+            }
+
+            continue placeholderLoop;
+          } else {
+            someCharsRejected = true;
+          }
+        }
+      }
+
+      if (suppressGuide === false) {
+        conformedValue += placeholder.substr(_i2, placeholderLength);
+      }
+
+      break;
+    } else {
+      conformedValue += charInPlaceholder;
+    }
+  }
+
+  if (suppressGuide && isAddition === false) {
+    var indexOfLastFilledPlaceholderChar = null;
+
+    for (var _i4 = 0; _i4 < conformedValue.length; _i4++) {
+      if (placeholder[_i4] === placeholderChar$1) {
+        indexOfLastFilledPlaceholderChar = _i4;
+      }
+    }
+
+    if (indexOfLastFilledPlaceholderChar !== null) {
+      conformedValue = conformedValue.substr(0, indexOfLastFilledPlaceholderChar + 1);
+    } else {
+      conformedValue = emptyString;
+    }
+  }
+
+  return {
+    conformedValue: conformedValue,
+    meta: {
+      someCharsRejected: someCharsRejected
+    }
+  };
+}
+
+var NEXT_CHAR_OPTIONAL = {
+  __nextCharOptional__: true
+};
+var defaultMaskReplacers = {
+  '#': /\d/,
+  A: /[a-z]/i,
+  N: /[a-z0-9]/i,
+  '?': NEXT_CHAR_OPTIONAL,
+  X: /./
+};
+
+var stringToRegexp = function stringToRegexp(str) {
+  var lastSlash = str.lastIndexOf('/');
+  return new RegExp(str.slice(1, lastSlash), str.slice(lastSlash + 1));
+};
+
+var makeRegexpOptional = function makeRegexpOptional(charRegexp) {
+  return stringToRegexp(charRegexp.toString().replace(/.(\/)[gmiyus]{0,6}$/, function (match) {
+    return match.replace('/', '?/');
+  }));
+};
+
+var escapeIfNeeded = function escapeIfNeeded(char) {
+  return '[\\^$.|?*+()'.indexOf(char) > -1 ? "\\".concat(char) : char;
+};
+
+var charRegexp = function charRegexp(char) {
+  return new RegExp("/[".concat(escapeIfNeeded(char), "]/"));
+};
+
+var isRegexp = function isRegexp(entity) {
+  return entity instanceof RegExp;
+};
+
+var castToRegexp = function castToRegexp(char) {
+  return isRegexp(char) ? char : charRegexp(char);
+};
+
+function maskToRegExpMask(mask) {
+  var maskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
+  return mask.map(function (char, index, array) {
+    var maskChar = maskReplacers[char] || char;
+    var previousChar = array[index - 1];
+    var previousMaskChar = maskReplacers[previousChar] || previousChar;
+
+    if (maskChar === NEXT_CHAR_OPTIONAL) {
+      return null;
+    }
+
+    if (previousMaskChar === NEXT_CHAR_OPTIONAL) {
+      return makeRegexpOptional(castToRegexp(maskChar));
+    }
+
+    return maskChar;
+  }).filter(Boolean);
+}
+
+function stringMaskToRegExpMask(stringMask) {
+  var maskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
+  return maskToRegExpMask(stringMask.split(''), maskReplacers);
+}
+function arrayMaskToRegExpMask(arrayMask) {
+  var maskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
+  var flattenedMask = arrayMask.map(function (part) {
+    if (part instanceof RegExp) {
+      return part;
+    }
+
+    if (typeof part === 'string') {
+      return part.split('');
+    }
+
+    return null;
+  }).filter(Boolean).reduce(function (mask, part) {
+    return mask.concat(part);
+  }, []);
+  return maskToRegExpMask(flattenedMask, maskReplacers);
+}
+
+var trigger = function trigger(el, type) {
+  var e = document.createEvent('HTMLEvents');
+  e.initEvent(type, true, true);
+  el.dispatchEvent(e);
+};
+var queryInputElementInside = function queryInputElementInside(el) {
+  return el instanceof HTMLInputElement ? el : el.querySelector('input') || el;
+};
+var isFunction = function isFunction(val) {
+  return typeof val === 'function';
+};
+var isString = function isString(val) {
+  return typeof val === 'string';
+};
+var isRegexp$1 = function isRegexp(val) {
+  return val instanceof RegExp;
+};
+
+function createOptions() {
+  var elementOptions = new Map();
+  var defaultOptions = {
+    previousValue: '',
+    mask: []
+  };
+
+  function get(el) {
+    return elementOptions.get(el) || _objectSpread2({}, defaultOptions);
+  }
+
+  function partiallyUpdate(el, newOptions) {
+    elementOptions.set(el, _objectSpread2(_objectSpread2({}, get(el)), newOptions));
+  }
+
+  function remove(el) {
+    elementOptions.delete(el);
+  }
+
+  return {
+    partiallyUpdate: partiallyUpdate,
+    remove: remove,
+    get: get
+  };
+}
+
+var options = createOptions();
+
+function triggerInputUpdate(el) {
+  trigger(el, 'input');
+}
+
+function updateValue(el) {
+  var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var value = el.value;
+
+  var _options$get = options.get(el),
+      previousValue = _options$get.previousValue,
+      mask = _options$get.mask;
+
+  var isValueChanged = value !== previousValue;
+  var isLengthIncreased = value.length > previousValue.length;
+  var isUpdateNeeded = value && isValueChanged && isLengthIncreased;
+
+  if ((force || isUpdateNeeded) && mask) {
+    var _conformToMask = conformToMask(value, mask, {
+      guide: false
+    }),
+        conformedValue = _conformToMask.conformedValue;
+
+    el.value = conformedValue;
+    triggerInputUpdate(el);
+  }
+
+  options.partiallyUpdate(el, {
+    previousValue: value
+  });
+}
+
+function updateMask(el, inputMask, maskReplacers) {
+  var mask;
+
+  if (Array.isArray(inputMask)) {
+    mask = arrayMaskToRegExpMask(inputMask, maskReplacers);
+  } else if (isFunction(inputMask)) {
+    mask = inputMask;
+  } else if (isString(inputMask) && inputMask.length > 0) {
+    mask = stringMaskToRegExpMask(inputMask, maskReplacers);
+  } else {
+    mask = inputMask;
+  }
+
+  options.partiallyUpdate(el, {
+    mask: mask
+  });
+}
+
+function extendMaskReplacers(maskReplacers) {
+  var baseMaskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
+
+  if (maskReplacers === null || Array.isArray(maskReplacers) || _typeof(maskReplacers) !== 'object') {
+    return baseMaskReplacers;
+  }
+
+  return Object.keys(maskReplacers).reduce(function (extendedMaskReplacers, key) {
+    var value = maskReplacers[key];
+
+    if (value !== null && !(value instanceof RegExp)) {
+      return extendedMaskReplacers;
+    }
+
+    return _objectSpread2(_objectSpread2({}, extendedMaskReplacers), {}, _defineProperty({}, key, value));
+  }, baseMaskReplacers);
+}
+
+function maskToString(mask) {
+  var maskArray = Array.isArray(mask) ? mask : [mask];
+  var filteredMaskArray = maskArray.filter(function (part) {
+    return isString(part) || isRegexp$1(part);
+  });
+  return filteredMaskArray.toString();
+}
+
+function createDirective() {
+  var directiveOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var instanceMaskReplacers = extendMaskReplacers(directiveOptions && directiveOptions.placeholders);
+  return {
+    bind: function bind(el, _ref) {
+      var value = _ref.value;
+      el = queryInputElementInside(el);
+      updateMask(el, value, instanceMaskReplacers);
+      updateValue(el);
+    },
+    componentUpdated: function componentUpdated(el, _ref2) {
+      var value = _ref2.value,
+          oldValue = _ref2.oldValue;
+      el = queryInputElementInside(el);
+      var isMaskChanged = isFunction(value) || maskToString(oldValue) !== maskToString(value);
+
+      if (isMaskChanged) {
+        updateMask(el, value, instanceMaskReplacers);
+      }
+
+      updateValue(el, isMaskChanged);
+    },
+    unbind: function unbind(el) {
+      el = queryInputElementInside(el);
+      options.remove(el);
+    }
+  };
+}
+var directive = createDirective();
+
+Vue.use(Vuex);
+
+var backupStore = new Vuex.Store({});
 
 var state = {
   config: null, // package init configuration
   error: null, // error from last operation
 
+  text_confirmation: null, // log in by phone text
+  sign_by_phone_step: 1, // sign in by phone step
+
   tab: false,
   is_loading: false,
   is_session_persistant: true,
+  is_login_with_phone_shown: false,
   is_authguard_dialog_shown: true, // login dialog
   is_authguard_dialog_persistent: true, // login dialog persistent option
   is_email_verification_link_sent: false, // email verification confirmation
@@ -108,13 +604,17 @@ var getters = {
   isResetPasswordScreenShown: function isResetPasswordScreenShown(state) {
     return state.is_reset_password_screen_shown
   },
+  isLoginWithPhoneShown: function isLoginWithPhoneShown(state) {
+    return state.is_login_with_phone_shown
+  },
 };
 
 var debug = function () {
   var text = [], len = arguments.length;
   while ( len-- ) text[ len ] = arguments[ len ];
 
-  var ref = Vue.prototype.$authGuardStore.state.auth.config;
+  var store = Vue.prototype.$authGuardStore;
+  var ref = store.state.auth.config;
   var debug = ref.debug;
 
   if (!Boolean(debug)) { return }
@@ -325,36 +825,61 @@ var actions = {
   },
 
   //
-  sendCode: function sendCode(ref, ref$1) {
-    var this$1$1 = this;
+  textPhoneVerificationCode: async function textPhoneVerificationCode(ref, ref$1) {
     var state = ref.state;
+    var commit = ref.commit;
+    var phoneNumber = ref$1.phoneNumber;
+    var recaptchaVerifier = ref$1.recaptchaVerifier;
 
-    var ref$2 = state.config;
-    var firebase = ref$2.firebase;
+    try {
+      commit("SET_LOADING", true);
+      commit("SET_PHONE_TEXT_CONFIRMATION", null);
 
-    firebase
-      .auth()
-      .signInWithPhoneNumber("+1" + phoneNumber, this.recaptchaVerifier)
-      .then(function (res) {
-        this$1$1.step = 3;
-        this$1$1.codeAuth = res;
-      })
-      .catch(function (error) {
-        this$1$1.step = 1;
-      });
+      var ref$2 = state.config;
+      var firebase = ref$2.firebase;
+
+      // TESTING: turn on for testing on localhost
+      if (window.location.hostname === "localhost") {
+        firebase.auth().settings.appVerificationDisabledForTesting = true;
+        console.log("TESTING: setting firebase appVerificationDisabledForTesting", true);
+      }
+
+      var phone = "+1" + phoneNumber.replace(/\D/g, "");
+      var confirmationResult = await firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier);
+
+      commit("SET_LOADING", false);
+      commit("SET_SIGN_BY_PHONE_STEP", 2);
+      commit("SET_PHONE_TEXT_CONFIRMATION", confirmationResult);
+    } catch (error) {
+      commit("SET_ERROR", error);
+      commit("SET_LOADING", false);
+    }
   },
 
   //
-  confirmCode: function confirmCode() {
-    var this$1$1 = this;
+  confirmCode: async function confirmCode(ref, confirmationCode) {
+    var state = ref.state;
+    var commit = ref.commit;
 
-    this.codeAuth.confirm(this.confirmationCode).then(function () { return (this$1$1.step = 1); });
+    try {
+      commit("SET_LOADING", true);
+
+      console.log("confirmationCode", confirmationCode.join());
+
+      await state.text_confirmation.confirm(confirmationCode.join());
+
+      commit("SET_LOADING", false);
+      commit("SET_SIGN_BY_PHONE_STEP", 1);
+    } catch (error) {
+      commit("SET_ERROR", error);
+      commit("SET_LOADING", false);
+      commit("SET_SIGN_BY_PHONE_STEP", 1);
+    }
   },
 
   //
   registerUser: async function registerUser(ref, ref$1) {
     var state = ref.state;
-    ref.getters;
     var commit = ref.commit;
     var displayName = ref$1.displayName;
     var email = ref$1.email;
@@ -471,11 +996,24 @@ var mutations = {
   },
   SET_EMAIL_VERIFICATION_SCREEN_SHOWN: function SET_EMAIL_VERIFICATION_SCREEN_SHOWN(state, status) {
     state.is_email_verification_screen_shown = status;
+    if (status === false) { state.error = null; }
   },
   SET_PASSWORD_RESET_SCREEN_SHOWN: function SET_PASSWORD_RESET_SCREEN_SHOWN(state, status) {
     state.tab = status ? 1 : 0;
     state.is_reset_password_screen_shown = status;
     if (status === false) { state.is_email_reset_password_link_sent = false; }
+  },
+  SET_PHONE_TEXT_CONFIRMATION: function SET_PHONE_TEXT_CONFIRMATION(state, confirmation) {
+    state.text_confirmation = confirmation;
+  },
+  SET_SHOW_LOGIN_WITH_PHONE: function SET_SHOW_LOGIN_WITH_PHONE(state, status) {
+    state.tab = 0; // reset tab to Sign In
+    state.is_login_with_phone_shown = status;
+
+    if (status === false) { state.sign_by_phone_step = 1; } // reset sign by phone step
+  },
+  SET_SIGN_BY_PHONE_STEP: function SET_SIGN_BY_PHONE_STEP(state, step) {
+    state.sign_by_phone_step = step;
   },
 };
 
@@ -504,7 +1042,7 @@ var defaultSettings = {
   iconColor: "orange", // authentication prompt icon color
 };
 
-var script$6 = {
+var script$7 = {
   components: {
     VIcon: VIcon,
     VListItemTitle: VListItemTitle,
@@ -593,10 +1131,10 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
 }
 
 /* script */
-var __vue_script__$6 = script$6;
+var __vue_script__$7 = script$7;
 
 /* template */
-var __vue_render__$6 = function() {
+var __vue_render__$7 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -639,17 +1177,17 @@ var __vue_render__$6 = function() {
     1
   )
 };
-var __vue_staticRenderFns__$6 = [];
-__vue_render__$6._withStripped = true;
+var __vue_staticRenderFns__$7 = [];
+__vue_render__$7._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$6 = undefined;
+  var __vue_inject_styles__$7 = undefined;
   /* scoped */
-  var __vue_scope_id__$6 = undefined;
+  var __vue_scope_id__$7 = undefined;
   /* module identifier */
-  var __vue_module_identifier__$6 = undefined;
+  var __vue_module_identifier__$7 = undefined;
   /* functional template */
-  var __vue_is_functional_template__$6 = false;
+  var __vue_is_functional_template__$7 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -658,22 +1196,22 @@ __vue_render__$6._withStripped = true;
   
 
   
-  var __vue_component__$6 = /*#__PURE__*/normalizeComponent(
-    { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
-    __vue_inject_styles__$6,
-    __vue_script__$6,
-    __vue_scope_id__$6,
-    __vue_is_functional_template__$6,
-    __vue_module_identifier__$6,
+  var __vue_component__$7 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
+    __vue_inject_styles__$7,
+    __vue_script__$7,
+    __vue_scope_id__$7,
+    __vue_is_functional_template__$7,
+    __vue_module_identifier__$7,
     false,
     undefined,
     undefined,
     undefined
   );
 
-var script$5 = {
+var script$6 = {
   components: {
-    Branding: __vue_component__$6,
+    Branding: __vue_component__$7,
     VAlert: VAlert,
     VTextField: VTextField,
     VCheckbox: VCheckbox,
@@ -706,10 +1244,10 @@ var script$5 = {
 };
 
 /* script */
-var __vue_script__$5 = script$5;
+var __vue_script__$6 = script$6;
 
 /* template */
-var __vue_render__$5 = function() {
+var __vue_render__$6 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -825,7 +1363,7 @@ var __vue_render__$5 = function() {
                     large: "",
                     color: "primary",
                     type: "submit",
-                    disabled: _vm.isLoading
+                    disabled: _vm.email === "" || _vm.password === ""
                   },
                   on: {
                     click: function($event) {
@@ -848,17 +1386,17 @@ var __vue_render__$5 = function() {
     1
   )
 };
-var __vue_staticRenderFns__$5 = [];
-__vue_render__$5._withStripped = true;
+var __vue_staticRenderFns__$6 = [];
+__vue_render__$6._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$5 = undefined;
+  var __vue_inject_styles__$6 = undefined;
   /* scoped */
-  var __vue_scope_id__$5 = undefined;
+  var __vue_scope_id__$6 = undefined;
   /* module identifier */
-  var __vue_module_identifier__$5 = undefined;
+  var __vue_module_identifier__$6 = undefined;
   /* functional template */
-  var __vue_is_functional_template__$5 = false;
+  var __vue_is_functional_template__$6 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -867,22 +1405,22 @@ __vue_render__$5._withStripped = true;
   
 
   
-  var __vue_component__$5 = /*#__PURE__*/normalizeComponent(
-    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
-    __vue_inject_styles__$5,
-    __vue_script__$5,
-    __vue_scope_id__$5,
-    __vue_is_functional_template__$5,
-    __vue_module_identifier__$5,
+  var __vue_component__$6 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+    __vue_inject_styles__$6,
+    __vue_script__$6,
+    __vue_scope_id__$6,
+    __vue_is_functional_template__$6,
+    __vue_module_identifier__$6,
     false,
     undefined,
     undefined,
     undefined
   );
 
-var script$4 = {
+var script$5 = {
   components: {
-    Branding: __vue_component__$6,
+    Branding: __vue_component__$7,
     VAlert: VAlert,
     VTextField: VTextField,
     VCardText: VCardText,
@@ -927,10 +1465,10 @@ var script$4 = {
 };
 
 /* script */
-var __vue_script__$4 = script$4;
+var __vue_script__$5 = script$5;
 
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$5 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1070,7 +1608,7 @@ var __vue_render__$4 = function() {
                         depressed: "",
                         color: "primary",
                         type: "submit",
-                        disabled: _vm.isLoading
+                        disabled: !_vm.valid
                       }
                     },
                     [_vm._v(" Register ")]
@@ -1088,17 +1626,17 @@ var __vue_render__$4 = function() {
     1
   )
 };
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
+var __vue_staticRenderFns__$5 = [];
+__vue_render__$5._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$4 = undefined;
+  var __vue_inject_styles__$5 = undefined;
   /* scoped */
-  var __vue_scope_id__$4 = undefined;
+  var __vue_scope_id__$5 = undefined;
   /* module identifier */
-  var __vue_module_identifier__$4 = undefined;
+  var __vue_module_identifier__$5 = undefined;
   /* functional template */
-  var __vue_is_functional_template__$4 = false;
+  var __vue_is_functional_template__$5 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -1107,22 +1645,22 @@ __vue_render__$4._withStripped = true;
   
 
   
-  var __vue_component__$4 = /*#__PURE__*/normalizeComponent(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
-    __vue_inject_styles__$4,
-    __vue_script__$4,
-    __vue_scope_id__$4,
-    __vue_is_functional_template__$4,
-    __vue_module_identifier__$4,
+  var __vue_component__$5 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    __vue_inject_styles__$5,
+    __vue_script__$5,
+    __vue_scope_id__$5,
+    __vue_is_functional_template__$5,
+    __vue_module_identifier__$5,
     false,
     undefined,
     undefined,
     undefined
   );
 
-var script$3 = {
+var script$4 = {
   components: {
-    Branding: __vue_component__$6,
+    Branding: __vue_component__$7,
     VAlert: VAlert,
     VTextField: VTextField,
     VCardText: VCardText,
@@ -1157,10 +1695,10 @@ var script$3 = {
 };
 
 /* script */
-var __vue_script__$3 = script$3;
+var __vue_script__$4 = script$4;
 
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$4 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1327,19 +1865,418 @@ var __vue_render__$3 = function() {
     1
   )
 };
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
+
+  /* style */
+  var __vue_inject_styles__$4 = undefined;
+  /* scoped */
+  var __vue_scope_id__$4 = undefined;
+  /* module identifier */
+  var __vue_module_identifier__$4 = undefined;
+  /* functional template */
+  var __vue_is_functional_template__$4 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+  /* style inject shadow dom */
+  
+
+  
+  var __vue_component__$4 = /*#__PURE__*/normalizeComponent(
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    __vue_inject_styles__$4,
+    __vue_script__$4,
+    __vue_scope_id__$4,
+    __vue_is_functional_template__$4,
+    __vue_module_identifier__$4,
+    false,
+    undefined,
+    undefined,
+    undefined
+  );
+
+var script$3 = {
+  components: {
+    Branding: __vue_component__$7,
+    VAlert: VAlert,
+    VTextField: VTextField,
+    VCardText: VCardText,
+    VBtn: VBtn,
+    VCardActions: VCardActions,
+    VForm: VForm,
+    VCol: VCol,
+    VRow: VRow,
+    VContainer: VContainer,
+    VCard: VCard
+  },
+
+  data: function () { return ({
+    valid: false,
+    code: [], // text confirmation code
+    digitMask: "#",
+    phoneMask: "(###) ###-####",
+    phoneNumber: "", // phone number field to send code to
+    recaptchaVerifier: null,
+    recaptchaWidgetId: null,
+  }); },
+
+  computed: Object.assign({}, mapState("auth", ["config", "sign_by_phone_step"]),
+    mapGetters("auth", ["isLoading", "getError"]),
+
+    // phone number validation
+    {rules: function rules() {
+      var validation = {
+        phoneNumber: this.phoneNumber.replace(/\D/g, "") < 1000000000 ? "Please enter a valid US phone number" : true,
+      };
+
+      return validation
+    }}),
+
+  mounted: function mounted() {
+    var this$1$1 = this;
+
+    this.recaptchaVerifier = new firebaseProvider.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
+    this.recaptchaVerifier.render().then(function (widgetId) { return (this$1$1.recaptchaWidgetId = widgetId); });
+
+    // window.grecaptcha.reset(this.recaptchaWidgetId)
+
+    // // Or, if you haven't stored the widget ID:
+    // this.recaptchaVerifier.render().then(function (widgetId) {
+    //   grecaptcha.reset(widgetId)
+    // })
+  },
+
+  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "textPhoneVerificationCode", "confirmCode"]),
+    mapMutations("auth", ["SET_SHOW_LOGIN_WITH_PHONE", "SET_ERROR"]),
+
+    // paste handler to allow confirmation code paste
+    {onPaste: function onPaste(event) {
+      var text = event.clipboardData.getData("text").substr(0, 6);
+
+      for (var index = 0; index < text.length; index++) {
+        this.$set(this.code, index, text[index]);
+      }
+    },
+
+    // form field focus handler to automatically move cursor to the next field
+    nextElementFocus: function nextElementFocus(index, event) {
+      var i = index;
+
+      if (["Backspace", "ArrowLeft"].includes(event.key)) {
+        i = index > 1 ? index - 1 : 0;
+      }
+
+      // jeez to figure this out OMG :)
+      // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array
+      if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowRight"].includes(event.key)) {
+        this.$set(this.code, index, event.key);
+
+        i = index > 4 ? index : index + 1;
+      }
+
+      var el = "code" + i;
+
+      this.$refs[el][0].focus();
+    }}),
+};
+
+var isOldIE = typeof navigator !== 'undefined' &&
+    /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
+function createInjector(context) {
+    return function (id, style) { return addStyle(id, style); };
+}
+var HEAD;
+var styles = {};
+function addStyle(id, css) {
+    var group = isOldIE ? css.media || 'default' : id;
+    var style = styles[group] || (styles[group] = { ids: new Set(), styles: [] });
+    if (!style.ids.has(id)) {
+        style.ids.add(id);
+        var code = css.source;
+        if (css.map) {
+            // https://developer.chrome.com/devtools/docs/javascript-debugging
+            // this makes source maps inside style tags work properly in Chrome
+            code += '\n/*# sourceURL=' + css.map.sources[0] + ' */';
+            // http://stackoverflow.com/a/26603875
+            code +=
+                '\n/*# sourceMappingURL=data:application/json;base64,' +
+                    btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) +
+                    ' */';
+        }
+        if (!style.element) {
+            style.element = document.createElement('style');
+            style.element.type = 'text/css';
+            if (css.media)
+                { style.element.setAttribute('media', css.media); }
+            if (HEAD === undefined) {
+                HEAD = document.head || document.getElementsByTagName('head')[0];
+            }
+            HEAD.appendChild(style.element);
+        }
+        if ('styleSheet' in style.element) {
+            style.styles.push(code);
+            style.element.styleSheet.cssText = style.styles
+                .filter(Boolean)
+                .join('\n');
+        }
+        else {
+            var index = style.ids.size - 1;
+            var textNode = document.createTextNode(code);
+            var nodes = style.element.childNodes;
+            if (nodes[index])
+                { style.element.removeChild(nodes[index]); }
+            if (nodes.length)
+                { style.element.insertBefore(textNode, nodes[index]); }
+            else
+                { style.element.appendChild(textNode); }
+        }
+    }
+}
+
+/* script */
+var __vue_script__$3 = script$3;
+
+/* template */
+var __vue_render__$3 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "v-container",
+    [
+      _c("div", { attrs: { id: "recaptcha-container" } }),
+      _vm._v(" "),
+      _c(
+        "v-card",
+        { attrs: { flat: "" } },
+        [
+          Boolean(_vm.getError)
+            ? _c(
+                "v-alert",
+                {
+                  attrs: { type: "error", dismissible: "" },
+                  on: {
+                    click: function($event) {
+                      return _vm.SET_ERROR(null)
+                    }
+                  }
+                },
+                [_vm._v("\n      " + _vm._s(_vm.getError.message) + "\n    ")]
+              )
+            : _c("branding", { staticClass: "text-center" }),
+          _vm._v(" "),
+          _vm.sign_by_phone_step === 1
+            ? _c(
+                "div",
+                [
+                  _c(
+                    "v-form",
+                    {
+                      ref: "form",
+                      on: {
+                        submit: function($event) {
+                          $event.preventDefault();
+                          return _vm.textPhoneVerificationCode({
+                            phoneNumber: _vm.phoneNumber,
+                            recaptchaVerifier: _vm.recaptchaVerifier
+                          })
+                        }
+                      },
+                      model: {
+                        value: _vm.valid,
+                        callback: function($$v) {
+                          _vm.valid = $$v;
+                        },
+                        expression: "valid"
+                      }
+                    },
+                    [
+                      _c(
+                        "v-card-text",
+                        [
+                          _c("v-text-field", {
+                            directives: [
+                              {
+                                name: "mask",
+                                rawName: "v-mask",
+                                value: _vm.phoneMask,
+                                expression: "phoneMask"
+                              }
+                            ],
+                            staticClass: "mx-15 px-5 large-font",
+                            attrs: {
+                              autocomplete: "off",
+                              label: "Phone Number",
+                              "prepend-icon": "mdi-cellphone",
+                              prefix: "+1",
+                              rules: [_vm.rules.phoneNumber]
+                            },
+                            model: {
+                              value: _vm.phoneNumber,
+                              callback: function($$v) {
+                                _vm.phoneNumber = $$v;
+                              },
+                              expression: "phoneNumber"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "v-card-actions",
+                        [
+                          _c(
+                            "v-btn",
+                            {
+                              attrs: {
+                                color: "primary",
+                                block: "",
+                                large: "",
+                                depressed: "",
+                                disabled: !_vm.valid,
+                                type: "submit"
+                              }
+                            },
+                            [_vm._v(" Send Code ")]
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _vm.sign_by_phone_step === 2
+            ? _c(
+                "v-container",
+                [
+                  _c("p", { staticClass: "text-center" }, [
+                    _vm._v("\n        enter confirmation code"),
+                    _c("br"),
+                    _vm._v(
+                      "\n        you have recived on your mobile phone\n      "
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "v-row",
+                    { staticClass: "centered-input" },
+                    _vm._l(6, function(element, index) {
+                      return _c(
+                        "v-col",
+                        { key: index, attrs: { cols: "2" } },
+                        [
+                          _c("v-text-field", {
+                            directives: [
+                              {
+                                name: "mask",
+                                rawName: "v-mask",
+                                value: _vm.digitMask,
+                                expression: "digitMask"
+                              }
+                            ],
+                            key: index,
+                            ref: "code" + index,
+                            refInFor: true,
+                            attrs: {
+                              value: _vm.code[index],
+                              "item-value": _vm.code[index],
+                              "item-text": _vm.code[index],
+                              outlined: "",
+                              maxlength: "1"
+                            },
+                            on: {
+                              keyup: function($event) {
+                                return _vm.nextElementFocus(index, $event)
+                              },
+                              paste: _vm.onPaste
+                            },
+                            model: {
+                              value: _vm.code[index],
+                              callback: function($$v) {
+                                _vm.$set(_vm.code, index, $$v);
+                              },
+                              expression: "code[index]"
+                            }
+                          })
+                        ],
+                        1
+                      )
+                    }),
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: {
+                        color: "primary",
+                        block: "",
+                        large: "",
+                        depressed: "",
+                        disabled: _vm.code.length < 6
+                      },
+                      on: {
+                        click: function($event) {
+                          return _vm.confirmCode(_vm.code)
+                        }
+                      }
+                    },
+                    [_vm._v("\n        Confirm Code\n      ")]
+                  )
+                ],
+                1
+              )
+            : _vm._e(),
+          _vm._v(" "),
+          _c(
+            "v-container",
+            { staticClass: "text-center" },
+            [
+              _c(
+                "v-btn",
+                {
+                  attrs: { text: "", "x-small": "", color: "primary" },
+                  on: {
+                    click: function($event) {
+                      return _vm.SET_SHOW_LOGIN_WITH_PHONE(false)
+                    }
+                  }
+                },
+                [_vm._v(" Sign In with email ")]
+              )
+            ],
+            1
+          )
+        ],
+        1
+      )
+    ],
+    1
+  )
+};
 var __vue_staticRenderFns__$3 = [];
 __vue_render__$3._withStripped = true;
 
   /* style */
-  var __vue_inject_styles__$3 = undefined;
+  var __vue_inject_styles__$3 = function (inject) {
+    if (!inject) { return }
+    inject("data-v-a6315db4_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* styles for phone number field */\n.large-font[data-v-a6315db4] input {\n  font-size: 1.5rem;\n}\n\n/* styles for confirmation code form fields */\n.centered-input[data-v-a6315db4] input {\n  text-align: center;\n  font-weight: bold;\n  font-size: 1.5rem;\n}\n", map: {"version":3,"sources":["/Users/mark/Sites/npm-packages/firebase-vuetify-auth/src/components/LoginWithPhone.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAgKA,kCAAA;AACA;EACA,iBAAA;AACA;;AAEA,6CAAA;AACA;EACA,kBAAA;EACA,iBAAA;EACA,iBAAA;AACA","file":"LoginWithPhone.vue","sourcesContent":["<template>\n  <v-container>\n    <!-- recaptcha container needed for authenticating with the phone provider -->\n    <div id=\"recaptcha-container\" />\n\n    <!-- phone authentication provider: enter phone number -->\n    <v-card flat>\n      <!-- error alerts -->\n      <v-alert v-if=\"Boolean(getError)\" type=\"error\" dismissible @click=\"SET_ERROR(null)\">\n        {{ getError.message }}\n      </v-alert>\n\n      <!-- application branding -->\n      <branding v-else class=\"text-center\" />\n\n      <!-- send code by text to phone -->\n      <div v-if=\"sign_by_phone_step === 1\">\n        <v-form\n          ref=\"form\"\n          v-model=\"valid\"\n          @submit.prevent=\"textPhoneVerificationCode({ phoneNumber, recaptchaVerifier })\"\n        >\n          <v-card-text>\n            <v-text-field\n              v-model=\"phoneNumber\"\n              v-mask=\"phoneMask\"\n              class=\"mx-15 px-5 large-font\"\n              autocomplete=\"off\"\n              label=\"Phone Number\"\n              prepend-icon=\"mdi-cellphone\"\n              prefix=\"+1\"\n              :rules=\"[rules.phoneNumber]\"\n            />\n          </v-card-text>\n\n          <v-card-actions>\n            <v-btn color=\"primary\" block large depressed :disabled=\"!valid\" type=\"submit\"> Send Code </v-btn>\n          </v-card-actions>\n        </v-form>\n      </div>\n\n      <!-- confirm code received by phone text -->\n      <v-container v-if=\"sign_by_phone_step === 2\">\n        <p class=\"text-center\">\n          enter confirmation code<br />\n          you have recived on your mobile phone\n        </p>\n\n        <v-row class=\"centered-input\">\n          <v-col v-for=\"(element, index) in 6\" :key=\"index\" cols=\"2\">\n            <v-text-field\n              :ref=\"'code' + index\"\n              :key=\"index\"\n              v-model=\"code[index]\"\n              v-mask=\"digitMask\"\n              :value=\"code[index]\"\n              :item-value=\"code[index]\"\n              :item-text=\"code[index]\"\n              outlined\n              maxlength=\"1\"\n              @keyup=\"nextElementFocus(index, $event)\"\n              @paste=\"onPaste\"\n            />\n          </v-col>\n        </v-row>\n\n        <v-btn color=\"primary\" block large depressed :disabled=\"code.length < 6\" @click=\"confirmCode(code)\">\n          Confirm Code\n        </v-btn>\n      </v-container>\n\n      <v-container class=\"text-center\">\n        <v-btn text x-small color=\"primary\" @click=\"SET_SHOW_LOGIN_WITH_PHONE(false)\"> Sign In with email </v-btn>\n      </v-container>\n    </v-card>\n  </v-container>\n</template>\n\n<script>\nimport firebase from \"firebase/app\"\nimport Branding from \"./Branding.vue\"\nimport { mapState, mapGetters, mapMutations, mapActions } from \"vuex\"\n\nexport default {\n  components: { Branding },\n\n  data: () => ({\n    valid: false,\n    code: [], // text confirmation code\n    digitMask: \"#\",\n    phoneMask: \"(###) ###-####\",\n    phoneNumber: \"\", // phone number field to send code to\n    recaptchaVerifier: null,\n    recaptchaWidgetId: null,\n  }),\n\n  computed: {\n    ...mapState(\"auth\", [\"config\", \"sign_by_phone_step\"]),\n    ...mapGetters(\"auth\", [\"isLoading\", \"getError\"]),\n\n    // phone number validation\n    rules() {\n      const validation = {\n        phoneNumber: this.phoneNumber.replace(/\\D/g, \"\") < 1000000000 ? \"Please enter a valid US phone number\" : true,\n      }\n\n      return validation\n    },\n  },\n\n  mounted() {\n    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(\"recaptcha-container\", { size: \"invisible\" })\n    this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))\n\n    // window.grecaptcha.reset(this.recaptchaWidgetId)\n\n    // // Or, if you haven't stored the widget ID:\n    // this.recaptchaVerifier.render().then(function (widgetId) {\n    //   grecaptcha.reset(widgetId)\n    // })\n  },\n\n  methods: {\n    ...mapActions(\"auth\", [\"loginWithGoogle\", \"loginWithFacebook\", \"textPhoneVerificationCode\", \"confirmCode\"]),\n    ...mapMutations(\"auth\", [\"SET_SHOW_LOGIN_WITH_PHONE\", \"SET_ERROR\"]),\n\n    // paste handler to allow confirmation code paste\n    onPaste(event) {\n      const text = event.clipboardData.getData(\"text\").substr(0, 6)\n\n      for (var index = 0; index < text.length; index++) {\n        this.$set(this.code, index, text[index])\n      }\n    },\n\n    // form field focus handler to automatically move cursor to the next field\n    nextElementFocus(index, event) {\n      let i = index\n\n      if ([\"Backspace\", \"ArrowLeft\"].includes(event.key)) {\n        i = index > 1 ? index - 1 : 0\n      }\n\n      // jeez to figure this out OMG :)\n      // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array\n      if ([\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"ArrowRight\"].includes(event.key)) {\n        this.$set(this.code, index, event.key)\n\n        i = index > 4 ? index : index + 1\n      }\n\n      const el = \"code\" + i\n\n      this.$refs[el][0].focus()\n    },\n  },\n}\n</script>\n\n<style scoped>\n/* styles for phone number field */\n.large-font >>> input {\n  font-size: 1.5rem;\n}\n\n/* styles for confirmation code form fields */\n.centered-input >>> input {\n  text-align: center;\n  font-weight: bold;\n  font-size: 1.5rem;\n}\n</style>\n"]}, media: undefined });
+
+  };
   /* scoped */
-  var __vue_scope_id__$3 = undefined;
+  var __vue_scope_id__$3 = "data-v-a6315db4";
   /* module identifier */
   var __vue_module_identifier__$3 = undefined;
   /* functional template */
   var __vue_is_functional_template__$3 = false;
-  /* style inject */
-  
   /* style inject SSR */
   
   /* style inject shadow dom */
@@ -1354,7 +2291,7 @@ __vue_render__$3._withStripped = true;
     __vue_is_functional_template__$3,
     __vue_module_identifier__$3,
     false,
-    undefined,
+    createInjector,
     undefined,
     undefined
   );
@@ -1367,8 +2304,6 @@ var script$2 = {
     VContainer: VContainer,
     VCard: VCard
   },
-
-  data: function () { return ({}); },
 
   computed: Object.assign({}, mapState("auth", ["config"]),
     mapGetters("auth", [
@@ -1425,7 +2360,14 @@ var __vue_render__$2 = function() {
                 _vm._v(" "),
                 _c(
                   "v-btn",
-                  { attrs: { color: "primary" }, on: { click: _vm.goToLogin } },
+                  {
+                    attrs: { color: "primary" },
+                    on: {
+                      click: function($event) {
+                        return _vm.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)
+                      }
+                    }
+                  },
                   [_vm._v(" Back to Login ")]
                 )
               ],
@@ -1635,53 +2577,14 @@ var script$1 = {
     VIcon: VIcon,
     VBtn: VBtn,
     VTooltip: VTooltip,
-    VContainer: VContainer,
-    VCardTitle: VCardTitle,
-    VTextField: VTextField,
-    VCol: VCol,
-    VRow: VRow,
-    VCardText: VCardText,
-    VCard: VCard,
-    VDialog: VDialog
+    VContainer: VContainer
   },
-
-  props: ["google", "facebook", "phone"],
-
-  data: function () { return ({
-    step: 1,
-    valid: false,
-    dialog: false,
-    codeAuth: null,
-    confirmationCode: null,
-    codeMask: "######",
-    phoneMask: "(###) ###-####",
-    phoneNumber: null, // phone number field to send code to
-    enterPhoneNumber: false, // show phone number field
-    recaptchaVerifier: null,
-    recaptchaWidgetId: null,
-  }); },
 
   computed: Object.assign({}, mapState("auth", ["config"]),
+    mapGetters("auth", ["isLoading"])),
 
-    {rules: function rules() {
-      var validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
-        password: this.form.password == "" ? "Password cannot be empty" : true,
-      };
-
-      return validation
-    },
-
-    firebase: function firebase() {
-      return this.config.firebase
-    }}),
-
-  mounted: function mounted() {
-    // this.recaptchaVerifier = new this.firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
-    // this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))
-  },
-
-  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone"]))
+  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone"]),
+    mapMutations("auth", ["SET_SHOW_LOGIN_WITH_PHONE"]))
 };
 
 /* script */
@@ -1840,7 +2743,9 @@ var __vue_render__$1 = function() {
                                         },
                                         on: {
                                           click: function($event) {
-                                            return _vm.loginWithPhone()
+                                            return _vm.SET_SHOW_LOGIN_WITH_PHONE(
+                                              true
+                                            )
                                           }
                                         }
                                       },
@@ -1859,7 +2764,7 @@ var __vue_render__$1 = function() {
                         ],
                         null,
                         false,
-                        4126551563
+                        3730036540
                       )
                     },
                     [
@@ -1868,199 +2773,6 @@ var __vue_render__$1 = function() {
                         _vm._v("Authenticate with Text Message To Your Phone")
                       ])
                     ]
-                  )
-                : _vm._e()
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-dialog",
-            {
-              attrs: { width: "500" },
-              model: {
-                value: _vm.dialog,
-                callback: function($$v) {
-                  _vm.dialog = $$v;
-                },
-                expression: "dialog"
-              }
-            },
-            [
-              _c("div", { attrs: { id: "recaptcha-container" } }),
-              _vm._v(" "),
-              _vm.step === 2
-                ? _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-card-title",
-                        { staticClass: "body-1 primary white--text" },
-                        [_vm._v(" Enter Phone Number ")]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-card-text",
-                        [
-                          _c(
-                            "v-container",
-                            { attrs: { fluid: "" } },
-                            [
-                              _c(
-                                "v-row",
-                                {
-                                  attrs: { align: "center", justify: "center" }
-                                },
-                                [
-                                  _c(
-                                    "v-col",
-                                    [
-                                      _c("v-text-field", {
-                                        directives: [
-                                          {
-                                            name: "mask",
-                                            rawName: "v-mask",
-                                            value: _vm.phoneMask,
-                                            expression: "phoneMask"
-                                          }
-                                        ],
-                                        attrs: {
-                                          autocomplete: "off",
-                                          label: "Phone Number",
-                                          "prepend-icon": "mdi-cellphone"
-                                        },
-                                        model: {
-                                          value: _vm.phoneNumber,
-                                          callback: function($$v) {
-                                            _vm.phoneNumber = $$v;
-                                          },
-                                          expression: "phoneNumber"
-                                        }
-                                      })
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "v-col",
-                                    [
-                                      _c(
-                                        "v-btn",
-                                        {
-                                          attrs: {
-                                            color: "primary",
-                                            outlined: "",
-                                            disabled: _vm.progress
-                                          },
-                                          on: {
-                                            click: function($event) {
-                                              return _vm.sendCode()
-                                            }
-                                          }
-                                        },
-                                        [_vm._v(" Send Code ")]
-                                      )
-                                    ],
-                                    1
-                                  )
-                                ],
-                                1
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.step === 3
-                ? _c(
-                    "v-card",
-                    [
-                      _c(
-                        "v-card-title",
-                        { staticClass: "body-1 primary white--text" },
-                        [_vm._v(" Enter Confirm Code ")]
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "v-card-text",
-                        [
-                          _c(
-                            "v-container",
-                            { attrs: { fluid: "" } },
-                            [
-                              _c(
-                                "v-row",
-                                {
-                                  attrs: { align: "center", justify: "center" }
-                                },
-                                [
-                                  _c(
-                                    "v-col",
-                                    [
-                                      _c("v-text-field", {
-                                        directives: [
-                                          {
-                                            name: "mask",
-                                            rawName: "v-mask",
-                                            value: _vm.codeMask,
-                                            expression: "codeMask"
-                                          }
-                                        ],
-                                        attrs: {
-                                          autocomplete: "off",
-                                          label: "Confirmation Code"
-                                        },
-                                        model: {
-                                          value: _vm.confirmationCode,
-                                          callback: function($$v) {
-                                            _vm.confirmationCode = $$v;
-                                          },
-                                          expression: "confirmationCode"
-                                        }
-                                      })
-                                    ],
-                                    1
-                                  ),
-                                  _vm._v(" "),
-                                  _c(
-                                    "v-col",
-                                    [
-                                      _c(
-                                        "v-btn",
-                                        {
-                                          attrs: {
-                                            color: "primary",
-                                            outlined: "",
-                                            disabled: _vm.progress
-                                          },
-                                          on: {
-                                            click: function($event) {
-                                              return _vm.confirmCode()
-                                            }
-                                          }
-                                        },
-                                        [_vm._v(" Confirm Code ")]
-                                      )
-                                    ],
-                                    1
-                                  )
-                                ],
-                                1
-                              )
-                            ],
-                            1
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
                   )
                 : _vm._e()
             ],
@@ -2107,9 +2819,10 @@ var script = {
   name: "AuthenticationGuard",
 
   components: {
-    Login: __vue_component__$5,
-    Register: __vue_component__$4,
-    PasswordReset: __vue_component__$3,
+    Login: __vue_component__$6,
+    Register: __vue_component__$5,
+    PasswordReset: __vue_component__$4,
+    LoginWithPhone: __vue_component__$3,
     EmailVerification: __vue_component__$2,
     LoginWithProvider: __vue_component__$1,
     VProgressLinear: VProgressLinear,
@@ -2131,6 +2844,7 @@ var script = {
     mapGetters("auth", [
       "isLoading",
       "isAuthenticated",
+      "isLoginWithPhoneShown",
       "isAuthGuardDialogShown",
       "isAuthGuardDialogPersistent",
       "isUserRegistrationAllowed",
@@ -2228,22 +2942,30 @@ var __vue_render__ = function() {
                               }
                             },
                             [
-                              _c(
-                                "v-tab",
-                                {
-                                  on: {
-                                    click: function($event) {
-                                      _vm.SET_TAB(0);
-                                      _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(false);
-                                    }
-                                  }
-                                },
-                                [
-                                  _vm._v(
-                                    "\n              Sign In\n            "
+                              !_vm.isLoginWithPhoneShown
+                                ? _c(
+                                    "v-tab",
+                                    {
+                                      on: {
+                                        click: function($event) {
+                                          _vm.SET_TAB(0);
+                                          _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(
+                                            false
+                                          );
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _vm._v(
+                                        "\n              Sign In\n            "
+                                      )
+                                    ]
                                   )
-                                ]
-                              ),
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.isLoginWithPhoneShown
+                                ? _c("v-tab", [_vm._v(" Sign In ")])
+                                : _vm._e(),
                               _vm._v(" "),
                               !_vm.isResetPasswordScreenShown &&
                               _vm.isUserRegistrationAllowed
@@ -2269,12 +2991,23 @@ var __vue_render__ = function() {
                               }
                             },
                             [
-                              _c(
-                                "v-tab-item",
-                                { staticClass: "pt-5" },
-                                [_c("Login")],
-                                1
-                              ),
+                              !_vm.isLoginWithPhoneShown
+                                ? _c(
+                                    "v-tab-item",
+                                    { staticClass: "pt-5" },
+                                    [_c("Login")],
+                                    1
+                                  )
+                                : _vm._e(),
+                              _vm._v(" "),
+                              _vm.isLoginWithPhoneShown
+                                ? _c(
+                                    "v-tab-item",
+                                    { staticClass: "pt-5" },
+                                    [_c("LoginWithPhone")],
+                                    1
+                                  )
+                                : _vm._e(),
                               _vm._v(" "),
                               !_vm.isResetPasswordScreenShown &&
                               _vm.isUserRegistrationAllowed
@@ -2377,8 +3110,6 @@ function AuthGuardMiddleware (to, from, next) {
   return allowRoute ? next() : null
 }
 
-// vuex store namespace
-
 // Declare install function executed by Vue.use()
 function install(Vue, options) {
   if ( options === void 0 ) options = {};
@@ -2389,25 +3120,32 @@ function install(Vue, options) {
 
   // merge default settings with user settings
   var config = Object.assign({}, defaultSettings, options);
-  var store = config.store;
   var router = config.router;
   var firebase = config.firebase;
 
-  Vue.prototype.$authGuardStore = store;
+  var store = config.store;
 
   // verify if required dependency instances are passed to this package config
-  if (store == null) { console.error("ERROR: vuex store instance missing in AuthenticationGuard config!"); }
-  if (router == null) { console.error("ERROR: vue router instance missing in AuthenticationGuard config!"); }
-  if (firebase == null) { console.error("ERROR: firebase instance missing in AuthenticationGuard config!"); }
+  if (router === null) { console.error("ERROR: vue router instance missing in AuthenticationGuard config!"); }
+  if (firebase === null) { console.error("ERROR: firebase instance missing in AuthenticationGuard config!"); }
 
-  console.log("!!!!", options);
+  if (store === null) {
+    console.error("WARNING: vuex store instance missing in AuthenticationGuard config!");
+
+    // use backup store if none passed in options - backwards compatibility
+    store = backupStore;
+  }
 
   // register vuex store namespace
   store.registerModule("auth", AuthStore);
 
+  // save store in Vue.prototype to be accessible authcheck.js
+  Vue.prototype.$authGuardStore = store;
+
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config);
 
+  Vue.directive("mask", directive);
   Vue.component("AuthenticationGuard", __vue_component__);
 }
 

@@ -133,14 +133,16 @@ export default {
     try {
       commit("SET_LOADING", true)
 
-      console.log("confirmationCode.join()", confirmationCode.join())
+      console.log("confirmationCode", confirmationCode.join())
 
       await state.text_confirmation.confirm(confirmationCode.join())
 
       commit("SET_LOADING", false)
+      commit("SET_SIGN_BY_PHONE_STEP", 1)
     } catch (error) {
       commit("SET_ERROR", error)
       commit("SET_LOADING", false)
+      commit("SET_SIGN_BY_PHONE_STEP", 1)
     }
   },
 
