@@ -16,7 +16,9 @@
     is_session_persistant: true,
     is_authguard_dialog_shown: true, // login dialog
     is_authguard_dialog_persistent: true, // login dialog persistent option
+    is_email_verification_link_sent: false, // email verification confirmation
     is_email_reset_password_link_sent: false, // confirmation for successful reset password link email
+    is_email_verification_screen_shown: false, // show email verification screen,
   };
 
   var getters = {
@@ -97,8 +99,11 @@
     isEmailVerificationRequired: function isEmailVerificationRequired(state) {
       return state.config.verification
     },
-    isEmailVerificationRequired: function isEmailVerificationRequired(state) {
-      return state.config.verification
+    isEmailVerificationScrenShown: function isEmailVerificationScrenShown(state) {
+      return state.is_email_verification_screen_shown
+    },
+    isEmailVerificationLinkSent: function isEmailVerificationLinkSent(state) {
+      return state.is_email_verification_link_sent
     },
     isEmailResetPasswordLinkSent: function isEmailResetPasswordLinkSent(state) {
       return state.is_email_reset_password_link_sent
@@ -2233,7 +2238,7 @@
     //
     registerUser: async function registerUser(ref, ref$1) {
       var state = ref.state;
-      var getters = ref.getters;
+      ref.getters;
       var commit = ref.commit;
       var displayName = ref$1.displayName;
       var email = ref$1.email;
@@ -2244,12 +2249,16 @@
 
         var ref$2 = state.config;
         var firebase = ref$2.firebase;
+        var verification = state.config.email;
 
         await firebase.auth().createUserWithEmailAndPassword(email, password);
         await firebase.auth().signInWithEmailAndPassword(email, password);
         await firebase.auth().currentUser.updateProfile({ displayName: displayName });
 
-        if (getters.isEmailVerificationRequired) { await firebase.auth().currentUser.sendEmailVerification(); }
+        // send email to verify user email address if config option is not set to false
+        if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
+          await firebase.auth().currentUser.sendEmailVerification();
+        }
 
         commit("SET_LOADING", false);
       } catch (error) {
@@ -2290,6 +2299,7 @@
     //
     sendVerificationEmail: function sendVerificationEmail(ref) {
       var state = ref.state;
+      var commit = ref.commit;
 
       return new Promise(async function (resolve, reject) {
         try {
@@ -2301,6 +2311,7 @@
           await firebase.auth().currentUser.sendEmailVerification();
 
           commit("SET_LOADING", false);
+          commit("SET_EMAIL_VERIFICATION_LINK_SENT", true);
 
           return resolve()
         } catch (error) {
@@ -2335,9 +2346,15 @@
     SET_EMAIL_PASSWORD_RESET_LINK_SENT: function SET_EMAIL_PASSWORD_RESET_LINK_SENT(state, status) {
       state.is_email_reset_password_link_sent = status;
     },
+    SET_EMAIL_VERIFICATION_LINK_SENT: function SET_EMAIL_VERIFICATION_LINK_SENT(state, status) {
+      state.is_email_verification_link_sent = status;
+    },
+    SET_EMAIL_VERIFICATION_SCREEN_SHOWN: function SET_EMAIL_VERIFICATION_SCREEN_SHOWN(state, status) {
+      state.is_email_verification_screen_shown = status;
+    },
   };
 
-  var AuthStoreNamespace = {
+  var AuthStore = {
     namespaced: true,
 
     state: state,
@@ -2362,13 +2379,11 @@
     iconColor: "orange", // authentication prompt icon color
   };
 
-  // import store from "../../store"
-
   var debug = function () {
     var text = [], len = arguments.length;
     while ( len-- ) text[ len ] = arguments[ len ];
 
-    var ref = Vue__default['default'].prototype.$authGuardStore;
+    var ref = Vue__default['default'].prototype.$authGuardStore.state.auth.config;
     var debug = ref.debug;
 
     if (!Boolean(debug)) { return }
@@ -2385,7 +2400,7 @@
 
     var currentUser = store.getters["auth/getCurrentUser"];
     var isAuthenticated = store.getters["auth/isAuthenticated"];
-    var verification = store.getters["auth/isEmailVerificationRequired"];
+    var verification = store.state.auth.config.verification;
 
     if (verification) { debug("[ auth check ]: email verification required: [", verification, "]"); }
 
@@ -2425,6 +2440,7 @@
         allowRoute = true;
       } else {
         debug("[ auth check ]: authguard config requires email verification");
+        store.commit("auth/SET_EMAIL_VERIFICATION_SCREEN_SHOWN", true);
       }
 
       if (allowRoute) {
@@ -3333,13 +3349,15 @@
     data: function () { return ({}); },
 
     computed: Object.assign({}, vuex.mapState("auth", ["config"]),
-      vuex.mapGetters("auth", ["isLoading", "isAuthenticated", "getError", "isEmailResetPasswordLinkSent"])),
+      vuex.mapGetters("auth", [
+        "getError",
+        "isLoading",
+        "isAuthenticated",
+        "isEmailResetPasswordLinkSent",
+        "isEmailVerificationLinkSent" ])),
 
     methods: Object.assign({}, vuex.mapActions("auth", ["signIn", "signOut", "sendVerificationEmail"]),
-
-      {goToLogin: function goToLogin() {
-        this.$emit("signOut");
-      }})
+      vuex.mapMutations("auth", ["SET_EMAIL_VERIFICATION_SCREEN_SHOWN"]))
   };
 
   /* script */
@@ -3394,7 +3412,7 @@
             : _c(
                 "div",
                 [
-                  !_vm.isEmailResetPasswordLinkSent
+                  !_vm.isEmailVerificationLinkSent
                     ? _c(
                         "div",
                         [
@@ -3417,7 +3435,7 @@
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.isEmailResetPasswordLinkSent
+                  _vm.isEmailVerificationLinkSent
                     ? _c(
                         "div",
                         [
@@ -3477,9 +3495,17 @@
                                 disabled: _vm.isLoading,
                                 color: "primary"
                               },
-                              on: { click: _vm.sendVerificationEmail }
+                              on: {
+                                click: function($event) {
+                                  return _vm.sendVerificationEmail()
+                                }
+                              }
                             },
-                            [_vm._v(" Send Verification Email ")]
+                            [
+                              _vm._v(
+                                "\n          Send Verification Email\n        "
+                              )
+                            ]
                           )
                         ],
                         1
@@ -3494,7 +3520,13 @@
                             "v-btn",
                             {
                               attrs: { color: "primary" },
-                              on: { click: _vm.goToLogin }
+                              on: {
+                                click: function($event) {
+                                  return _vm.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(
+                                    false
+                                  )
+                                }
+                              }
                             },
                             [_vm._v(" Back to Login ")]
                           )
@@ -3523,7 +3555,13 @@
                             "v-btn",
                             {
                               attrs: { color: "primary", outlined: "" },
-                              on: { click: _vm.signIn }
+                              on: {
+                                click: function($event) {
+                                  return _vm.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(
+                                    false
+                                  )
+                                }
+                              }
                             },
                             [_vm._v(" SignIn ")]
                           )
@@ -4072,10 +4110,11 @@
     computed: Object.assign({}, vuex.mapState("auth", ["config"]),
       vuex.mapGetters("auth", [
         "isLoading",
+        "isAuthenticated",
         "isAuthGuardDialogShown",
         "isAuthGuardDialogPersistent",
         "isUserRegistrationAllowed",
-        "isEmailVerificationRequired" ]),
+        "isEmailVerificationScrenShown" ]),
 
       {currentRoute: function currentRoute() {
         return this.$route.path
@@ -4111,6 +4150,7 @@
 
         this$1$1.$store.commit("auth/SET_CONFIG", null);
         this$1$1.$store.commit("auth/SET_CONFIG", config);
+        this$1$1.$store.commit("auth/SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false);
 
         authCheck();
         this$1$1.revalidateAuthGuard();
@@ -4185,7 +4225,7 @@
                       attrs: { indeterminate: _vm.isLoading }
                     }),
                     _vm._v(" "),
-                    _vm.isEmailVerificationRequired
+                    _vm.isEmailVerificationScrenShown
                       ? _c("div", [_c("EmailVerification")], 1)
                       : _c(
                           "div",
@@ -4267,7 +4307,7 @@
                           1
                         ),
                     _vm._v(" "),
-                    !_vm.isEmailVerificationRequired
+                    !_vm.isEmailVerificationScrenShown
                       ? _c("v-card-actions", [_c("LoginWithProvider")], 1)
                       : _vm._e()
                   ],
@@ -4365,6 +4405,8 @@
     if (router == null) { console.error("ERROR: vue router instance missing in AuthenticationGuard config!"); }
     if (firebase == null) { console.error("ERROR: firebase instance missing in AuthenticationGuard config!"); }
 
+    store.registerModule("auth", AuthStore);
+
     // commit npm package config to vuex store
     store.commit("auth/SET_CONFIG", config);
 
@@ -4378,6 +4420,7 @@
 
   // Auto-install when vue is found (eg. in browser via <script> tag)
   var GlobalVue = null;
+
   if (typeof window !== "undefined") {
     GlobalVue = window.Vue;
   } else if (typeof global !== "undefined") {
@@ -4387,11 +4430,11 @@
     GlobalVue.use(plugin);
   }
 
-  var AuthStore = AuthStoreNamespace;
-  var AuthMiddleware = AuthGuardMiddleware;
+  var auth = AuthStore; // export vuex store namespace
+  var AuthMiddleware = AuthGuardMiddleware; // export vue router middleware
 
   exports.AuthMiddleware = AuthMiddleware;
-  exports.AuthStore = AuthStore;
+  exports.auth = auth;
   exports['default'] = plugin;
   exports.install = install;
 

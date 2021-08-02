@@ -1,8 +1,7 @@
-// import store from "../../store"
 import Vue from "vue"
 
 const debug = (...text) => {
-  const { debug } = Vue.prototype.$authGuardStore
+  const { debug } = Vue.prototype.$authGuardStore.state.auth.config
 
   if (!Boolean(debug)) return
 
@@ -18,7 +17,7 @@ export default () => {
 
   const currentUser = store.getters["auth/getCurrentUser"]
   const isAuthenticated = store.getters["auth/isAuthenticated"]
-  const verification = store.getters["auth/isEmailVerificationRequired"]
+  const verification = store.state.auth.config.verification
 
   if (verification) debug("[ auth check ]: email verification required: [", verification, "]")
 
@@ -58,6 +57,7 @@ export default () => {
       allowRoute = true
     } else {
       debug("[ auth check ]: authguard config requires email verification")
+      store.commit("auth/SET_EMAIL_VERIFICATION_SCREEN_SHOWN", true)
     }
 
     if (allowRoute) {

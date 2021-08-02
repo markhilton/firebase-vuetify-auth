@@ -20,4 +20,10 @@ export default {
   SET_EMAIL_PASSWORD_RESET_LINK_SENT(state, status) {
     state.is_email_reset_password_link_sent = status
   },
+  SET_EMAIL_VERIFICATION_LINK_SENT(state, status) {
+    state.is_email_verification_link_sent = status
+  },
+  SET_EMAIL_VERIFICATION_SCREEN_SHOWN(state, status) {
+    state.is_email_verification_screen_shown = status
+  },
 }

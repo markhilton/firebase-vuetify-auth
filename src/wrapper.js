@@ -1,5 +1,5 @@
 // vuex store namespace
-import AuthStoreNamespace from "./store/auth"
+import AuthStore from "./store/auth"
 
 // default npm package init config
 import defaultSettings from "./store/defaultSettings"
@@ -27,6 +27,8 @@ export function install(Vue, options = {}) {
   if (router == null) console.error("ERROR: vue router instance missing in AuthenticationGuard config!")
   if (firebase == null) console.error("ERROR: firebase instance missing in AuthenticationGuard config!")
 
+  store.registerModule("auth", AuthStore)
+
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config)
 
@@ -40,6 +42,7 @@ const plugin = {
 
 // Auto-install when vue is found (eg. in browser via <script> tag)
 let GlobalVue = null
+
 if (typeof window !== "undefined") {
   GlobalVue = window.Vue
 } else if (typeof global !== "undefined") {
@@ -49,7 +52,7 @@ if (GlobalVue) {
   GlobalVue.use(plugin)
 }
 
-export const AuthStore = AuthStoreNamespace
-export const AuthMiddleware = AuthGuardMiddleware
+export const auth = AuthStore // export vuex store namespace
+export const AuthMiddleware = AuthGuardMiddleware // export vue router middleware
 
-export default plugin
+export default plugin // export plugin install function

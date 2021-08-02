@@ -11,7 +11,7 @@
         <v-card flat outlined>
           <v-progress-linear :indeterminate="isLoading" />
 
-          <div v-if="isEmailVerificationRequired">
+          <div v-if="isEmailVerificationScrenShown">
             <EmailVerification />
           </div>
 
@@ -37,7 +37,7 @@
             </v-tabs-items>
           </div>
 
-          <v-card-actions v-if="!isEmailVerificationRequired">
+          <v-card-actions v-if="!isEmailVerificationScrenShown">
             <LoginWithProvider />
           </v-card-actions>
         </v-card>
@@ -77,10 +77,11 @@ export default {
     ...mapState("auth", ["config"]),
     ...mapGetters("auth", [
       "isLoading",
+      "isAuthenticated",
       "isAuthGuardDialogShown",
       "isAuthGuardDialogPersistent",
       "isUserRegistrationAllowed",
-      "isEmailVerificationRequired",
+      "isEmailVerificationScrenShown",
     ]),
 
     currentRoute() {
@@ -116,6 +117,7 @@ export default {
 
       this.$store.commit("auth/SET_CONFIG", null)
       this.$store.commit("auth/SET_CONFIG", config)
+      this.$store.commit("auth/SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
 
       authcheck()
       this.revalidateAuthGuard()

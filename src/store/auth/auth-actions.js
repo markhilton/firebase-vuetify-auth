@@ -107,12 +107,16 @@ export default {
       commit("SET_LOADING", true)
 
       const { firebase } = state.config
+      const verification = state.config.email
 
       await firebase.auth().createUserWithEmailAndPassword(email, password)
       await firebase.auth().signInWithEmailAndPassword(email, password)
       await firebase.auth().currentUser.updateProfile({ displayName })
 
-      if (getters.isEmailVerificationRequired) await firebase.auth().currentUser.sendEmailVerification()
+      // send email to verify user email address if config option is not set to false
+      if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
+        await firebase.auth().currentUser.sendEmailVerification()
+      }
 
       commit("SET_LOADING", false)
     } catch (error) {
@@ -144,7 +148,7 @@ export default {
   },
 
   //
-  sendVerificationEmail({ state }) {
+  sendVerificationEmail({ state, commit }) {
     return new Promise(async (resolve, reject) => {
       try {
         commit("SET_LOADING", true)
@@ -154,6 +158,7 @@ export default {
         await firebase.auth().currentUser.sendEmailVerification()
 
         commit("SET_LOADING", false)
+        commit("SET_EMAIL_VERIFICATION_LINK_SENT", true)
 
         return resolve()
       } catch (error) {
