@@ -2,6 +2,8 @@ export default {
   config: null, // package init configuration
   error: null, // error from last operation
 
+  text_confirmation: null, // log in by phone text
+
   tab: false,
   is_loading: false,
   is_session_persistant: true,

@@ -26,9 +26,10 @@
   "dependencies": {
     "@mdi/font": "^5.9.55",
     "firebase": "^8.8.0",
+    "v-mask": "^2.2.4",
     "vue": "^2.6.14",
-    "vuetify": "^2.5.5",
     "vue-router": "^3.5.2",
+    "vuetify": "^2.5.5",
     "vuex": "^3.6.2"
   },
   "devDependencies": {

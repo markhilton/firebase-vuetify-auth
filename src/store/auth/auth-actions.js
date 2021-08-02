@@ -103,28 +103,41 @@ export default {
   },
 
   //
-  sendCode({ state }, {}) {
-    const { firebase } = state.config
+  async sendCode({ state, commit }, { phoneNumber, recaptchaVerifier }) {
+    try {
+      commit("SET_LOADING", true)
+      commit("SET_PHONE_TEXT_CONFIRMATION", null)
 
-    firebase
-      .auth()
-      .signInWithPhoneNumber("+1" + phoneNumber, this.recaptchaVerifier)
-      .then((res) => {
-        this.step = 3
-        this.codeAuth = res
-      })
-      .catch((error) => {
-        this.step = 1
-      })
+      const { firebase } = state.config
+
+      firebase.auth().settings.appVerificationDisabledForTesting = true // TESTING
+
+      const confirmationResult = await firebase.auth().signInWithPhoneNumber("+1" + phoneNumber, recaptchaVerifier)
+
+      commit("SET_LOADING", false)
+      commit("SET_PHONE_TEXT_CONFIRMATION", confirmationResult)
+    } catch (error) {
+      commit("SET_ERROR", error)
+      commit("SET_LOADING", false)
+    }
   },
 
   //
-  confirmCode() {
-    this.codeAuth.confirm(this.confirmationCode).then(() => (this.step = 1))
+  async confirmCode({ state, commit }, { confirmationCode }) {
+    try {
+      commit("SET_LOADING", true)
+
+      await state.text_confirmation.confirm(confirmationCode)
+
+      commit("SET_LOADING", false)
+    } catch (error) {
+      commit("SET_ERROR", error)
+      commit("SET_LOADING", false)
+    }
   },
 
   //
-  async registerUser({ state, getters, commit }, { displayName, email, password }) {
+  async registerUser({ state, commit }, { displayName, email, password }) {
     try {
       commit("SET_LOADING", true)
 

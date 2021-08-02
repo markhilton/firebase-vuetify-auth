@@ -28,10 +28,14 @@ export default {
   },
   SET_EMAIL_VERIFICATION_SCREEN_SHOWN(state, status) {
     state.is_email_verification_screen_shown = status
+    if (status === false) state.error = null
   },
   SET_PASSWORD_RESET_SCREEN_SHOWN(state, status) {
     state.tab = status ? 1 : 0
     state.is_reset_password_screen_shown = status
     if (status === false) state.is_email_reset_password_link_sent = false
+  },
+  SET_PHONE_TEXT_CONFIRMATION(state, confirmation) {
+    state.text_confirmation = confirmation
   },
 }

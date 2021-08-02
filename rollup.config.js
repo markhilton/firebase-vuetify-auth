@@ -12,6 +12,7 @@ export default {
     globals: {
       vue: "vue",
       vuex: "vuex",
+      "v-mask": "v-mask",
       firebase: "firebase",
       "firebase/app": "firebase/app",
       "@mdi/font": "@mdi/font",
@@ -19,7 +20,7 @@ export default {
       "@/middleware": "./src/middleware",
     },
   },
-  external: ["vue", "vuex", "vuetify/lib", "@mdi/font", "firebase", "firebase/app"],
+  external: ["vue", "vuex", "vuetify/lib", "@mdi/font", "v-mask", "firebase", "firebase/app"],
   plugins: [
     resolve(),
     commonjs({

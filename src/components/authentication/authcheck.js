@@ -1,7 +1,8 @@
 import Vue from "vue"
 
 const debug = (...text) => {
-  const { debug } = Vue.prototype.$authGuardStore.state.auth.config
+  const store = Vue.prototype.$authGuardStore
+  const { debug } = store.state.auth.config
 
   if (!Boolean(debug)) return
 

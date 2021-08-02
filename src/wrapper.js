@@ -1,3 +1,5 @@
+import { VueMaskDirective } from "v-mask"
+
 // vuex store namespace
 import AuthStore from "./store/auth"
 
@@ -20,6 +22,7 @@ export function install(Vue, options = {}) {
   const config = { ...defaultSettings, ...options }
   const { store, router, firebase } = config
 
+  // save store in Vue.prototype to be accessible authcheck.js
   Vue.prototype.$authGuardStore = store
 
   // verify if required dependency instances are passed to this package config
@@ -27,14 +30,13 @@ export function install(Vue, options = {}) {
   if (router == null) console.error("ERROR: vue router instance missing in AuthenticationGuard config!")
   if (firebase == null) console.error("ERROR: firebase instance missing in AuthenticationGuard config!")
 
-  console.log("!!!!", options)
-
   // register vuex store namespace
   store.registerModule("auth", AuthStore)
 
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config)
 
+  Vue.directive("mask", VueMaskDirective)
   Vue.component("AuthenticationGuard", AuthGuard)
 }
 

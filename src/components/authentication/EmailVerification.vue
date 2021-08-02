@@ -11,7 +11,7 @@
           {{ getError.message }}
         </v-alert>
 
-        <v-btn color="primary" @click="goToLogin"> Back to Login </v-btn>
+        <v-btn color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)"> Back to Login </v-btn>
       </div>
 
       <!-- email verification -->

@@ -1,5 +1,8 @@
 <template>
   <v-container v-if="config.google || config.facebook || config.phone" class="text-center ma-0 pa-0">
+    <!-- recaptcha container needed for authenticating with the phone provider -->
+    <div id="recaptcha-container" />
+
     <div class="caption">or login with</div>
 
     <v-container>
@@ -35,8 +38,6 @@
     </v-container>
 
     <v-dialog v-model="dialog" width="500">
-      <div id="recaptcha-container" />
-
       <!-- phone authentication provider: enter phone number -->
       <v-card v-if="step === 2">
         <v-card-title class="body-1 primary white--text"> Enter Phone Number </v-card-title>
@@ -55,7 +56,17 @@
               </v-col>
 
               <v-col>
-                <v-btn color="primary" outlined :disabled="progress" @click="sendCode()"> Send Code </v-btn>
+                <v-btn
+                  color="primary"
+                  outlined
+                  :disabled="isLoading"
+                  @click="
+                    sendCode({ phoneNumber, recaptchaVerifier })
+                    step = 3
+                  "
+                >
+                  Send Code
+                </v-btn>
               </v-col>
             </v-row>
           </v-container>
@@ -70,16 +81,13 @@
           <v-container fluid>
             <v-row align="center" justify="center">
               <v-col>
-                <v-text-field
-                  v-model="confirmationCode"
-                  v-mask="codeMask"
-                  autocomplete="off"
-                  label="Confirmation Code"
-                />
+                <v-text-field v-model="confirmationCode" autocomplete="off" label="Confirmation Code" />
               </v-col>
 
               <v-col>
-                <v-btn color="primary" outlined :disabled="progress" @click="confirmCode()"> Confirm Code </v-btn>
+                <v-btn color="primary" outlined :disabled="isLoading" @click="confirmCode({ confirmationCode })">
+                  Confirm Code
+                </v-btn>
               </v-col>
             </v-row>
           </v-container>
@@ -90,13 +98,12 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex"
+import firebase from "firebase/app"
+import { mapState, mapGetters, mapActions } from "vuex"
 
 export default {
-  props: ["google", "facebook", "phone"],
-
   data: () => ({
-    step: 1,
+    step: 2,
     valid: false,
     dialog: false,
     codeAuth: null,
@@ -111,28 +118,20 @@ export default {
 
   computed: {
     ...mapState("auth", ["config"]),
-
-    rules() {
-      const validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
-        password: this.form.password == "" ? "Password cannot be empty" : true,
-      }
-
-      return validation
-    },
-
-    firebase() {
-      return this.config.firebase
-    },
+    ...mapGetters("auth", ["isLoading"]),
   },
 
   mounted() {
-    // this.recaptchaVerifier = new this.firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
-    // this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))
+    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
+    this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))
   },
 
   methods: {
-    ...mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone"]),
+    ...mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "sendCode", "confirmCode"]),
+
+    loginWithPhone() {
+      this.dialog = true
+    },
   },
 }
 </script>
