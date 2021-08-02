@@ -2362,7 +2362,7 @@ var debug = function () {
   var text = [], len = arguments.length;
   while ( len-- ) text[ len ] = arguments[ len ];
 
-  var ref = store.state.auth.config;
+  var ref = Vue.prototype.$authGuardStore;
   var debug = ref.debug;
 
   if (!Boolean(debug)) { return }
@@ -4342,8 +4342,6 @@ function AuthGuardMiddleware (to, from, next) {
 function install(Vue, options) {
   if ( options === void 0 ) options = {};
 
-  console.log("$authGuardStore @!!!!!!!!!!!!", options);
-
   if (install.installed) { return }
 
   install.installed = true;
@@ -4386,4 +4384,4 @@ if (GlobalVue) {
 var AuthStore = AuthStoreNamespace;
 var AuthMiddleware = AuthGuardMiddleware;
 
-export { AuthMiddleware, AuthStore, __vue_component__ as default, install };
+export { AuthMiddleware, AuthStore, plugin as default, install };

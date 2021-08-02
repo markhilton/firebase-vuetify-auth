@@ -12,8 +12,6 @@ import AuthGuardMiddleware from "./components/authentication/authguard"
 
 // Declare install function executed by Vue.use()
 export function install(Vue, options = {}) {
-  console.log("$authGuardStore @!!!!!!!!!!!!", options)
-
   if (install.installed) return
 
   install.installed = true
@@ -54,4 +52,4 @@ if (GlobalVue) {
 export const AuthStore = AuthStoreNamespace
 export const AuthMiddleware = AuthGuardMiddleware
 
-export default AuthGuard
+export default plugin

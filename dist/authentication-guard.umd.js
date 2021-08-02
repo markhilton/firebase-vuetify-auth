@@ -2368,7 +2368,7 @@
     var text = [], len = arguments.length;
     while ( len-- ) text[ len ] = arguments[ len ];
 
-    var ref = store.state.auth.config;
+    var ref = Vue__default['default'].prototype.$authGuardStore;
     var debug = ref.debug;
 
     if (!Boolean(debug)) { return }
@@ -4348,8 +4348,6 @@
   function install(Vue, options) {
     if ( options === void 0 ) options = {};
 
-    console.log("$authGuardStore @!!!!!!!!!!!!", options);
-
     if (install.installed) { return }
 
     install.installed = true;
@@ -4394,7 +4392,7 @@
 
   exports.AuthMiddleware = AuthMiddleware;
   exports.AuthStore = AuthStore;
-  exports['default'] = __vue_component__;
+  exports['default'] = plugin;
   exports.install = install;
 
   Object.defineProperty(exports, '__esModule', { value: true });
