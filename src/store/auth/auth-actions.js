@@ -1,4 +1,5 @@
 import firebaseProvider from "firebase/app"
+import authcheck from "../../components/authentication/authcheck"
 
 export default {
   revalidateAuthGuard({ state, getters, commit }) {
@@ -20,6 +21,26 @@ export default {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", true)
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
       }
+    })
+  },
+
+  //
+  onAuthStateChanged({ state, commit, dispatch }) {
+    const { firebase, debug } = state.config
+
+    // important to use onAuthStateChanged to mutate config state
+    // in order to prevent vuex from not recognizing firebase changes
+    firebase.auth().onAuthStateChanged(() => {
+      if (debug) console.log("[ auth guard ]: firebase auth state changed")
+
+      const config = state.config
+
+      commit("SET_CONFIG", null)
+      commit("SET_CONFIG", config)
+      commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
+
+      authcheck()
+      dispatch("revalidateAuthGuard")
     })
   },
 
@@ -57,6 +78,7 @@ export default {
   //
   loginWithGoogle({ state }) {
     const { firebase } = state.config
+
     const provider = new firebaseProvider.auth.GoogleAuthProvider()
 
     firebase.auth().useDeviceLanguage()
@@ -133,6 +155,7 @@ export default {
 
       await firebase.auth().sendPasswordResetEmail(email)
 
+      commit("SET_ERROR", false)
       commit("SET_LOADING", false)
       commit("SET_EMAIL_PASSWORD_RESET_LINK_SENT", true)
     } catch (error) {

@@ -27,6 +27,9 @@ export function install(Vue, options = {}) {
   if (router == null) console.error("ERROR: vue router instance missing in AuthenticationGuard config!")
   if (firebase == null) console.error("ERROR: firebase instance missing in AuthenticationGuard config!")
 
+  console.log("!!!!", options)
+
+  // register vuex store namespace
   store.registerModule("auth", AuthStore)
 
   // commit npm package config to vuex store

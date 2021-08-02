@@ -34,7 +34,7 @@
       </v-card-text>
 
       <div class="text-center pb-4">
-        <v-btn text x-small color="primary" @click="emailPasswordResetLink(email)"> Forgot Password? </v-btn>
+        <v-btn text x-small color="primary" @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true)"> Forgot Password? </v-btn>
       </div>
 
       <v-card-actions>
@@ -77,8 +77,13 @@ export default {
   },
 
   methods: {
-    ...mapActions("auth", ["loginWithEmail", "emailPasswordResetLink"]),
-    ...mapMutations("auth", ["SET_SESSION_PERSISTANCE", "SET_EMAIL_PASSWORD_RESET_LINK_SENT", "SET_ERROR"]),
+    ...mapActions("auth", ["loginWithEmail"]),
+    ...mapMutations("auth", [
+      "SET_SESSION_PERSISTANCE",
+      "SET_EMAIL_PASSWORD_RESET_LINK_SENT",
+      "SET_PASSWORD_RESET_SCREEN_SHOWN",
+      "SET_ERROR",
+    ]),
   },
 }
 </script>

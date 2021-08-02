@@ -16,22 +16,29 @@
           </div>
 
           <div v-else>
-            <v-tabs v-model="tab" grow>
-              <v-tab @click="showSignInTab"> Sign In </v-tab>
-              <v-tab v-if="!resetPassword && isUserRegistrationAllowed"> Register </v-tab>
-              <v-tab v-if="resetPassword || !isUserRegistrationAllowed"> Reset Password </v-tab>
+            <v-tabs :value="tab" grow @change="SET_TAB($event)">
+              <v-tab
+                @click="
+                  SET_TAB(0)
+                  SET_PASSWORD_RESET_SCREEN_SHOWN(false)
+                "
+              >
+                Sign In
+              </v-tab>
+              <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"> Register </v-tab>
+              <v-tab v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed"> Reset Password </v-tab>
             </v-tabs>
 
-            <v-tabs-items v-model="tab">
+            <v-tabs-items :value="tab" @change="SET_TAB($event)">
               <v-tab-item class="pt-5">
                 <Login />
               </v-tab-item>
 
-              <v-tab-item v-if="!resetPassword && isUserRegistrationAllowed" class="pt-5">
+              <v-tab-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
                 <Register />
               </v-tab-item>
 
-              <v-tab-item v-if="resetPassword || !isUserRegistrationAllowed" class="pt-5">
+              <v-tab-item v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed" class="pt-5">
                 <PasswordReset />
               </v-tab-item>
             </v-tabs-items>
@@ -68,13 +75,11 @@ export default {
   },
 
   data: () => ({
-    tab: 0,
     loginError: null,
-    resetPassword: false,
   }),
 
   computed: {
-    ...mapState("auth", ["config"]),
+    ...mapState("auth", ["config", "tab"]),
     ...mapGetters("auth", [
       "isLoading",
       "isAuthenticated",
@@ -82,6 +87,7 @@ export default {
       "isAuthGuardDialogPersistent",
       "isUserRegistrationAllowed",
       "isEmailVerificationScrenShown",
+      "isResetPasswordScreenShown",
     ]),
 
     currentRoute() {
@@ -108,51 +114,19 @@ export default {
   },
 
   created() {
-    // important to use onAuthStateChanged to mutate config state
-    // in order to prevent vuex from not recognizing firebase changes
-    this.firebase.auth().onAuthStateChanged(() => {
-      if (this.debug) console.log("[ auth guard ]: firebase auth state changed")
-
-      const config = this.config
-
-      this.$store.commit("auth/SET_CONFIG", null)
-      this.$store.commit("auth/SET_CONFIG", config)
-      this.$store.commit("auth/SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
-
-      authcheck()
-      this.revalidateAuthGuard()
-    })
+    this.onAuthStateChanged()
   },
 
   methods: {
     ...mapActions("auth", [
+      "onAuthStateChanged",
       "revalidateAuthGuard",
       "loginWithEmail",
       "registerUser",
       "signOut",
       "sendVerificationEmail",
     ]),
-    ...mapMutations("auth", ["SET_USER", "SET_AUTH_GUARD_DIALOG_SHOWN"]),
-
-    //
-    showSignInTab() {
-      this.resetPassword = false
-      this.tab = 0
-    },
-
-    //
-    emailPasswordResetLink() {
-      this.resetPassword = true
-      this.tab = 1
-      // const auth = firebase.auth();
-      // const emailAddress = "user@example.com";
-
-      // auth.sendPasswordResetEmail(emailAddress).then(function() {
-      //   // Email sent.
-      // }).catch(function(error) {
-      //   // An error happened.
-      // });
-    },
+    ...mapMutations("auth", ["SET_TAB", "SET_USER", "SET_AUTH_GUARD_DIALOG_SHOWN", "SET_PASSWORD_RESET_SCREEN_SHOWN"]),
   },
 }
 </script>

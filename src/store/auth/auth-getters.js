@@ -82,4 +82,7 @@ export default {
   isEmailResetPasswordLinkSent(state) {
     return state.is_email_reset_password_link_sent
   },
+  isResetPasswordScreenShown(state) {
+    return state.is_reset_password_screen_shown
+  },
 }

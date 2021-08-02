@@ -1,6 +1,6 @@
 {
   "name": "@nerd305/firebase-vuetify-auth",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Firebase user auth guard with Vuetify templates",
   "author": "Mark Hilton <nerd305@gmail.com>",
   "license": "MIT",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@mdi/font": "^5.9.55",
-    "firebase": "^8.6.8",
+    "firebase": "^8.8.0",
     "vue": "^2.6.14",
     "vuetify": "^2.5.5",
     "vue-router": "^3.5.2",

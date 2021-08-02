@@ -2,6 +2,7 @@ export default {
   config: null, // package init configuration
   error: null, // error from last operation
 
+  tab: false,
   is_loading: false,
   is_session_persistant: true,
   is_authguard_dialog_shown: true, // login dialog
@@ -9,4 +10,5 @@ export default {
   is_email_verification_link_sent: false, // email verification confirmation
   is_email_reset_password_link_sent: false, // confirmation for successful reset password link email
   is_email_verification_screen_shown: false, // show email verification screen,
+  is_reset_password_screen_shown: false, // show reset password screen,
 }

@@ -1,26 +1,26 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="emailPasswordResetLink">
-        <!-- error alerrts -->
-        <v-alert v-if="alert" v-model="alert" type="error" dismissible>
-          {{ error.message }}
+      <v-form ref="form" v-model="valid" @submit.prevent="emailPasswordResetLink(email)">
+        <!-- error alerts -->
+        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+          {{ getError.message }}
         </v-alert>
 
         <!-- application branding -->
         <branding v-else class="text-center" />
 
         <!-- login form -->
-        <div v-if="!success">
+        <div v-if="!isEmailResetPasswordLinkSent">
           <v-card-text class="mb-0 pb-0">
             <div class="mb-5">
               Enter registered user email address and we will send you a link to reset your password.
             </div>
 
             <v-text-field
-              v-model="form.email"
+              v-model="email"
               required
-              :error="alert"
+              :error="Boolean(getError)"
               class="mr-2"
               label="Email"
               prepend-icon="mdi-account"
@@ -36,7 +36,7 @@
         </div>
 
         <!-- success message -->
-        <v-container v-if="success" class="pa-4 text-center">
+        <v-container v-if="isEmailResetPasswordLinkSent" class="pa-4 text-center">
           <v-card-text class="text-h5"> Email has been sent! </v-card-text>
 
           <v-card-text
@@ -45,7 +45,7 @@
           >
 
           <v-card-actions>
-            <v-btn block large depressed color="primary" @click="$emit('showSignInTab')"> Login </v-btn>
+            <v-btn block large depressed color="primary" @click="SET_PASSWORD_RESET_SCREEN_SHOWN(false)"> Login </v-btn>
           </v-card-actions>
         </v-container>
       </v-form>
@@ -55,50 +55,36 @@
 
 <script>
 import Branding from "./Branding.vue"
+import { mapGetters, mapMutations, mapActions } from "vuex"
 
 export default {
   components: { Branding },
 
-  props: ["firebase", "isLoading"],
-
   data: () => ({
-    form: {
-      email: "",
-    },
-    error: null,
+    email: "",
     valid: false,
-    success: false,
   }),
 
   computed: {
+    ...mapGetters("auth", ["isLoading", "getError", "isEmailResetPasswordLinkSent"]),
+
     rules() {
       const validation = {
-        email: this.form.email == "" ? "Email cannot be empty" : true,
+        email: this.email == "" ? "Email cannot be empty" : true,
       }
 
       return validation
     },
-
-    alert() {
-      return Boolean(this.error)
-    },
   },
 
   methods: {
-    //
-    emailPasswordResetLink() {
-      this.firebase
-        .auth()
-        .sendPasswordResetEmail(this.form.email)
-        .then(() => {
-          this.error = null
-          this.success = true
-        })
-        .catch((error) => {
-          this.error = error
-          this.success = false
-        })
-    },
+    ...mapActions("auth", ["emailPasswordResetLink"]),
+    ...mapMutations("auth", [
+      "SET_TAB",
+      "SET_ERROR",
+      "SET_PASSWORD_RESET_SCREEN_SHOWN",
+      "SET_EMAIL_PASSWORD_RESET_LINK_SENT",
+    ]),
   },
 }
 </script>
