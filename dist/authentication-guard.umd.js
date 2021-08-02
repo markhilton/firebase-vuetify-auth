@@ -9,22 +9,6 @@
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
   var Vuex__default = /*#__PURE__*/_interopDefaultLegacy(Vuex);
 
-  var defaultSettings = {
-    debug: false,
-    store: null, // vuex store
-    router: null, // routes
-    firebase: null, // pass on firebase middleware app init
-    verification: false, // require user email to be verified before granting access
-    registration: true, // allow new user registrations
-    phone: false, // allow authentication with phone
-    google: false, // allow authentication with gmail account
-    facebook: false, // allow authentication with facebook account
-    title: "Authenticate",
-    subtitle: "Firebase Vuetify Authentication NPM package",
-    icon: "mdi-brightness-7", // authentication prompt icon
-    iconColor: "orange", // authentication prompt icon color
-  };
-
   var state = {
     config: null, // package init configuration
     error: null, // error from last operation
@@ -2370,7 +2354,7 @@
     },
   };
 
-  var auth = {
+  var AuthStoreNamespace = {
     namespaced: true,
 
     state: state,
@@ -2379,11 +2363,27 @@
     mutations: mutations,
   };
 
+  var defaultSettings = {
+    debug: false,
+    store: null, // vuex store
+    router: null, // routes
+    firebase: null, // pass on firebase middleware app init
+    verification: false, // require user email to be verified before granting access
+    registration: true, // allow new user registrations
+    phone: false, // allow authentication with phone
+    google: false, // allow authentication with gmail account
+    facebook: false, // allow authentication with facebook account
+    title: "Authenticate",
+    subtitle: "Firebase Vuetify Authentication NPM package",
+    icon: "mdi-brightness-7", // authentication prompt icon
+    iconColor: "orange", // authentication prompt icon color
+  };
+
   Vue__default['default'].use(Vuex__default['default']);
 
   var store = new Vuex__default['default'].Store({
     modules: {
-      auth: auth,
+      auth: AuthStoreNamespace,
     },
   });
 
@@ -3795,7 +3795,7 @@
     return allowRoute ? next() : null
   }
 
-  // default npm package init config
+  // vuex store namespace
 
   // Declare install function executed by Vue.use()
   var install = function (Vue, options) {
@@ -3841,9 +3841,11 @@
     install: install,
   };
 
+  var AuthStore = AuthStoreNamespace;
   var AuthMiddleware = AuthGuardMiddleware;
 
   exports.AuthMiddleware = AuthMiddleware;
+  exports.AuthStore = AuthStore;
   exports['default'] = wrapper;
 
   Object.defineProperty(exports, '__esModule', { value: true });
