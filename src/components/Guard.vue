@@ -18,6 +18,7 @@
           <div v-else>
             <v-tabs :value="tab" grow @change="SET_TAB($event)">
               <v-tab
+                v-if="!isLoginWithPhoneShown"
                 @click="
                   SET_TAB(0)
                   SET_PASSWORD_RESET_SCREEN_SHOWN(false)
@@ -25,13 +26,18 @@
               >
                 Sign In
               </v-tab>
+              <v-tab v-if="isLoginWithPhoneShown"> Sign In </v-tab>
               <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"> Register </v-tab>
               <v-tab v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed"> Reset Password </v-tab>
             </v-tabs>
 
             <v-tabs-items :value="tab" @change="SET_TAB($event)">
-              <v-tab-item class="pt-5">
+              <v-tab-item v-if="!isLoginWithPhoneShown" class="pt-5">
                 <Login />
+              </v-tab-item>
+
+              <v-tab-item v-if="isLoginWithPhoneShown" class="pt-5">
+                <LoginWithPhone />
               </v-tab-item>
 
               <v-tab-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
@@ -60,6 +66,7 @@ import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 import Login from "./Login.vue"
 import Register from "./Register.vue"
 import PasswordReset from "./PasswordReset.vue"
+import LoginWithPhone from "./LoginWithPhone.vue"
 import EmailVerification from "./EmailVerification.vue"
 import LoginWithProvider from "./LoginWithProvider.vue"
 
@@ -70,6 +77,7 @@ export default {
     Login,
     Register,
     PasswordReset,
+    LoginWithPhone,
     EmailVerification,
     LoginWithProvider,
   },
@@ -83,6 +91,7 @@ export default {
     ...mapGetters("auth", [
       "isLoading",
       "isAuthenticated",
+      "isLoginWithPhoneShown",
       "isAuthGuardDialogShown",
       "isAuthGuardDialogPersistent",
       "isUserRegistrationAllowed",

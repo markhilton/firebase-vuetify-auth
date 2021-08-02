@@ -3,10 +3,12 @@ export default {
   error: null, // error from last operation
 
   text_confirmation: null, // log in by phone text
+  sign_by_phone_step: 1, // sign in by phone step
 
   tab: false,
   is_loading: false,
   is_session_persistant: true,
+  is_login_with_phone_shown: false,
   is_authguard_dialog_shown: true, // login dialog
   is_authguard_dialog_persistent: true, // login dialog persistent option
   is_email_verification_link_sent: false, // email verification confirmation

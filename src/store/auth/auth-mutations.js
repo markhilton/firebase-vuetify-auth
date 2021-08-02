@@ -38,4 +38,13 @@ export default {
   SET_PHONE_TEXT_CONFIRMATION(state, confirmation) {
     state.text_confirmation = confirmation
   },
+  SET_SHOW_LOGIN_WITH_PHONE(state, status) {
+    state.tab = 0 // reset tab to Sign In
+    state.is_login_with_phone_shown = status
+
+    if (status === false) state.sign_by_phone_step = 1 // reset sign by phone step
+  },
+  SET_SIGN_BY_PHONE_STEP(state, step) {
+    state.sign_by_phone_step = step
+  },
 }

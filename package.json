@@ -43,8 +43,6 @@
     "@vue/cli-plugin-vuex": "^4.5.13",
     "@vue/cli-service": "^4.5.13",
     "@vue/eslint-config-prettier": "^6.0.0",
-    "clean-publish": "^2.2.0",
-    "css-loader": "^5.2.4",
     "eslint": "^7.32.0",
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-promise": "^5.1.0",
@@ -55,7 +53,7 @@
     "rollup-plugin-vue": "^5.1.9",
     "rollup-plugin-vuetify": "^0.2.4",
     "sass": "^1.32.13",
-    "sass-loader": "^10.1.1",
+    "sass-loader": "^10.2.0",
     "vue-cli-plugin-vuetify": "^2.4.1",
     "vue-template-compiler": "^2.6.12",
     "vuetify-loader": "^1.7.1"

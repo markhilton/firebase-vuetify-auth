@@ -66,8 +66,6 @@
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 
 export default {
-  data: () => ({}),
-
   computed: {
     ...mapState("auth", ["config"]),
     ...mapGetters("auth", [

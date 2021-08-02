@@ -103,18 +103,24 @@ export default {
   },
 
   //
-  async sendCode({ state, commit }, { phoneNumber, recaptchaVerifier }) {
+  async textPhoneVerificationCode({ state, commit }, { phoneNumber, recaptchaVerifier }) {
     try {
       commit("SET_LOADING", true)
       commit("SET_PHONE_TEXT_CONFIRMATION", null)
 
       const { firebase } = state.config
 
-      firebase.auth().settings.appVerificationDisabledForTesting = true // TESTING
+      // TESTING: turn on for testing on localhost
+      if (window.location.hostname === "localhost") {
+        firebase.auth().settings.appVerificationDisabledForTesting = true
+        console.log("TESTING: setting firebase appVerificationDisabledForTesting", true)
+      }
 
-      const confirmationResult = await firebase.auth().signInWithPhoneNumber("+1" + phoneNumber, recaptchaVerifier)
+      const phone = "+1" + phoneNumber.replace(/\D/g, "")
+      const confirmationResult = await firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
 
       commit("SET_LOADING", false)
+      commit("SET_SIGN_BY_PHONE_STEP", 2)
       commit("SET_PHONE_TEXT_CONFIRMATION", confirmationResult)
     } catch (error) {
       commit("SET_ERROR", error)
@@ -123,11 +129,13 @@ export default {
   },
 
   //
-  async confirmCode({ state, commit }, { confirmationCode }) {
+  async confirmCode({ state, commit }, confirmationCode) {
     try {
       commit("SET_LOADING", true)
 
-      await state.text_confirmation.confirm(confirmationCode)
+      console.log("confirmationCode.join()", confirmationCode.join())
+
+      await state.text_confirmation.confirm(confirmationCode.join())
 
       commit("SET_LOADING", false)
     } catch (error) {

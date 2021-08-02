@@ -44,7 +44,7 @@
           large
           color="primary"
           type="submit"
-          :disabled="isLoading"
+          :disabled="email === '' || password === ''"
           @click="loginWithEmail({ email, password })"
         >
           Login

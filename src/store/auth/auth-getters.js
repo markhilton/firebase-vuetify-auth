@@ -85,4 +85,7 @@ export default {
   isResetPasswordScreenShown(state) {
     return state.is_reset_password_screen_shown
   },
+  isLoginWithPhoneShown(state) {
+    return state.is_login_with_phone_shown
+  },
 }
