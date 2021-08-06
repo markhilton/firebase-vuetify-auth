@@ -2911,6 +2911,7 @@
             attrs: {
               value: _vm.isAuthGuardDialogShown,
               persistent: _vm.isAuthGuardDialogPersistent,
+              "retain-focus": false,
               "overlay-opacity": "0.95",
               "content-class": "elevation-0"
             },

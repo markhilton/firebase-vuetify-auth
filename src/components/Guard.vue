@@ -3,6 +3,7 @@
     <v-dialog
       :value="isAuthGuardDialogShown"
       :persistent="isAuthGuardDialogPersistent"
+      :retain-focus="false"
       overlay-opacity="0.95"
       content-class="elevation-0"
       @input="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
