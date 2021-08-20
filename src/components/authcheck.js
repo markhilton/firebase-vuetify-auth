@@ -52,7 +52,7 @@ export default () => {
         "[ auth check ]: user email domain: [",
         domain,
         "] not included on domain list that requires email verification to authenticate:",
-        verification,
+        verification
       )
 
       allowRoute = true

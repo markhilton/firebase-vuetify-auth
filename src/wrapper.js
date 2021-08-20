@@ -27,11 +27,15 @@ export function install(Vue, options = {}) {
   let { store } = config
 
   // verify if required dependency instances are passed to this package config
-  if (router === null) console.error("ERROR: vue router instance missing in AuthenticationGuard config!")
-  if (firebase === null) console.error("ERROR: firebase instance missing in AuthenticationGuard config!")
+  if (config.debug && router === null) {
+    console.error("[ auth guard ]: ERROR: vue router instance missing in AuthenticationGuard config!")
+  }
+  if (config.debug && firebase === null) {
+    console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!")
+  }
 
-  if (store === null) {
-    console.error("WARNING: vuex store instance missing in AuthenticationGuard config!")
+  if (config.debug && store === null) {
+    console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!")
 
     // use backup store if none passed in options - backwards compatibility
     store = backupStore
@@ -39,6 +43,10 @@ export function install(Vue, options = {}) {
 
   // register vuex store namespace
   store.registerModule("auth", AuthStore)
+
+  if (config.debug) {
+    console.log("[ auth guard ]: registering VueX namespace: auth")
+  }
 
   // save store in Vue.prototype to be accessible authcheck.js
   Vue.prototype.$authGuardStore = store
