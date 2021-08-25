@@ -1,4 +1,3 @@
-/* eslint-env node */
 import firebase from "firebase/app"
 import "firebase/auth"
 
@@ -14,4 +13,4 @@ const config = {
 }
 
 // export default firebase
-export default !firebase.apps.length ? firebase.initializeApp(config) : firebase.app()
+export default firebase.initializeApp(config)

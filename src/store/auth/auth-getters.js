@@ -6,8 +6,7 @@ export default {
     return state.is_session_persistant
   },
   getCurrentUser(state) {
-    const { firebase } = state.config
-    return firebase.auth().currentUser
+    return state.current_user
   },
   getUid(state, getters) {
     const user = getters.getCurrentUser

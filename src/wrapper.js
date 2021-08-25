@@ -51,6 +51,8 @@ export function install(Vue, options = {}) {
   // save store in Vue.prototype to be accessible authcheck.js
   Vue.prototype.$authGuardStore = store
 
+  delete config.store
+
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config)
 

@@ -30,13 +30,14 @@ export default {
 
     // important to use onAuthStateChanged to mutate config state
     // in order to prevent vuex from not recognizing firebase changes
-    firebase.auth().onAuthStateChanged(() => {
-      if (debug) console.log("[ auth guard ]: firebase auth state changed")
+    firebase.auth().onAuthStateChanged((user) => {
+      if (debug) console.log("[ auth guard ]: firebase auth state changed", user)
 
       const config = state.config
 
-      commit("SET_CONFIG", null)
+      // commit("SET_CONFIG", null)
       commit("SET_CONFIG", config)
+      commit("SET_CURRENT_USER", user)
       commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
 
       authcheck()
@@ -189,7 +190,10 @@ export default {
 
   //
   signOut({ state }) {
-    const { firebase } = state.config
+    const { firebase, debug } = state.config
+
+    if (debug) console.log("[ auth guard ]: signOut request", firebase.auth())
+
     return firebase.auth().signOut()
   },
 
