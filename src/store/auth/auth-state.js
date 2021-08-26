@@ -2,8 +2,6 @@ export default {
   config: null, // package init configuration
   error: null, // error from last operation
 
-  current_user: null,
-
   text_confirmation: null, // log in by phone text
   sign_by_phone_step: 1, // sign in by phone step
 

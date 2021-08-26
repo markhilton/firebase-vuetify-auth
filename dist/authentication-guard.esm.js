@@ -499,8 +499,6 @@ var state = {
   config: null, // package init configuration
   error: null, // error from last operation
 
-  current_user: null,
-
   text_confirmation: null, // log in by phone text
   sign_by_phone_step: 1, // sign in by phone step
 
@@ -524,7 +522,8 @@ var getters = {
     return state.is_session_persistant
   },
   getCurrentUser: function getCurrentUser(state) {
-    return state.current_user
+    var auth = state.config.firebase.auth();
+    return auth.currentUser
   },
   getUid: function getUid(state, getters) {
     var user = getters.getCurrentUser;
@@ -743,7 +742,6 @@ var actions = {
 
       // commit("SET_CONFIG", null)
       commit("SET_CONFIG", config);
-      commit("SET_CURRENT_USER", user);
       commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false);
 
       authCheck();
@@ -983,9 +981,6 @@ var mutations = {
   },
   SET_LOADING: function SET_LOADING(state, status) {
     state.is_login = status;
-  },
-  SET_CURRENT_USER: function SET_CURRENT_USER(state, user) {
-    state.current_user = user;
   },
   SET_SESSION_PERSISTANCE: function SET_SESSION_PERSISTANCE(state, status) {
     state.is_session_persistant = status;

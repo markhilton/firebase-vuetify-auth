@@ -37,7 +37,6 @@ export default {
 
       // commit("SET_CONFIG", null)
       commit("SET_CONFIG", config)
-      commit("SET_CURRENT_USER", user)
       commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
 
       authcheck()

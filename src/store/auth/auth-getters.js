@@ -6,7 +6,10 @@ export default {
     return state.is_session_persistant
   },
   getCurrentUser(state) {
-    return state.current_user
+    // this getter has to fetch current user state directly from firebase sdk
+    // to avoid issue with onAuthStateChanged listener priority between this package and main app
+    const auth = state.config.firebase.auth()
+    return auth.currentUser
   },
   getUid(state, getters) {
     const user = getters.getCurrentUser

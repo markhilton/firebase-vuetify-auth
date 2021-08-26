@@ -11,9 +11,6 @@ export default {
   SET_LOADING(state, status) {
     state.is_login = status
   },
-  SET_CURRENT_USER(state, user) {
-    state.current_user = user
-  },
   SET_SESSION_PERSISTANCE(state, status) {
     state.is_session_persistant = status
   },
