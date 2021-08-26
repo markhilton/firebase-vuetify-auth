@@ -15,6 +15,8 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 
 ## Requirements
 
+# Start from here
+
 This package assumes your VUE project is already integrated with Firebase:
 
 1. `.env` file containing Firebase application environment variables is set up
