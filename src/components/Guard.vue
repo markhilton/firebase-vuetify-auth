@@ -104,10 +104,6 @@ export default {
       return this.$route.path
     },
 
-    firebase() {
-      return this.config.firebase
-    },
-
     debug() {
       return this.config.debug
     },
@@ -119,23 +115,16 @@ export default {
       if (this.debug) console.log("[ auth guard ]: vue router current route change: [", before, "] -> [", after, "]")
 
       authcheck()
-      this.revalidateAuthGuard()
     },
   },
 
   created() {
-    this.onAuthStateChanged()
+    // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
+    this.initializeGuard()
   },
 
   methods: {
-    ...mapActions("auth", [
-      "onAuthStateChanged",
-      "revalidateAuthGuard",
-      "loginWithEmail",
-      "registerUser",
-      "signOut",
-      "sendVerificationEmail",
-    ]),
+    ...mapActions("auth", ["initializeGuard", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
     ...mapMutations("auth", ["SET_TAB", "SET_USER", "SET_AUTH_GUARD_DIALOG_SHOWN", "SET_PASSWORD_RESET_SCREEN_SHOWN"]),
   },
 }

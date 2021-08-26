@@ -15,9 +15,9 @@ export default () => {
   let allowRoute = false // default state
 
   const store = Vue.prototype.$authGuardStore
-
-  const currentUser = store.getters["auth/getCurrentUser"]
-  const isAuthenticated = store.getters["auth/isAuthenticated"]
+  const { firebase } = store.state.auth.config
+  const currentUser = firebase.auth().currentUser
+  const isAuthenticated = currentUser ? true : false
   const verification = store.state.auth.config.verification
 
   if (verification) debug("[ auth check ]: email verification required: [", verification, "]")
@@ -75,9 +75,10 @@ export default () => {
     debug("[ auth check ]: currentUser is NOT authenticated")
 
     store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true) // added v0.5.6 because on log out the dialog was not persistent
   }
 
-  debug("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!")
+  debug("[ auth check ]: is route ALLOWED: [", allowRoute, "]")
 
   return allowRoute
 }

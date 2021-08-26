@@ -18,10 +18,16 @@
  * - user navigates from protected route to public route
  *
  */
+import Vue from "vue"
 import authCheck from "./authcheck"
 
 export default (to, from, next) => {
+  const store = Vue.prototype.$authGuardStore
+  const { debug } = store.state.auth.config
+
+  if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
+
   const allowRoute = authCheck()
-  console.log("[ AuthMiddleware ]: [", allowRoute, "]")
+
   return allowRoute ? next() : null
 }

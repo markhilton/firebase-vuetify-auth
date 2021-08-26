@@ -2,22 +2,31 @@ import firebaseProvider from "firebase/app"
 import authcheck from "../../components/authcheck"
 
 export default {
-  revalidateAuthGuard({ state, getters, commit }) {
-    const { router, debug } = state.config
+  authGuardOnRouterReady({ state, getters, commit }) {
+    const { debug, router } = state.config
 
-    if (debug) console.log("[ auth guard ]: revalidate request after state change")
+    if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
 
     // check current route when router is ready
     router.onReady(() => {
-      if (debug)
-        console.log("[ auth guard ]: vue router ready, isCurrentRoutePublic: [", getters.isCurrentRoutePublic, "]")
+      const { firebase } = state.config
+      const isAuthenticated = firebase.auth().currentUser ? true : false
+      const isCurrentRoutePublic = getters.isCurrentRoutePublic
 
-      if (getters.isCurrentRoutePublic) {
+      if (debug) {
+        console.log(
+          "[ auth guard ]: vue router READY! isCurrentRoutePublic: [",
+          isCurrentRoutePublic,
+          "] isAuthenticated: [",
+          isAuthenticated,
+          "]"
+        )
+      }
+
+      if (isCurrentRoutePublic) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", false)
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
-      } else if (!getters.isAuthenticated) {
-        if (debug) console.log("[ auth guard ]: isAuthenticated: [", getters.isAuthenticated, "]")
-
+      } else if (!isAuthenticated) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", true)
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
       }
@@ -25,23 +34,20 @@ export default {
   },
 
   //
-  onAuthStateChanged({ state, commit, dispatch }) {
-    const { firebase, debug } = state.config
+  initializeGuard({ state, commit, dispatch }) {
+    const config = state.config
+    const { debug, firebase } = config
+    const auth = firebase.auth()
+    const user = auth.currentUser
 
-    // important to use onAuthStateChanged to mutate config state
-    // in order to prevent vuex from not recognizing firebase changes
-    firebase.auth().onAuthStateChanged((user) => {
-      if (debug) console.log("[ auth guard ]: firebase auth STATE CHANGED: [", user, "]")
+    if (debug) console.log("[ auth guard ]: component initialized for user: [", user, "]")
 
-      const config = state.config
+    commit("SET_CONFIG", null) // have to commit null to make firebase auth reactive
+    commit("SET_CONFIG", config)
+    commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
 
-      // commit("SET_CONFIG", null)
-      commit("SET_CONFIG", config)
-      commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
-
-      authcheck()
-      // dispatch("revalidateAuthGuard") // investigate why we need this here, seems redundant
-    })
+    authcheck()
+    dispatch("authGuardOnRouterReady") // revalidate auth guard for vue router
   },
 
   //

@@ -529,6 +529,8 @@
       return state.is_session_persistant
     },
     getCurrentUser: function getCurrentUser(state) {
+      // this getter has to fetch current user state directly from firebase sdk
+      // to avoid issue with onAuthStateChanged listener priority between this package and main app
       var auth = state.config.firebase.auth();
       return auth.currentUser
     },
@@ -634,9 +636,10 @@
     var allowRoute = false; // default state
 
     var store = Vue__default['default'].prototype.$authGuardStore;
-
-    var currentUser = store.getters["auth/getCurrentUser"];
-    var isAuthenticated = store.getters["auth/isAuthenticated"];
+    var ref = store.state.auth.config;
+    var firebase = ref.firebase;
+    var currentUser = firebase.auth().currentUser;
+    var isAuthenticated = currentUser ? true : false;
     var verification = store.state.auth.config.verification;
 
     if (verification) { debug("[ auth check ]: email verification required: [", verification, "]"); }
@@ -694,36 +697,47 @@
       debug("[ auth check ]: currentUser is NOT authenticated");
 
       store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true);
+      store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true); // added v0.5.6 because on log out the dialog was not persistent
     }
 
-    debug("[ auth check ]:", allowRoute ? "route ALLOWED!" : "route BLOCKED!");
+    debug("[ auth check ]: is route ALLOWED: [", allowRoute, "]");
 
     return allowRoute
   }
 
   var actions = {
-    revalidateAuthGuard: function revalidateAuthGuard(ref) {
+    authGuardOnRouterReady: function authGuardOnRouterReady(ref) {
       var state = ref.state;
       var getters = ref.getters;
       var commit = ref.commit;
 
       var ref$1 = state.config;
-      var router = ref$1.router;
       var debug = ref$1.debug;
+      var router = ref$1.router;
 
-      if (debug) { console.log("[ auth guard ]: revalidate request after state change"); }
+      if (debug) { console.log("[ auth guard ]: revalidate when vue router ready"); }
 
       // check current route when router is ready
       router.onReady(function () {
-        if (debug)
-          { console.log("[ auth guard ]: vue router ready, isCurrentRoutePublic: [", getters.isCurrentRoutePublic, "]"); }
+        var ref = state.config;
+        var firebase = ref.firebase;
+        var isAuthenticated = firebase.auth().currentUser ? true : false;
+        var isCurrentRoutePublic = getters.isCurrentRoutePublic;
 
-        if (getters.isCurrentRoutePublic) {
+        if (debug) {
+          console.log(
+            "[ auth guard ]: vue router READY! isCurrentRoutePublic: [",
+            isCurrentRoutePublic,
+            "] isAuthenticated: [",
+            isAuthenticated,
+            "]"
+          );
+        }
+
+        if (isCurrentRoutePublic) {
           commit("SET_AUTH_GUARD_DIALOG_SHOWN", false);
           commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
-        } else if (!getters.isAuthenticated) {
-          if (debug) { console.log("[ auth guard ]: isAuthenticated: [", getters.isAuthenticated, "]"); }
-
+        } else if (!isAuthenticated) {
           commit("SET_AUTH_GUARD_DIALOG_SHOWN", true);
           commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true);
         }
@@ -731,29 +745,25 @@
     },
 
     //
-    onAuthStateChanged: function onAuthStateChanged(ref) {
+    initializeGuard: function initializeGuard(ref) {
       var state = ref.state;
       var commit = ref.commit;
-      ref.dispatch;
+      var dispatch = ref.dispatch;
 
-      var ref$1 = state.config;
-      var firebase = ref$1.firebase;
-      var debug = ref$1.debug;
+      var config = state.config;
+      var debug = config.debug;
+      var firebase = config.firebase;
+      var auth = firebase.auth();
+      var user = auth.currentUser;
 
-      // important to use onAuthStateChanged to mutate config state
-      // in order to prevent vuex from not recognizing firebase changes
-      firebase.auth().onAuthStateChanged(function (user) {
-        if (debug) { console.log("[ auth guard ]: firebase auth STATE CHANGED: [", user, "]"); }
+      if (debug) { console.log("[ auth guard ]: component initialized for user: [", user, "]"); }
 
-        var config = state.config;
+      commit("SET_CONFIG", null); // have to commit null to make firebase auth reactive
+      commit("SET_CONFIG", config);
+      commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false);
 
-        // commit("SET_CONFIG", null)
-        commit("SET_CONFIG", config);
-        commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false);
-
-        authCheck();
-        // dispatch("revalidateAuthGuard") // investigate why we need this here, seems redundant
-      });
+      authCheck();
+      dispatch("authGuardOnRouterReady"); // revalidate auth guard for vue router
     },
 
     //
@@ -2865,10 +2875,6 @@
         return this.$route.path
       },
 
-      firebase: function firebase() {
-        return this.config.firebase
-      },
-
       debug: function debug() {
         return this.config.debug
       }}),
@@ -2879,21 +2885,15 @@
         if (this.debug) { console.log("[ auth guard ]: vue router current route change: [", before, "] -> [", after, "]"); }
 
         authCheck();
-        this.revalidateAuthGuard();
       },
     },
 
     created: function created() {
-      this.onAuthStateChanged();
+      // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
+      this.initializeGuard();
     },
 
-    methods: Object.assign({}, Vuex.mapActions("auth", [
-        "onAuthStateChanged",
-        "revalidateAuthGuard",
-        "loginWithEmail",
-        "registerUser",
-        "signOut",
-        "sendVerificationEmail" ]),
+    methods: Object.assign({}, Vuex.mapActions("auth", ["initializeGuard", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
       Vuex.mapMutations("auth", ["SET_TAB", "SET_USER", "SET_AUTH_GUARD_DIALOG_SHOWN", "SET_PASSWORD_RESET_SCREEN_SHOWN"])),
   };
 
@@ -3116,8 +3116,14 @@
    */
 
   function AuthGuardMiddleware (to, from, next) {
+    var store = Vue__default['default'].prototype.$authGuardStore;
+    var ref = store.state.auth.config;
+    var debug = ref.debug;
+
+    if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
+
     var allowRoute = authCheck();
-    console.log("[ AuthMiddleware ]: [", allowRoute, "]");
+
     return allowRoute ? next() : null
   }
 
