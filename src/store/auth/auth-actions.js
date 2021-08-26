@@ -31,7 +31,7 @@ export default {
     // important to use onAuthStateChanged to mutate config state
     // in order to prevent vuex from not recognizing firebase changes
     firebase.auth().onAuthStateChanged((user) => {
-      if (debug) console.log("[ auth guard ]: firebase auth state changed", user)
+      if (debug) console.log("[ auth guard ]: firebase auth STATE CHANGED: [", user, "]")
 
       const config = state.config
 
@@ -41,7 +41,7 @@ export default {
       commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
 
       authcheck()
-      dispatch("revalidateAuthGuard")
+      // dispatch("revalidateAuthGuard") // investigate why we need this here, seems redundant
     })
   },
 

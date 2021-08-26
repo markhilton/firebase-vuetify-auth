@@ -22,6 +22,6 @@ import authCheck from "./authcheck"
 
 export default (to, from, next) => {
   const allowRoute = authCheck()
-
+  console.log("[ AuthMiddleware ]: [", allowRoute, "]")
   return allowRoute ? next() : null
 }

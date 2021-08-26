@@ -728,7 +728,7 @@ var actions = {
   onAuthStateChanged: function onAuthStateChanged(ref) {
     var state = ref.state;
     var commit = ref.commit;
-    var dispatch = ref.dispatch;
+    ref.dispatch;
 
     var ref$1 = state.config;
     var firebase = ref$1.firebase;
@@ -737,7 +737,7 @@ var actions = {
     // important to use onAuthStateChanged to mutate config state
     // in order to prevent vuex from not recognizing firebase changes
     firebase.auth().onAuthStateChanged(function (user) {
-      if (debug) { console.log("[ auth guard ]: firebase auth state changed", user); }
+      if (debug) { console.log("[ auth guard ]: firebase auth STATE CHANGED: [", user, "]"); }
 
       var config = state.config;
 
@@ -747,7 +747,7 @@ var actions = {
       commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false);
 
       authCheck();
-      dispatch("revalidateAuthGuard");
+      // dispatch("revalidateAuthGuard") // investigate why we need this here, seems redundant
     });
   },
 
@@ -3115,7 +3115,7 @@ __vue_render__._withStripped = true;
 
 function AuthGuardMiddleware (to, from, next) {
   var allowRoute = authCheck();
-
+  console.log("[ AuthMiddleware ]: [", allowRoute, "]");
   return allowRoute ? next() : null
 }
 
