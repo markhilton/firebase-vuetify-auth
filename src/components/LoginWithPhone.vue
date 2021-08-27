@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import Branding from "./Branding.vue"
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 

@@ -1,4 +1,4 @@
-import firebaseProvider from "firebase/app"
+import firebaseProvider from "firebase/compat/app"
 import authcheck from "../../components/authcheck"
 
 export default {
