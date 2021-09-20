@@ -8,8 +8,10 @@ export default {
   getCurrentUser(state) {
     // this getter has to fetch current user state directly from firebase sdk
     // to avoid issue with onAuthStateChanged listener priority between this package and main app
-    const auth = state.config.firebase.auth()
-    return auth.currentUser
+    // IMPORTANT: this was a bug causing entire vue devtools vuex debugger not working
+    // because of failed getter when firebase config state is not defined
+    const { firebase } = state.config
+    return firebase ? firebase.auth().currentUser : null
   },
   getUid(state, getters) {
     const user = getters.getCurrentUser
