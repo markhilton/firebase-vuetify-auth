@@ -552,7 +552,17 @@ var getters = {
   getCurrentUser: function getCurrentUser(state) {
     var user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser;
 
-    return user ? Object.assign({}, user) : null
+    if (!user) { return null }
+
+    var uid = user.uid;
+    var displayName = user.displayName;
+    var email = user.email;
+    var emailVerified = user.emailVerified;
+    var isAnonymous = user.isAnonymous;
+    var phoneNumber = user.phoneNumber;
+    var photoURL = user.photoURL;
+
+    return { uid: uid, displayName: displayName, email: email, emailVerified: emailVerified, isAnonymous: isAnonymous, phoneNumber: phoneNumber, photoURL: photoURL }
   },
   getUid: function getUid(state, getters) {
     var user = getters.getCurrentUser;
@@ -575,7 +585,7 @@ var getters = {
     return user ? user.phoneNumber : null
   },
   getMetadata: function getMetadata(state, getters) {
-    var user = getters.getCurrentUser;
+    var user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser;
     return user ? user.metadata : null
   },
   isLoading: function isLoading(state) {
@@ -643,9 +653,8 @@ var debug = function () {
   var text = [], len = arguments.length;
   while ( len-- ) text[ len ] = arguments[ len ];
 
-  var store = Vue.prototype.$authGuardStore;
-  var ref = store.state.auth.config;
-  var debug = ref.debug;
+  Vue.prototype.$authGuardStore;
+  var debug = Vue.prototype.$authGuardDebug;
 
   if (!Boolean(debug)) { return }
 
@@ -726,9 +735,6 @@ function authCheck () {
   return allowRoute
 }
 
-var router = Vue.prototype.$authGuardRouter;
-var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
-
 var actions = {
   authGuardOnRouterReady: function authGuardOnRouterReady(ref) {
     var state = ref.state;
@@ -737,6 +743,8 @@ var actions = {
 
     var ref$1 = state.config;
     var debug = ref$1.debug;
+    var router = Vue.prototype.$authGuardRouter;
+    var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
     if (debug) { console.log("[ auth guard ]: revalidate when vue router ready"); }
 
@@ -773,6 +781,7 @@ var actions = {
 
     var config = state.config;
     var debug = config.debug;
+    var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
     var user = auth.currentUser;
 
     if (debug) { console.log("[ auth guard ]: component initialized for user: [", user, "]"); }
@@ -794,6 +803,8 @@ var actions = {
 
     return new Promise(async function (resolve, reject) {
       try {
+        var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
+
         commit("SET_LOADING", true);
 
         await signOut(auth);
@@ -820,6 +831,7 @@ var actions = {
     ref.state;
 
     var provider = new GoogleAuthProvider();
+    var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider);
@@ -830,6 +842,7 @@ var actions = {
     ref.state;
 
     var provider = new FacebookAuthProvider();
+    var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider);
@@ -852,6 +865,7 @@ var actions = {
       commit("SET_PHONE_TEXT_CONFIRMATION", null);
 
       var phone = "+1" + phoneNumber.replace(/\D/g, "");
+      var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
       var confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
 
       commit("SET_LOADING", false);
@@ -896,6 +910,7 @@ var actions = {
       commit("SET_LOADING", true);
 
       var verification = state.config.email;
+      var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
       await createUserWithEmailAndPassword(auth, email, password);
       await signInWithEmailAndPassword(auth, email, password);
@@ -920,6 +935,8 @@ var actions = {
     try {
       commit("SET_LOADING", true);
 
+      var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
+
       await sendPasswordResetEmail(auth, email);
 
       commit("SET_ERROR", false);
@@ -937,6 +954,7 @@ var actions = {
 
     var ref$1 = state.config;
     var debug = ref$1.debug;
+    var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
     if (debug) { console.log("[ auth guard ]: signOut request"); }
 
@@ -951,6 +969,8 @@ var actions = {
     return new Promise(async function (resolve, reject) {
       try {
         commit("SET_LOADING", true);
+
+        var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
         await sendEmailVerification(auth.currentUser);
 
@@ -3067,19 +3087,12 @@ __vue_render__._withStripped = true;
 
 function AuthGuardMiddleware (to, from, next) {
   var store = Vue.prototype.$authGuardStore;
+  var debug = Vue.prototype.$authGuardDebug;
 
-  if (!store) {
-    console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!");
-  } else {
-    var ref = store.state.auth.config;
-    var debug = ref.debug;
+  if (!store) { console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!"); }
+  else if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
 
-    if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
-  }
-
-  var allowRoute = authCheck();
-
-  return allowRoute ? next() : null
+  return authCheck() ? next() : null
 }
 
 // Declare install function executed by Vue.use()
@@ -3094,11 +3107,12 @@ function install(Vue, options) {
   var config = Object.assign({}, defaultSettings, options);
   var router = config.router;
   var firebase = config.firebase;
+  var debug = config.debug;
 
   var store = config.store;
 
   // verify if required dependency instances are passed to this package config
-  if (config.debug) {
+  if (debug) {
     if (router === null) {
       console.error("[ auth guard ]: ERROR: vue router instance missing in AuthenticationGuard config!");
     }
@@ -3117,11 +3131,10 @@ function install(Vue, options) {
   // register vuex store namespace
   store.registerModule("auth", AuthStore);
 
-  if (config.debug) {
-    console.log("[ auth guard ]: registering VueX namespace: auth");
-  }
+  if (debug) { console.log("[ auth guard ]: registering VueX namespace: auth"); }
 
   // save store in Vue.prototype to be accessible authcheck.js
+  Vue.prototype.$authGuardDebug = debug;
   Vue.prototype.$authGuardStore = store;
   Vue.prototype.$authGuardRouter = router;
   Vue.prototype.$authGuardFirebaseApp = firebase;

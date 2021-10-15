@@ -13,7 +13,11 @@ export default {
   getCurrentUser(state) {
     const user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser
 
-    return user ? { ...user } : null
+    if (!user) return null
+
+    const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
+
+    return { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
   },
   getUid(state, getters) {
     const user = getters.getCurrentUser
@@ -36,7 +40,7 @@ export default {
     return user ? user.phoneNumber : null
   },
   getMetadata(state, getters) {
-    const user = getters.getCurrentUser
+    const user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser
     return user ? user.metadata : null
   },
   isLoading(state) {

@@ -14,12 +14,11 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth"
 
-const router = Vue.prototype.$authGuardRouter
-const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
-
 export default {
   authGuardOnRouterReady({ state, getters, commit }) {
     const { debug } = state.config
+    const router = Vue.prototype.$authGuardRouter
+    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
     if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
 
@@ -52,6 +51,7 @@ export default {
   initializeGuard({ state, commit, dispatch }) {
     const config = state.config
     const { debug } = config
+    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
     const user = auth.currentUser
 
     if (debug) console.log("[ auth guard ]: component initialized for user: [", user, "]")
@@ -68,6 +68,8 @@ export default {
   loginWithEmail({ state, commit }, { email, password }) {
     return new Promise(async (resolve, reject) => {
       try {
+        const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+
         commit("SET_LOADING", true)
 
         await signOut(auth)
@@ -92,6 +94,7 @@ export default {
   //
   loginWithGoogle({ state }) {
     const provider = new GoogleAuthProvider()
+    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider)
@@ -100,6 +103,7 @@ export default {
   //
   loginWithFacebook({ state }) {
     const provider = new FacebookAuthProvider()
+    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider)
@@ -115,6 +119,7 @@ export default {
       commit("SET_PHONE_TEXT_CONFIRMATION", null)
 
       const phone = "+1" + phoneNumber.replace(/\D/g, "")
+      const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
       const confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
 
       commit("SET_LOADING", false)
@@ -150,6 +155,7 @@ export default {
       commit("SET_LOADING", true)
 
       const verification = state.config.email
+      const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
       await createUserWithEmailAndPassword(auth, email, password)
       await signInWithEmailAndPassword(auth, email, password)
@@ -171,6 +177,8 @@ export default {
     try {
       commit("SET_LOADING", true)
 
+      const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+
       await sendPasswordResetEmail(auth, email)
 
       commit("SET_ERROR", false)
@@ -185,6 +193,7 @@ export default {
   //
   signOut({ state }) {
     const { debug } = state.config
+    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
     if (debug) console.log("[ auth guard ]: signOut request")
 
@@ -196,6 +205,8 @@ export default {
     return new Promise(async (resolve, reject) => {
       try {
         commit("SET_LOADING", true)
+
+        const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
         await sendEmailVerification(auth.currentUser)
 

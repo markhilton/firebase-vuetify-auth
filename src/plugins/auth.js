@@ -4,15 +4,21 @@ import router from "@/router"
 import firebase from "@/middleware/firebase"
 import AuthGuard from "../wrapper"
 
+const debug = true
+const phone = true
+const google = true
+const facebook = true
+const verification = true
+
 const authGuardSettings = {
-  debug: true,
+  debug,
   store,
   router,
   firebase,
-  verification: true,
-  phone: true,
-  google: true,
-  facebook: true,
+  phone,
+  google,
+  facebook,
+  verification,
 }
 
 Vue.use(AuthGuard, authGuardSettings)

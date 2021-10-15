@@ -22,12 +22,12 @@ export function install(Vue, options = {}) {
 
   // merge default settings with user settings
   const config = { ...defaultSettings, ...options }
-  const { router, firebase } = config
+  const { router, firebase, debug } = config
 
   let { store } = config
 
   // verify if required dependency instances are passed to this package config
-  if (config.debug) {
+  if (debug) {
     if (router === null) {
       console.error("[ auth guard ]: ERROR: vue router instance missing in AuthenticationGuard config!")
     }
@@ -46,11 +46,10 @@ export function install(Vue, options = {}) {
   // register vuex store namespace
   store.registerModule("auth", AuthStore)
 
-  if (config.debug) {
-    console.log("[ auth guard ]: registering VueX namespace: auth")
-  }
+  if (debug) console.log("[ auth guard ]: registering VueX namespace: auth")
 
   // save store in Vue.prototype to be accessible authcheck.js
+  Vue.prototype.$authGuardDebug = debug
   Vue.prototype.$authGuardStore = store
   Vue.prototype.$authGuardRouter = router
   Vue.prototype.$authGuardFirebaseApp = firebase
