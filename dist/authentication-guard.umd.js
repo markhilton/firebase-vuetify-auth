@@ -638,8 +638,7 @@
     },
     // check if the current route is public to set negative persisten dialog
     isCurrentRoutePublic: function isCurrentRoutePublic(state) {
-      var ref = state.config;
-      var debug = ref.debug;
+      var debug = Vue__default["default"].prototype.$authGuardDebug;
 
       if (!router$1) { return false }
 
@@ -659,7 +658,6 @@
     var text = [], len = arguments.length;
     while ( len-- ) text[ len ] = arguments[ len ];
 
-    Vue__default["default"].prototype.$authGuardStore;
     var debug = Vue__default["default"].prototype.$authGuardDebug;
 
     if (!Boolean(debug)) { return }
@@ -743,12 +741,11 @@
 
   var actions = {
     authGuardOnRouterReady: function authGuardOnRouterReady(ref) {
-      var state = ref.state;
+      ref.state;
       var getters = ref.getters;
       var commit = ref.commit;
 
-      var ref$1 = state.config;
-      var debug = ref$1.debug;
+      var debug = Vue__default["default"].prototype.$authGuardDebug;
       var router = Vue__default["default"].prototype.$authGuardRouter;
       var auth$1 = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
 
@@ -786,7 +783,7 @@
       var dispatch = ref.dispatch;
 
       var config = state.config;
-      var debug = config.debug;
+      var debug = Vue__default["default"].prototype.$authGuardDebug;
       var auth$1 = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
       var user = auth$1.currentUser;
 
@@ -956,10 +953,9 @@
 
     //
     signOut: function signOut$1(ref) {
-      var state = ref.state;
+      ref.state;
 
-      var ref$1 = state.config;
-      var debug = ref$1.debug;
+      var debug = Vue__default["default"].prototype.$authGuardDebug;
       var auth$1 = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
 
       if (debug) { console.log("[ auth guard ]: signOut request"); }

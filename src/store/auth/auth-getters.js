@@ -87,7 +87,7 @@ export default {
   },
   // check if the current route is public to set negative persisten dialog
   isCurrentRoutePublic(state) {
-    const { debug } = state.config
+    const debug = Vue.prototype.$authGuardDebug
 
     if (!router) return false
 

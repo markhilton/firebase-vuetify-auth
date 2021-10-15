@@ -2,7 +2,6 @@ import Vue from "vue"
 import { getAuth } from "firebase/auth"
 
 const debug = (...text) => {
-  const store = Vue.prototype.$authGuardStore
   const debug = Vue.prototype.$authGuardDebug
 
   if (!Boolean(debug)) return

@@ -16,7 +16,7 @@ import {
 
 export default {
   authGuardOnRouterReady({ state, getters, commit }) {
-    const { debug } = state.config
+    const debug = Vue.prototype.$authGuardDebug
     const router = Vue.prototype.$authGuardRouter
     const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
@@ -50,7 +50,7 @@ export default {
   //
   initializeGuard({ state, commit, dispatch }) {
     const config = state.config
-    const { debug } = config
+    const debug = Vue.prototype.$authGuardDebug
     const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
     const user = auth.currentUser
 
@@ -192,7 +192,7 @@ export default {
 
   //
   signOut({ state }) {
-    const { debug } = state.config
+    const debug = Vue.prototype.$authGuardDebug
     const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
     if (debug) console.log("[ auth guard ]: signOut request")
