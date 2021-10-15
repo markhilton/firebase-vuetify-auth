@@ -52,9 +52,12 @@ export function install(Vue, options = {}) {
 
   // save store in Vue.prototype to be accessible authcheck.js
   Vue.prototype.$authGuardStore = store
+  Vue.prototype.$authGuardRouter = router
   Vue.prototype.$authGuardFirebaseApp = firebase
 
   delete config.store
+  delete config.router
+  delete config.firebase
 
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config)

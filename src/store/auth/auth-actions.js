@@ -14,11 +14,12 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth"
 
+const router = Vue.prototype.$authGuardRouter
 const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
 export default {
   authGuardOnRouterReady({ state, getters, commit }) {
-    const { debug, router } = state.config
+    const { debug } = state.config
 
     if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
 
@@ -68,8 +69,6 @@ export default {
     return new Promise(async (resolve, reject) => {
       try {
         commit("SET_LOADING", true)
-
-        const { router } = state.config
 
         await signOut(auth)
         await setPersistence(auth, browserSessionPersistence)

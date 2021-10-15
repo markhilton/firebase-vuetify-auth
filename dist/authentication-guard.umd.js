@@ -1,13 +1,53 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuex'), require('firebase/auth'), require('vuetify/lib')) :
   typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuex', 'firebase/auth', 'vuetify/lib'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthGuard = {}, global.vue, global.vuex, global['firebase/auth'], global['vuetify/lib']));
-}(this, (function (exports, Vue, Vuex, auth$1, lib) { 'use strict';
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthGuard = {}, global.vue, global.vuex, global["firebase/auth"], global["vuetify/lib"]));
+})(this, (function (exports, Vue, Vuex, auth$1, lib) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
   var Vuex__default = /*#__PURE__*/_interopDefaultLegacy(Vuex);
+
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+
+      if (enumerableOnly) {
+        symbols = symbols.filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+        });
+      }
+
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
+    var arguments$1 = arguments;
+
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments$1[i] != null ? arguments$1[i] : {};
+
+      if (i % 2) {
+        ownKeys(Object(source), true).forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
 
   function _typeof(obj) {
     "@babel/helpers - typeof";
@@ -40,48 +80,12 @@
     return obj;
   }
 
-  function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-
-    if (Object.getOwnPropertySymbols) {
-      var symbols = Object.getOwnPropertySymbols(object);
-      if (enumerableOnly) { symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      }); }
-      keys.push.apply(keys, symbols);
-    }
-
-    return keys;
-  }
-
-  function _objectSpread2(target) {
-    var arguments$1 = arguments;
-
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments$1[i] != null ? arguments$1[i] : {};
-
-      if (i % 2) {
-        ownKeys(Object(source), true).forEach(function (key) {
-          _defineProperty(target, key, source[key]);
-        });
-      } else if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-      } else {
-        ownKeys(Object(source)).forEach(function (key) {
-          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-      }
-    }
-
-    return target;
-  }
-
   var placeholderChar = '_';
   var strFunction = 'function';
 
-  var emptyArray = [];
+  var emptyArray$1 = [];
   function convertMaskToPlaceholder() {
-    var mask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyArray;
+    var mask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyArray$1;
     var placeholderChar$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : placeholderChar;
 
     if (!isArray(mask)) {
@@ -115,11 +119,11 @@
     };
   }
 
-  var emptyArray$1 = [];
+  var emptyArray = [];
   var emptyString = '';
   function conformToMask() {
     var rawValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyString;
-    var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : emptyArray$1;
+    var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : emptyArray;
     var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     if (!isArray(mask)) {
@@ -297,12 +301,12 @@
     return new RegExp("/[".concat(escapeIfNeeded(char), "]/"));
   };
 
-  var isRegexp = function isRegexp(entity) {
+  var isRegexp$1 = function isRegexp(entity) {
     return entity instanceof RegExp;
   };
 
   var castToRegexp = function castToRegexp(char) {
-    return isRegexp(char) ? char : charRegexp(char);
+    return isRegexp$1(char) ? char : charRegexp(char);
   };
 
   function maskToRegExpMask(mask) {
@@ -360,9 +364,25 @@
   var isString = function isString(val) {
     return typeof val === 'string';
   };
-  var isRegexp$1 = function isRegexp(val) {
+  var isRegexp = function isRegexp(val) {
     return val instanceof RegExp;
   };
+
+  function parseMask(inputMask, maskReplacers) {
+    if (Array.isArray(inputMask)) {
+      return arrayMaskToRegExpMask(inputMask, maskReplacers);
+    }
+
+    if (isFunction(inputMask)) {
+      return inputMask;
+    }
+
+    if (isString(inputMask) && inputMask.length > 0) {
+      return stringMaskToRegExpMask(inputMask, maskReplacers);
+    }
+
+    return inputMask;
+  }
 
   function createOptions() {
     var elementOptions = new Map();
@@ -388,6 +408,24 @@
       remove: remove,
       get: get
     };
+  }
+
+  function extendMaskReplacers(maskReplacers) {
+    var baseMaskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
+
+    if (maskReplacers === null || Array.isArray(maskReplacers) || _typeof(maskReplacers) !== 'object') {
+      return baseMaskReplacers;
+    }
+
+    return Object.keys(maskReplacers).reduce(function (extendedMaskReplacers, key) {
+      var value = maskReplacers[key];
+
+      if (value !== null && !(value instanceof RegExp)) {
+        return extendedMaskReplacers;
+      }
+
+      return _objectSpread2(_objectSpread2({}, extendedMaskReplacers), {}, _defineProperty({}, key, value));
+    }, baseMaskReplacers);
   }
 
   var options = createOptions();
@@ -424,45 +462,16 @@
   }
 
   function updateMask(el, inputMask, maskReplacers) {
-    var mask;
-
-    if (Array.isArray(inputMask)) {
-      mask = arrayMaskToRegExpMask(inputMask, maskReplacers);
-    } else if (isFunction(inputMask)) {
-      mask = inputMask;
-    } else if (isString(inputMask) && inputMask.length > 0) {
-      mask = stringMaskToRegExpMask(inputMask, maskReplacers);
-    } else {
-      mask = inputMask;
-    }
-
+    var mask = parseMask(inputMask, maskReplacers);
     options.partiallyUpdate(el, {
       mask: mask
     });
   }
 
-  function extendMaskReplacers(maskReplacers) {
-    var baseMaskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
-
-    if (maskReplacers === null || Array.isArray(maskReplacers) || _typeof(maskReplacers) !== 'object') {
-      return baseMaskReplacers;
-    }
-
-    return Object.keys(maskReplacers).reduce(function (extendedMaskReplacers, key) {
-      var value = maskReplacers[key];
-
-      if (value !== null && !(value instanceof RegExp)) {
-        return extendedMaskReplacers;
-      }
-
-      return _objectSpread2(_objectSpread2({}, extendedMaskReplacers), {}, _defineProperty({}, key, value));
-    }, baseMaskReplacers);
-  }
-
   function maskToString(mask) {
     var maskArray = Array.isArray(mask) ? mask : [mask];
     var filteredMaskArray = maskArray.filter(function (part) {
-      return isString(part) || isRegexp$1(part);
+      return isString(part) || isRegexp(part);
     });
     return filteredMaskArray.toString();
   }
@@ -497,9 +506,26 @@
   }
   var directive = createDirective();
 
-  Vue__default['default'].use(Vuex__default['default']);
+  function createFilter() {
+    var filterOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    var instanceMaskReplacers = extendMaskReplacers(filterOptions && filterOptions.placeholders);
+    return function (value, inputMask) {
+      if (!isString(value) && !Number.isFinite(value)) { return value; }
+      var mask = parseMask(inputMask, instanceMaskReplacers);
 
-  var backupStore = new Vuex__default['default'].Store({});
+      var _conformToMask = conformToMask("".concat(value), mask, {
+        guide: false
+      }),
+          conformedValue = _conformToMask.conformedValue;
+
+      return conformedValue;
+    };
+  }
+  createFilter();
+
+  Vue__default["default"].use(Vuex__default["default"]);
+
+  var backupStore = new Vuex__default["default"].Store({});
 
   var state = {
     config: null, // package init configuration
@@ -520,6 +546,8 @@
     is_reset_password_screen_shown: false, // show reset password screen,
   };
 
+  var router$1 = Vue__default["default"].prototype.$authGuardRouter;
+
   var getters = {
     getError: function getError(state) {
       return state.error
@@ -528,7 +556,7 @@
       return state.is_session_persistant
     },
     getCurrentUser: function getCurrentUser(state) {
-      var user = auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp).currentUser;
+      var user = auth$1.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp).currentUser;
 
       return user ? Object.assign({}, user) : null
     },
@@ -571,24 +599,6 @@
       var user = getters.getCurrentUser;
       return user ? user.emailVerified : null
     },
-    // check if the current route is public to set negative persisten dialog
-    isCurrentRoutePublic: function isCurrentRoutePublic(state) {
-      var ref = state.config;
-      var router = ref.router;
-      var debug = ref.debug;
-
-      if (!router) { return false }
-
-      var route = router.currentRoute;
-
-      var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
-
-      if (route.matched[0] && route.matched[0].path !== window.location.pathname) { isPublicRoute = false; }
-
-      if (debug) { console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]"); }
-
-      return isPublicRoute
-    },
     isAuthGuardDialogShown: function isAuthGuardDialogShown(state) {
       return state.is_authguard_dialog_shown
     },
@@ -616,13 +626,30 @@
     isLoginWithPhoneShown: function isLoginWithPhoneShown(state) {
       return state.is_login_with_phone_shown
     },
+    // check if the current route is public to set negative persisten dialog
+    isCurrentRoutePublic: function isCurrentRoutePublic(state) {
+      var ref = state.config;
+      var debug = ref.debug;
+
+      if (!router$1) { return false }
+
+      var route = router$1.currentRoute;
+
+      var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
+
+      if (route.matched[0] && route.matched[0].path !== window.location.pathname) { isPublicRoute = false; }
+
+      if (debug) { console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]"); }
+
+      return isPublicRoute
+    },
   };
 
   var debug = function () {
     var text = [], len = arguments.length;
     while ( len-- ) text[ len ] = arguments[ len ];
 
-    var store = Vue__default['default'].prototype.$authGuardStore;
+    var store = Vue__default["default"].prototype.$authGuardStore;
     var ref = store.state.auth.config;
     var debug = ref.debug;
 
@@ -636,8 +663,8 @@
 
     var allowRoute = false; // default state
 
-    var auth = auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp);
-    var store = Vue__default['default'].prototype.$authGuardStore;
+    var auth = auth$1.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
+    var store = Vue__default["default"].prototype.$authGuardStore;
     var currentUser = auth.currentUser;
     var isAuthenticated = currentUser ? true : false;
     var verification = store.state.auth.config.verification;
@@ -705,7 +732,8 @@
     return allowRoute
   }
 
-  var auth = auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp);
+  var router = Vue__default["default"].prototype.$authGuardRouter;
+  var auth = auth$1.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
 
   var actions = {
     authGuardOnRouterReady: function authGuardOnRouterReady(ref) {
@@ -715,7 +743,6 @@
 
       var ref$1 = state.config;
       var debug = ref$1.debug;
-      var router = ref$1.router;
 
       if (debug) { console.log("[ auth guard ]: revalidate when vue router ready"); }
 
@@ -766,7 +793,7 @@
 
     //
     loginWithEmail: function loginWithEmail(ref, ref$1) {
-      var state = ref.state;
+      ref.state;
       var commit = ref.commit;
       var email = ref$1.email;
       var password = ref$1.password;
@@ -774,9 +801,6 @@
       return new Promise(async function (resolve, reject) {
         try {
           commit("SET_LOADING", true);
-
-          var ref = state.config;
-          var router = ref.router;
 
           await auth$1.signOut(auth);
           await auth$1.setPersistence(auth, auth$1.browserSessionPersistence);
@@ -1904,7 +1928,7 @@
       this.recaptchaVerifier = new auth$1.RecaptchaVerifier(
         "recaptcha-container",
         { size: "invisible" },
-        auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp)
+        auth$1.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp)
       );
       this.recaptchaVerifier.render().then(function (widgetId) { return (this$1$1.recaptchaWidgetId = widgetId); });
 
@@ -3048,7 +3072,7 @@
    */
 
   function AuthGuardMiddleware (to, from, next) {
-    var store = Vue__default['default'].prototype.$authGuardStore;
+    var store = Vue__default["default"].prototype.$authGuardStore;
 
     if (!store) {
       console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!");
@@ -3105,9 +3129,12 @@
 
     // save store in Vue.prototype to be accessible authcheck.js
     Vue.prototype.$authGuardStore = store;
+    Vue.prototype.$authGuardRouter = router;
     Vue.prototype.$authGuardFirebaseApp = firebase;
 
     delete config.store;
+    delete config.router;
+    delete config.firebase;
 
     // commit npm package config to vuex store
     store.commit("auth/SET_CONFIG", config);
@@ -3136,9 +3163,9 @@
   var AuthMiddleware = AuthGuardMiddleware; // export vue router middleware
 
   exports.AuthMiddleware = AuthMiddleware;
-  exports['default'] = plugin;
+  exports["default"] = plugin;
   exports.install = install;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));

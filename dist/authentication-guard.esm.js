@@ -3,6 +3,46 @@ import Vuex, { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import { getAuth, signOut, setPersistence, browserSessionPersistence, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, RecaptchaVerifier } from 'firebase/auth';
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VCard, VContainer, VForm, VCol, VRow, VTooltip, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems, VDialog } from 'vuetify/lib';
 
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+
+    if (enumerableOnly) {
+      symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+    }
+
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  var arguments$1 = arguments;
+
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments$1[i] != null ? arguments$1[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -34,48 +74,12 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
-function ownKeys(object, enumerableOnly) {
-  var keys = Object.keys(object);
-
-  if (Object.getOwnPropertySymbols) {
-    var symbols = Object.getOwnPropertySymbols(object);
-    if (enumerableOnly) { symbols = symbols.filter(function (sym) {
-      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-    }); }
-    keys.push.apply(keys, symbols);
-  }
-
-  return keys;
-}
-
-function _objectSpread2(target) {
-  var arguments$1 = arguments;
-
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments$1[i] != null ? arguments$1[i] : {};
-
-    if (i % 2) {
-      ownKeys(Object(source), true).forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else if (Object.getOwnPropertyDescriptors) {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-    } else {
-      ownKeys(Object(source)).forEach(function (key) {
-        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-      });
-    }
-  }
-
-  return target;
-}
-
 var placeholderChar = '_';
 var strFunction = 'function';
 
-var emptyArray = [];
+var emptyArray$1 = [];
 function convertMaskToPlaceholder() {
-  var mask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyArray;
+  var mask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyArray$1;
   var placeholderChar$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : placeholderChar;
 
   if (!isArray(mask)) {
@@ -109,11 +113,11 @@ function processCaretTraps(mask) {
   };
 }
 
-var emptyArray$1 = [];
+var emptyArray = [];
 var emptyString = '';
 function conformToMask() {
   var rawValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyString;
-  var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : emptyArray$1;
+  var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : emptyArray;
   var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   if (!isArray(mask)) {
@@ -291,12 +295,12 @@ var charRegexp = function charRegexp(char) {
   return new RegExp("/[".concat(escapeIfNeeded(char), "]/"));
 };
 
-var isRegexp = function isRegexp(entity) {
+var isRegexp$1 = function isRegexp(entity) {
   return entity instanceof RegExp;
 };
 
 var castToRegexp = function castToRegexp(char) {
-  return isRegexp(char) ? char : charRegexp(char);
+  return isRegexp$1(char) ? char : charRegexp(char);
 };
 
 function maskToRegExpMask(mask) {
@@ -354,9 +358,25 @@ var isFunction = function isFunction(val) {
 var isString = function isString(val) {
   return typeof val === 'string';
 };
-var isRegexp$1 = function isRegexp(val) {
+var isRegexp = function isRegexp(val) {
   return val instanceof RegExp;
 };
+
+function parseMask(inputMask, maskReplacers) {
+  if (Array.isArray(inputMask)) {
+    return arrayMaskToRegExpMask(inputMask, maskReplacers);
+  }
+
+  if (isFunction(inputMask)) {
+    return inputMask;
+  }
+
+  if (isString(inputMask) && inputMask.length > 0) {
+    return stringMaskToRegExpMask(inputMask, maskReplacers);
+  }
+
+  return inputMask;
+}
 
 function createOptions() {
   var elementOptions = new Map();
@@ -382,6 +402,24 @@ function createOptions() {
     remove: remove,
     get: get
   };
+}
+
+function extendMaskReplacers(maskReplacers) {
+  var baseMaskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
+
+  if (maskReplacers === null || Array.isArray(maskReplacers) || _typeof(maskReplacers) !== 'object') {
+    return baseMaskReplacers;
+  }
+
+  return Object.keys(maskReplacers).reduce(function (extendedMaskReplacers, key) {
+    var value = maskReplacers[key];
+
+    if (value !== null && !(value instanceof RegExp)) {
+      return extendedMaskReplacers;
+    }
+
+    return _objectSpread2(_objectSpread2({}, extendedMaskReplacers), {}, _defineProperty({}, key, value));
+  }, baseMaskReplacers);
 }
 
 var options = createOptions();
@@ -418,45 +456,16 @@ function updateValue(el) {
 }
 
 function updateMask(el, inputMask, maskReplacers) {
-  var mask;
-
-  if (Array.isArray(inputMask)) {
-    mask = arrayMaskToRegExpMask(inputMask, maskReplacers);
-  } else if (isFunction(inputMask)) {
-    mask = inputMask;
-  } else if (isString(inputMask) && inputMask.length > 0) {
-    mask = stringMaskToRegExpMask(inputMask, maskReplacers);
-  } else {
-    mask = inputMask;
-  }
-
+  var mask = parseMask(inputMask, maskReplacers);
   options.partiallyUpdate(el, {
     mask: mask
   });
 }
 
-function extendMaskReplacers(maskReplacers) {
-  var baseMaskReplacers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultMaskReplacers;
-
-  if (maskReplacers === null || Array.isArray(maskReplacers) || _typeof(maskReplacers) !== 'object') {
-    return baseMaskReplacers;
-  }
-
-  return Object.keys(maskReplacers).reduce(function (extendedMaskReplacers, key) {
-    var value = maskReplacers[key];
-
-    if (value !== null && !(value instanceof RegExp)) {
-      return extendedMaskReplacers;
-    }
-
-    return _objectSpread2(_objectSpread2({}, extendedMaskReplacers), {}, _defineProperty({}, key, value));
-  }, baseMaskReplacers);
-}
-
 function maskToString(mask) {
   var maskArray = Array.isArray(mask) ? mask : [mask];
   var filteredMaskArray = maskArray.filter(function (part) {
-    return isString(part) || isRegexp$1(part);
+    return isString(part) || isRegexp(part);
   });
   return filteredMaskArray.toString();
 }
@@ -491,6 +500,23 @@ function createDirective() {
 }
 var directive = createDirective();
 
+function createFilter() {
+  var filterOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var instanceMaskReplacers = extendMaskReplacers(filterOptions && filterOptions.placeholders);
+  return function (value, inputMask) {
+    if (!isString(value) && !Number.isFinite(value)) { return value; }
+    var mask = parseMask(inputMask, instanceMaskReplacers);
+
+    var _conformToMask = conformToMask("".concat(value), mask, {
+      guide: false
+    }),
+        conformedValue = _conformToMask.conformedValue;
+
+    return conformedValue;
+  };
+}
+createFilter();
+
 Vue.use(Vuex);
 
 var backupStore = new Vuex.Store({});
@@ -513,6 +539,8 @@ var state = {
   is_email_verification_screen_shown: false, // show email verification screen,
   is_reset_password_screen_shown: false, // show reset password screen,
 };
+
+var router$1 = Vue.prototype.$authGuardRouter;
 
 var getters = {
   getError: function getError(state) {
@@ -565,24 +593,6 @@ var getters = {
     var user = getters.getCurrentUser;
     return user ? user.emailVerified : null
   },
-  // check if the current route is public to set negative persisten dialog
-  isCurrentRoutePublic: function isCurrentRoutePublic(state) {
-    var ref = state.config;
-    var router = ref.router;
-    var debug = ref.debug;
-
-    if (!router) { return false }
-
-    var route = router.currentRoute;
-
-    var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
-
-    if (route.matched[0] && route.matched[0].path !== window.location.pathname) { isPublicRoute = false; }
-
-    if (debug) { console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]"); }
-
-    return isPublicRoute
-  },
   isAuthGuardDialogShown: function isAuthGuardDialogShown(state) {
     return state.is_authguard_dialog_shown
   },
@@ -609,6 +619,23 @@ var getters = {
   },
   isLoginWithPhoneShown: function isLoginWithPhoneShown(state) {
     return state.is_login_with_phone_shown
+  },
+  // check if the current route is public to set negative persisten dialog
+  isCurrentRoutePublic: function isCurrentRoutePublic(state) {
+    var ref = state.config;
+    var debug = ref.debug;
+
+    if (!router$1) { return false }
+
+    var route = router$1.currentRoute;
+
+    var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
+
+    if (route.matched[0] && route.matched[0].path !== window.location.pathname) { isPublicRoute = false; }
+
+    if (debug) { console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]"); }
+
+    return isPublicRoute
   },
 };
 
@@ -699,6 +726,7 @@ function authCheck () {
   return allowRoute
 }
 
+var router = Vue.prototype.$authGuardRouter;
 var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
 var actions = {
@@ -709,7 +737,6 @@ var actions = {
 
     var ref$1 = state.config;
     var debug = ref$1.debug;
-    var router = ref$1.router;
 
     if (debug) { console.log("[ auth guard ]: revalidate when vue router ready"); }
 
@@ -760,7 +787,7 @@ var actions = {
 
   //
   loginWithEmail: function loginWithEmail(ref, ref$1) {
-    var state = ref.state;
+    ref.state;
     var commit = ref.commit;
     var email = ref$1.email;
     var password = ref$1.password;
@@ -768,9 +795,6 @@ var actions = {
     return new Promise(async function (resolve, reject) {
       try {
         commit("SET_LOADING", true);
-
-        var ref = state.config;
-        var router = ref.router;
 
         await signOut(auth);
         await setPersistence(auth, browserSessionPersistence);
@@ -3099,9 +3123,12 @@ function install(Vue, options) {
 
   // save store in Vue.prototype to be accessible authcheck.js
   Vue.prototype.$authGuardStore = store;
+  Vue.prototype.$authGuardRouter = router;
   Vue.prototype.$authGuardFirebaseApp = firebase;
 
   delete config.store;
+  delete config.router;
+  delete config.firebase;
 
   // commit npm package config to vuex store
   store.commit("auth/SET_CONFIG", config);
