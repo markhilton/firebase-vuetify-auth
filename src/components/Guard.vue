@@ -1,63 +1,61 @@
 <template>
-  <div>
-    <v-dialog
-      :value="isAuthGuardDialogShown"
-      :persistent="isAuthGuardDialogPersistent"
-      :retain-focus="false"
-      overlay-opacity="0.95"
-      content-class="elevation-0"
-      @input="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
-    >
-      <v-container style="max-width: 500px" class="mb-5">
-        <v-card flat outlined>
-          <v-progress-linear :indeterminate="isLoading" />
+  <v-dialog
+    :value="isAuthGuardDialogShown"
+    :persistent="isAuthGuardDialogPersistent"
+    :retain-focus="false"
+    overlay-opacity="0.95"
+    content-class="elevation-0"
+    @input="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
+  >
+    <v-container style="max-width: 500px" class="mb-5">
+      <v-card flat outlined>
+        <v-progress-linear :indeterminate="isLoading" />
 
-          <div v-if="isEmailVerificationScrenShown">
-            <EmailVerification />
-          </div>
+        <div v-if="isEmailVerificationScrenShown">
+          <EmailVerification />
+        </div>
 
-          <div v-else>
-            <v-tabs :value="tab" grow @change="SET_TAB($event)">
-              <v-tab
-                v-if="!isLoginWithPhoneShown"
-                @click="
-                  SET_TAB(0)
-                  SET_PASSWORD_RESET_SCREEN_SHOWN(false)
-                "
-              >
-                Sign In
-              </v-tab>
-              <v-tab v-if="isLoginWithPhoneShown"> Sign In </v-tab>
-              <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"> Register </v-tab>
-              <v-tab v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed"> Reset Password </v-tab>
-            </v-tabs>
+        <div v-else>
+          <v-tabs :value="tab" grow @change="SET_TAB($event)">
+            <v-tab
+              v-if="!isLoginWithPhoneShown"
+              @click="
+                SET_TAB(0)
+                SET_PASSWORD_RESET_SCREEN_SHOWN(false)
+              "
+            >
+              Sign In
+            </v-tab>
+            <v-tab v-if="isLoginWithPhoneShown"> Sign In </v-tab>
+            <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"> Register </v-tab>
+            <v-tab v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed"> Reset Password </v-tab>
+          </v-tabs>
 
-            <v-tabs-items :value="tab" @change="SET_TAB($event)">
-              <v-tab-item v-if="!isLoginWithPhoneShown" class="pt-5">
-                <Login />
-              </v-tab-item>
+          <v-tabs-items :value="tab" @change="SET_TAB($event)">
+            <v-tab-item v-if="!isLoginWithPhoneShown" class="pt-5">
+              <Login />
+            </v-tab-item>
 
-              <v-tab-item v-if="isLoginWithPhoneShown" class="pt-5">
-                <LoginWithPhone />
-              </v-tab-item>
+            <v-tab-item v-if="isLoginWithPhoneShown" class="pt-5">
+              <LoginWithPhone />
+            </v-tab-item>
 
-              <v-tab-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
-                <Register />
-              </v-tab-item>
+            <v-tab-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
+              <Register />
+            </v-tab-item>
 
-              <v-tab-item v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed" class="pt-5">
-                <PasswordReset />
-              </v-tab-item>
-            </v-tabs-items>
-          </div>
+            <v-tab-item v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed" class="pt-5">
+              <PasswordReset />
+            </v-tab-item>
+          </v-tabs-items>
+        </div>
 
-          <v-card-actions v-if="!isEmailVerificationScrenShown">
-            <LoginWithProvider />
-          </v-card-actions>
-        </v-card>
-      </v-container>
-    </v-dialog>
-  </div>
+        <v-card-actions v-if="!isEmailVerificationScrenShown">
+          <LoginWithProvider />
+        </v-card-actions>
+      </v-card>
+    </v-container>
+  </v-dialog>
 </template>
 
 <script>
@@ -82,10 +80,6 @@ export default {
     EmailVerification,
     LoginWithProvider,
   },
-
-  data: () => ({
-    loginError: null,
-  }),
 
   computed: {
     ...mapState("auth", ["config", "tab"]),

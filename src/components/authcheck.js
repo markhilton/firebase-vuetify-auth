@@ -1,4 +1,5 @@
 import Vue from "vue"
+import { getAuth } from "firebase/auth"
 
 const debug = (...text) => {
   const store = Vue.prototype.$authGuardStore
@@ -14,9 +15,9 @@ export default () => {
 
   let allowRoute = false // default state
 
+  const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
   const store = Vue.prototype.$authGuardStore
-  const { firebase } = store.state.auth.config
-  const currentUser = firebase.auth().currentUser
+  const currentUser = auth.currentUser
   const isAuthenticated = currentUser ? true : false
   const verification = store.state.auth.config.verification
 

@@ -1,14 +1,13 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuex'), require('firebase/compat/app'), require('vuetify/lib')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuex', 'firebase/compat/app', 'vuetify/lib'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthGuard = {}, global.vue, global.vuex, global['firebase/compat/app'], global['vuetify/lib']));
-}(this, (function (exports, Vue, Vuex, firebaseProvider, lib) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('vue'), require('vuex'), require('firebase/auth'), require('vuetify/lib')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'vue', 'vuex', 'firebase/auth', 'vuetify/lib'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.AuthGuard = {}, global.vue, global.vuex, global['firebase/auth'], global['vuetify/lib']));
+}(this, (function (exports, Vue, Vuex, auth$1, lib) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
   var Vue__default = /*#__PURE__*/_interopDefaultLegacy(Vue);
   var Vuex__default = /*#__PURE__*/_interopDefaultLegacy(Vuex);
-  var firebaseProvider__default = /*#__PURE__*/_interopDefaultLegacy(firebaseProvider);
 
   function _typeof(obj) {
     "@babel/helpers - typeof";
@@ -529,13 +528,9 @@
       return state.is_session_persistant
     },
     getCurrentUser: function getCurrentUser(state) {
-      // this getter has to fetch current user state directly from firebase sdk
-      // to avoid issue with onAuthStateChanged listener priority between this package and main app
-      // IMPORTANT: this was a bug causing entire vue devtools vuex debugger not working
-      // because of failed getter when firebase config state is not defined
-      var ref = state.config;
-      var firebase = ref.firebase;
-      return firebase ? firebase.auth().currentUser : null
+      var user = auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp).currentUser;
+
+      return user ? Object.assign({}, user) : null
     },
     getUid: function getUid(state, getters) {
       var user = getters.getCurrentUser;
@@ -581,6 +576,9 @@
       var ref = state.config;
       var router = ref.router;
       var debug = ref.debug;
+
+      if (!router) { return false }
+
       var route = router.currentRoute;
 
       var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
@@ -638,10 +636,9 @@
 
     var allowRoute = false; // default state
 
+    var auth = auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp);
     var store = Vue__default['default'].prototype.$authGuardStore;
-    var ref = store.state.auth.config;
-    var firebase = ref.firebase;
-    var currentUser = firebase.auth().currentUser;
+    var currentUser = auth.currentUser;
     var isAuthenticated = currentUser ? true : false;
     var verification = store.state.auth.config.verification;
 
@@ -708,6 +705,8 @@
     return allowRoute
   }
 
+  var auth = auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp);
+
   var actions = {
     authGuardOnRouterReady: function authGuardOnRouterReady(ref) {
       var state = ref.state;
@@ -722,9 +721,7 @@
 
       // check current route when router is ready
       router.onReady(function () {
-        var ref = state.config;
-        var firebase = ref.firebase;
-        var isAuthenticated = firebase.auth().currentUser ? true : false;
+        var isAuthenticated = auth.currentUser ? true : false;
         var isCurrentRoutePublic = getters.isCurrentRoutePublic;
 
         if (debug) {
@@ -755,8 +752,6 @@
 
       var config = state.config;
       var debug = config.debug;
-      var firebase = config.firebase;
-      var auth = firebase.auth();
       var user = auth.currentUser;
 
       if (debug) { console.log("[ auth guard ]: component initialized for user: [", user, "]"); }
@@ -782,18 +777,13 @@
 
           var ref = state.config;
           var router = ref.router;
-          var firebase = ref.firebase;
 
-          // set user session persistance
-          // https://firebase.google.com/docs/auth/web/auth-state-persistence
-          var persistance = state.is_session_persistant ? "local" : "session";
-
-          await firebase.auth().signOut();
-          await firebase.auth().setPersistence(persistance);
-          await firebase.auth().signInWithEmailAndPassword(email, password);
+          await auth$1.signOut(auth);
+          await auth$1.setPersistence(auth, auth$1.browserSessionPersistence);
+          await auth$1.signInWithEmailAndPassword(auth, email, password);
 
           // this is needed to reload route that was not loaded if user was not authenticated
-          if (router.currentRoute.name === null) { router.push(router.currentRoute.path); }
+          if (router.currentRoute.name === null) { router.push(router.currentRoute.path).catch(function () {}); }
 
           commit("SET_LOADING", false);
 
@@ -809,43 +799,32 @@
 
     //
     loginWithGoogle: function loginWithGoogle(ref) {
-      var state = ref.state;
+      ref.state;
 
-      var ref$1 = state.config;
-      var firebase = ref$1.firebase;
+      var provider = new auth$1.GoogleAuthProvider();
 
-      var provider = new firebaseProvider__default['default'].auth.GoogleAuthProvider();
-
-      firebase.auth().useDeviceLanguage();
-      firebase.auth().signInWithRedirect(provider);
+      // useDeviceLanguage(auth)
+      auth$1.signInWithRedirect(auth, provider);
     },
 
     //
     loginWithFacebook: function loginWithFacebook(ref) {
-      var state = ref.state;
+      ref.state;
 
-      var ref$1 = state.config;
-      var firebase = ref$1.firebase;
-      var provider = new firebaseProvider__default['default'].auth.FacebookAuthProvider();
+      var provider = new auth$1.FacebookAuthProvider();
 
-      firebase.auth().useDeviceLanguage();
-      firebase.auth().signInWithRedirect(provider);
+      // useDeviceLanguage(auth)
+      auth$1.signInWithRedirect(auth, provider);
     },
 
     //
     loginWithPhone: function loginWithPhone(ref) {
-      var state = ref.state;
-
-      var ref$1 = state.config;
-      var firebase = ref$1.firebase;
-
-      // Turn off phone auth app verification.
-      firebase.auth().settings.appVerificationDisabledForTesting = true;
-    },
+      ref.state;
+  },
 
     //
     textPhoneVerificationCode: async function textPhoneVerificationCode(ref, ref$1) {
-      var state = ref.state;
+      ref.state;
       var commit = ref.commit;
       var phoneNumber = ref$1.phoneNumber;
       var recaptchaVerifier = ref$1.recaptchaVerifier;
@@ -854,17 +833,8 @@
         commit("SET_LOADING", true);
         commit("SET_PHONE_TEXT_CONFIRMATION", null);
 
-        var ref$2 = state.config;
-        var firebase = ref$2.firebase;
-
-        // TESTING: turn on for testing on localhost
-        if (window.location.hostname === "localhost") {
-          firebase.auth().settings.appVerificationDisabledForTesting = true;
-          console.log("TESTING: setting firebase appVerificationDisabledForTesting", true);
-        }
-
         var phone = "+1" + phoneNumber.replace(/\D/g, "");
-        var confirmationResult = await firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier);
+        var confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
 
         commit("SET_LOADING", false);
         commit("SET_SIGN_BY_PHONE_STEP", 2);
@@ -907,17 +877,15 @@
       try {
         commit("SET_LOADING", true);
 
-        var ref$2 = state.config;
-        var firebase = ref$2.firebase;
         var verification = state.config.email;
 
-        await firebase.auth().createUserWithEmailAndPassword(email, password);
-        await firebase.auth().signInWithEmailAndPassword(email, password);
-        await firebase.auth().currentUser.updateProfile({ displayName: displayName });
+        await auth$1.createUserWithEmailAndPassword(auth, email, password);
+        await auth$1.signInWithEmailAndPassword(auth, email, password);
+        await auth$1.updateProfile(auth.currentUser, { displayName: displayName });
 
         // send email to verify user email address if config option is not set to false
         if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
-          await firebase.auth().currentUser.sendEmailVerification();
+          await auth$1.sendEmailVerification(auth.currentUser);
         }
 
         commit("SET_LOADING", false);
@@ -928,16 +896,13 @@
     },
 
     emailPasswordResetLink: async function emailPasswordResetLink(ref, email) {
-      var state = ref.state;
+      ref.state;
       var commit = ref.commit;
 
       try {
         commit("SET_LOADING", true);
 
-        var ref$1 = state.config;
-        var firebase = ref$1.firebase;
-
-        await firebase.auth().sendPasswordResetEmail(email);
+        await auth$1.sendPasswordResetEmail(auth, email);
 
         commit("SET_ERROR", false);
         commit("SET_LOADING", false);
@@ -949,31 +914,27 @@
     },
 
     //
-    signOut: function signOut(ref) {
+    signOut: function signOut$1(ref) {
       var state = ref.state;
 
       var ref$1 = state.config;
-      var firebase = ref$1.firebase;
       var debug = ref$1.debug;
 
-      if (debug) { console.log("[ auth guard ]: signOut request", firebase.auth()); }
+      if (debug) { console.log("[ auth guard ]: signOut request"); }
 
-      return firebase.auth().signOut()
+      return auth$1.signOut(auth)
     },
 
     //
     sendVerificationEmail: function sendVerificationEmail(ref) {
-      var state = ref.state;
+      ref.state;
       var commit = ref.commit;
 
       return new Promise(async function (resolve, reject) {
         try {
           commit("SET_LOADING", true);
 
-          var ref = state.config;
-          var firebase = ref.firebase;
-
-          await firebase.auth().currentUser.sendEmailVerification();
+          await auth$1.sendEmailVerification(auth.currentUser);
 
           commit("SET_LOADING", false);
           commit("SET_EMAIL_VERIFICATION_LINK_SENT", true);
@@ -1940,7 +1901,11 @@
     mounted: function mounted() {
       var this$1$1 = this;
 
-      this.recaptchaVerifier = new firebaseProvider__default['default'].auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" });
+      this.recaptchaVerifier = new auth$1.RecaptchaVerifier(
+        "recaptcha-container",
+        { size: "invisible" },
+        auth$1.getAuth(Vue__default['default'].prototype.$authGuardFirebaseApp)
+      );
       this.recaptchaVerifier.render().then(function (widgetId) { return (this$1$1.recaptchaWidgetId = widgetId); });
 
       // window.grecaptcha.reset(this.recaptchaWidgetId)
@@ -2271,11 +2236,11 @@
     /* style */
     var __vue_inject_styles__$3 = function (inject) {
       if (!inject) { return }
-      inject("data-v-af3b9a62_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* styles for phone number field */\n.large-font[data-v-af3b9a62] input {\n  font-size: 1.5rem;\n}\n\n/* styles for confirmation code form fields */\n.centered-input[data-v-af3b9a62] input {\n  text-align: center;\n  font-weight: bold;\n  font-size: 1.5rem;\n}\n", map: {"version":3,"sources":["/Users/mark/Sites/npm-packages/firebase-vuetify-auth/src/components/LoginWithPhone.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAgKA,kCAAA;AACA;EACA,iBAAA;AACA;;AAEA,6CAAA;AACA;EACA,kBAAA;EACA,iBAAA;EACA,iBAAA;AACA","file":"LoginWithPhone.vue","sourcesContent":["<template>\n  <v-container>\n    <!-- recaptcha container needed for authenticating with the phone provider -->\n    <div id=\"recaptcha-container\" />\n\n    <!-- phone authentication provider: enter phone number -->\n    <v-card flat>\n      <!-- error alerts -->\n      <v-alert v-if=\"Boolean(getError)\" type=\"error\" dismissible @click=\"SET_ERROR(null)\">\n        {{ getError.message }}\n      </v-alert>\n\n      <!-- application branding -->\n      <branding v-else class=\"text-center\" />\n\n      <!-- send code by text to phone -->\n      <div v-if=\"sign_by_phone_step === 1\">\n        <v-form\n          ref=\"form\"\n          v-model=\"valid\"\n          @submit.prevent=\"textPhoneVerificationCode({ phoneNumber, recaptchaVerifier })\"\n        >\n          <v-card-text>\n            <v-text-field\n              v-model=\"phoneNumber\"\n              v-mask=\"phoneMask\"\n              class=\"mx-15 px-5 large-font\"\n              autocomplete=\"off\"\n              label=\"Phone Number\"\n              prepend-icon=\"mdi-cellphone\"\n              prefix=\"+1\"\n              :rules=\"[rules.phoneNumber]\"\n            />\n          </v-card-text>\n\n          <v-card-actions>\n            <v-btn color=\"primary\" block large depressed :disabled=\"!valid\" type=\"submit\"> Send Code </v-btn>\n          </v-card-actions>\n        </v-form>\n      </div>\n\n      <!-- confirm code received by phone text -->\n      <v-container v-if=\"sign_by_phone_step === 2\">\n        <p class=\"text-center\">\n          enter confirmation code<br />\n          you have recived on your mobile phone\n        </p>\n\n        <v-row class=\"centered-input\">\n          <v-col v-for=\"(element, index) in 6\" :key=\"index\" cols=\"2\">\n            <v-text-field\n              :ref=\"'code' + index\"\n              :key=\"index\"\n              v-model=\"code[index]\"\n              v-mask=\"digitMask\"\n              :value=\"code[index]\"\n              :item-value=\"code[index]\"\n              :item-text=\"code[index]\"\n              outlined\n              maxlength=\"1\"\n              @keyup=\"nextElementFocus(index, $event)\"\n              @paste=\"onPaste\"\n            />\n          </v-col>\n        </v-row>\n\n        <v-btn color=\"primary\" block large depressed :disabled=\"code.length < 6\" @click=\"confirmCode(code)\">\n          Confirm Code\n        </v-btn>\n      </v-container>\n\n      <v-container class=\"text-center\">\n        <v-btn text x-small color=\"primary\" @click=\"SET_SHOW_LOGIN_WITH_PHONE(false)\"> Sign In with email </v-btn>\n      </v-container>\n    </v-card>\n  </v-container>\n</template>\n\n<script>\nimport firebase from \"firebase/compat/app\"\nimport Branding from \"./Branding.vue\"\nimport { mapState, mapGetters, mapMutations, mapActions } from \"vuex\"\n\nexport default {\n  components: { Branding },\n\n  data: () => ({\n    valid: false,\n    code: [], // text confirmation code\n    digitMask: \"#\",\n    phoneMask: \"(###) ###-####\",\n    phoneNumber: \"\", // phone number field to send code to\n    recaptchaVerifier: null,\n    recaptchaWidgetId: null,\n  }),\n\n  computed: {\n    ...mapState(\"auth\", [\"config\", \"sign_by_phone_step\"]),\n    ...mapGetters(\"auth\", [\"isLoading\", \"getError\"]),\n\n    // phone number validation\n    rules() {\n      const validation = {\n        phoneNumber: this.phoneNumber.replace(/\\D/g, \"\") < 1000000000 ? \"Please enter a valid US phone number\" : true,\n      }\n\n      return validation\n    },\n  },\n\n  mounted() {\n    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(\"recaptcha-container\", { size: \"invisible\" })\n    this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))\n\n    // window.grecaptcha.reset(this.recaptchaWidgetId)\n\n    // // Or, if you haven't stored the widget ID:\n    // this.recaptchaVerifier.render().then(function (widgetId) {\n    //   grecaptcha.reset(widgetId)\n    // })\n  },\n\n  methods: {\n    ...mapActions(\"auth\", [\"loginWithGoogle\", \"loginWithFacebook\", \"textPhoneVerificationCode\", \"confirmCode\"]),\n    ...mapMutations(\"auth\", [\"SET_SHOW_LOGIN_WITH_PHONE\", \"SET_ERROR\"]),\n\n    // paste handler to allow confirmation code paste\n    onPaste(event) {\n      const text = event.clipboardData.getData(\"text\").substr(0, 6)\n\n      for (var index = 0; index < text.length; index++) {\n        this.$set(this.code, index, text[index])\n      }\n    },\n\n    // form field focus handler to automatically move cursor to the next field\n    nextElementFocus(index, event) {\n      let i = index\n\n      if ([\"Backspace\", \"ArrowLeft\"].includes(event.key)) {\n        i = index > 1 ? index - 1 : 0\n      }\n\n      // jeez to figure this out OMG :)\n      // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array\n      if ([\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"ArrowRight\"].includes(event.key)) {\n        this.$set(this.code, index, event.key)\n\n        i = index > 4 ? index : index + 1\n      }\n\n      const el = \"code\" + i\n\n      this.$refs[el][0].focus()\n    },\n  },\n}\n</script>\n\n<style scoped>\n/* styles for phone number field */\n.large-font >>> input {\n  font-size: 1.5rem;\n}\n\n/* styles for confirmation code form fields */\n.centered-input >>> input {\n  text-align: center;\n  font-weight: bold;\n  font-size: 1.5rem;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-62c98517_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* styles for phone number field */\n.large-font[data-v-62c98517] input {\n  font-size: 1.5rem;\n}\n\n/* styles for confirmation code form fields */\n.centered-input[data-v-62c98517] input {\n  text-align: center;\n  font-weight: bold;\n  font-size: 1.5rem;\n}\n", map: {"version":3,"sources":["/Users/mark/Sites/npm-packages/firebase-vuetify-auth/src/components/LoginWithPhone.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAqKA,kCAAA;AACA;EACA,iBAAA;AACA;;AAEA,6CAAA;AACA;EACA,kBAAA;EACA,iBAAA;EACA,iBAAA;AACA","file":"LoginWithPhone.vue","sourcesContent":["<template>\n  <v-container>\n    <!-- recaptcha container needed for authenticating with the phone provider -->\n    <div id=\"recaptcha-container\" />\n\n    <!-- phone authentication provider: enter phone number -->\n    <v-card flat>\n      <!-- error alerts -->\n      <v-alert v-if=\"Boolean(getError)\" type=\"error\" dismissible @click=\"SET_ERROR(null)\">\n        {{ getError.message }}\n      </v-alert>\n\n      <!-- application branding -->\n      <branding v-else class=\"text-center\" />\n\n      <!-- send code by text to phone -->\n      <div v-if=\"sign_by_phone_step === 1\">\n        <v-form\n          ref=\"form\"\n          v-model=\"valid\"\n          @submit.prevent=\"textPhoneVerificationCode({ phoneNumber, recaptchaVerifier })\"\n        >\n          <v-card-text>\n            <v-text-field\n              v-model=\"phoneNumber\"\n              v-mask=\"phoneMask\"\n              class=\"mx-15 px-5 large-font\"\n              autocomplete=\"off\"\n              label=\"Phone Number\"\n              prepend-icon=\"mdi-cellphone\"\n              prefix=\"+1\"\n              :rules=\"[rules.phoneNumber]\"\n            />\n          </v-card-text>\n\n          <v-card-actions>\n            <v-btn color=\"primary\" block large depressed :disabled=\"!valid\" type=\"submit\"> Send Code </v-btn>\n          </v-card-actions>\n        </v-form>\n      </div>\n\n      <!-- confirm code received by phone text -->\n      <v-container v-if=\"sign_by_phone_step === 2\">\n        <p class=\"text-center\">\n          enter confirmation code<br />\n          you have recived on your mobile phone\n        </p>\n\n        <v-row class=\"centered-input\">\n          <v-col v-for=\"(element, index) in 6\" :key=\"index\" cols=\"2\">\n            <v-text-field\n              :ref=\"'code' + index\"\n              :key=\"index\"\n              v-model=\"code[index]\"\n              v-mask=\"digitMask\"\n              :value=\"code[index]\"\n              :item-value=\"code[index]\"\n              :item-text=\"code[index]\"\n              outlined\n              maxlength=\"1\"\n              @keyup=\"nextElementFocus(index, $event)\"\n              @paste=\"onPaste\"\n            />\n          </v-col>\n        </v-row>\n\n        <v-btn color=\"primary\" block large depressed :disabled=\"code.length < 6\" @click=\"confirmCode(code)\">\n          Confirm Code\n        </v-btn>\n      </v-container>\n\n      <v-container class=\"text-center\">\n        <v-btn text x-small color=\"primary\" @click=\"SET_SHOW_LOGIN_WITH_PHONE(false)\"> Sign In with email </v-btn>\n      </v-container>\n    </v-card>\n  </v-container>\n</template>\n\n<script>\nimport Vue from \"vue\"\nimport Branding from \"./Branding.vue\"\nimport { getAuth, RecaptchaVerifier } from \"firebase/auth\"\nimport { mapState, mapGetters, mapMutations, mapActions } from \"vuex\"\n\nexport default {\n  components: { Branding },\n\n  data: () => ({\n    valid: false,\n    code: [], // text confirmation code\n    digitMask: \"#\",\n    phoneMask: \"(###) ###-####\",\n    phoneNumber: \"\", // phone number field to send code to\n    recaptchaVerifier: null,\n    recaptchaWidgetId: null,\n  }),\n\n  computed: {\n    ...mapState(\"auth\", [\"config\", \"sign_by_phone_step\"]),\n    ...mapGetters(\"auth\", [\"isLoading\", \"getError\"]),\n\n    // phone number validation\n    rules() {\n      const validation = {\n        phoneNumber: this.phoneNumber.replace(/\\D/g, \"\") < 1000000000 ? \"Please enter a valid US phone number\" : true,\n      }\n\n      return validation\n    },\n  },\n\n  mounted() {\n    this.recaptchaVerifier = new RecaptchaVerifier(\n      \"recaptcha-container\",\n      { size: \"invisible\" },\n      getAuth(Vue.prototype.$authGuardFirebaseApp)\n    )\n    this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))\n\n    // window.grecaptcha.reset(this.recaptchaWidgetId)\n\n    // // Or, if you haven't stored the widget ID:\n    // this.recaptchaVerifier.render().then(function (widgetId) {\n    //   grecaptcha.reset(widgetId)\n    // })\n  },\n\n  methods: {\n    ...mapActions(\"auth\", [\"loginWithGoogle\", \"loginWithFacebook\", \"textPhoneVerificationCode\", \"confirmCode\"]),\n    ...mapMutations(\"auth\", [\"SET_SHOW_LOGIN_WITH_PHONE\", \"SET_ERROR\"]),\n\n    // paste handler to allow confirmation code paste\n    onPaste(event) {\n      const text = event.clipboardData.getData(\"text\").substr(0, 6)\n\n      for (var index = 0; index < text.length; index++) {\n        this.$set(this.code, index, text[index])\n      }\n    },\n\n    // form field focus handler to automatically move cursor to the next field\n    nextElementFocus(index, event) {\n      let i = index\n\n      if ([\"Backspace\", \"ArrowLeft\"].includes(event.key)) {\n        i = index > 1 ? index - 1 : 0\n      }\n\n      // jeez to figure this out OMG :)\n      // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array\n      if ([\"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \"ArrowRight\"].includes(event.key)) {\n        this.$set(this.code, index, event.key)\n\n        i = index > 4 ? index : index + 1\n      }\n\n      const el = \"code\" + i\n\n      this.$refs[el][0].focus()\n    },\n  },\n}\n</script>\n\n<style scoped>\n/* styles for phone number field */\n.large-font >>> input {\n  font-size: 1.5rem;\n}\n\n/* styles for confirmation code form fields */\n.centered-input >>> input {\n  text-align: center;\n  font-weight: bold;\n  font-size: 1.5rem;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    var __vue_scope_id__$3 = "data-v-af3b9a62";
+    var __vue_scope_id__$3 = "data-v-62c98517";
     /* module identifier */
     var __vue_module_identifier__$3 = undefined;
     /* functional template */
@@ -2839,10 +2804,6 @@
       VDialog: lib.VDialog
     },
 
-    data: function () { return ({
-      loginError: null,
-    }); },
-
     computed: Object.assign({}, Vuex.mapState("auth", ["config", "tab"]),
       Vuex.mapGetters("auth", [
         "isLoading",
@@ -2889,152 +2850,140 @@
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
     return _c(
-      "div",
+      "v-dialog",
+      {
+        attrs: {
+          value: _vm.isAuthGuardDialogShown,
+          persistent: _vm.isAuthGuardDialogPersistent,
+          "retain-focus": false,
+          "overlay-opacity": "0.95",
+          "content-class": "elevation-0"
+        },
+        on: {
+          input: function($event) {
+            return _vm.SET_AUTH_GUARD_DIALOG_SHOWN($event)
+          }
+        }
+      },
       [
         _c(
-          "v-dialog",
-          {
-            attrs: {
-              value: _vm.isAuthGuardDialogShown,
-              persistent: _vm.isAuthGuardDialogPersistent,
-              "retain-focus": false,
-              "overlay-opacity": "0.95",
-              "content-class": "elevation-0"
-            },
-            on: {
-              input: function($event) {
-                return _vm.SET_AUTH_GUARD_DIALOG_SHOWN($event)
-              }
-            }
-          },
+          "v-container",
+          { staticClass: "mb-5", staticStyle: { "max-width": "500px" } },
           [
             _c(
-              "v-container",
-              { staticClass: "mb-5", staticStyle: { "max-width": "500px" } },
+              "v-card",
+              { attrs: { flat: "", outlined: "" } },
               [
-                _c(
-                  "v-card",
-                  { attrs: { flat: "", outlined: "" } },
-                  [
-                    _c("v-progress-linear", {
-                      attrs: { indeterminate: _vm.isLoading }
-                    }),
-                    _vm._v(" "),
-                    _vm.isEmailVerificationScrenShown
-                      ? _c("div", [_c("EmailVerification")], 1)
-                      : _c(
-                          "div",
+                _c("v-progress-linear", {
+                  attrs: { indeterminate: _vm.isLoading }
+                }),
+                _vm._v(" "),
+                _vm.isEmailVerificationScrenShown
+                  ? _c("div", [_c("EmailVerification")], 1)
+                  : _c(
+                      "div",
+                      [
+                        _c(
+                          "v-tabs",
+                          {
+                            attrs: { value: _vm.tab, grow: "" },
+                            on: {
+                              change: function($event) {
+                                return _vm.SET_TAB($event)
+                              }
+                            }
+                          },
                           [
-                            _c(
-                              "v-tabs",
-                              {
-                                attrs: { value: _vm.tab, grow: "" },
-                                on: {
-                                  change: function($event) {
-                                    return _vm.SET_TAB($event)
-                                  }
-                                }
-                              },
-                              [
-                                !_vm.isLoginWithPhoneShown
-                                  ? _c(
-                                      "v-tab",
-                                      {
-                                        on: {
-                                          click: function($event) {
-                                            _vm.SET_TAB(0);
-                                            _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(
-                                              false
-                                            );
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _vm._v(
-                                          "\n              Sign In\n            "
-                                        )
-                                      ]
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                _vm.isLoginWithPhoneShown
-                                  ? _c("v-tab", [_vm._v(" Sign In ")])
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                !_vm.isResetPasswordScreenShown &&
-                                _vm.isUserRegistrationAllowed
-                                  ? _c("v-tab", [_vm._v(" Register ")])
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                _vm.isResetPasswordScreenShown ||
-                                !_vm.isUserRegistrationAllowed
-                                  ? _c("v-tab", [_vm._v(" Reset Password ")])
-                                  : _vm._e()
-                              ],
-                              1
-                            ),
+                            !_vm.isLoginWithPhoneShown
+                              ? _c(
+                                  "v-tab",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        _vm.SET_TAB(0);
+                                        _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(false);
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("\n            Sign In\n          ")]
+                                )
+                              : _vm._e(),
                             _vm._v(" "),
-                            _c(
-                              "v-tabs-items",
-                              {
-                                attrs: { value: _vm.tab },
-                                on: {
-                                  change: function($event) {
-                                    return _vm.SET_TAB($event)
-                                  }
-                                }
-                              },
-                              [
-                                !_vm.isLoginWithPhoneShown
-                                  ? _c(
-                                      "v-tab-item",
-                                      { staticClass: "pt-5" },
-                                      [_c("Login")],
-                                      1
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                _vm.isLoginWithPhoneShown
-                                  ? _c(
-                                      "v-tab-item",
-                                      { staticClass: "pt-5" },
-                                      [_c("LoginWithPhone")],
-                                      1
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                !_vm.isResetPasswordScreenShown &&
-                                _vm.isUserRegistrationAllowed
-                                  ? _c(
-                                      "v-tab-item",
-                                      { staticClass: "pt-5" },
-                                      [_c("Register")],
-                                      1
-                                    )
-                                  : _vm._e(),
-                                _vm._v(" "),
-                                _vm.isResetPasswordScreenShown ||
-                                !_vm.isUserRegistrationAllowed
-                                  ? _c(
-                                      "v-tab-item",
-                                      { staticClass: "pt-5" },
-                                      [_c("PasswordReset")],
-                                      1
-                                    )
-                                  : _vm._e()
-                              ],
-                              1
-                            )
+                            _vm.isLoginWithPhoneShown
+                              ? _c("v-tab", [_vm._v(" Sign In ")])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            !_vm.isResetPasswordScreenShown &&
+                            _vm.isUserRegistrationAllowed
+                              ? _c("v-tab", [_vm._v(" Register ")])
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.isResetPasswordScreenShown ||
+                            !_vm.isUserRegistrationAllowed
+                              ? _c("v-tab", [_vm._v(" Reset Password ")])
+                              : _vm._e()
                           ],
                           1
                         ),
-                    _vm._v(" "),
-                    !_vm.isEmailVerificationScrenShown
-                      ? _c("v-card-actions", [_c("LoginWithProvider")], 1)
-                      : _vm._e()
-                  ],
-                  1
-                )
+                        _vm._v(" "),
+                        _c(
+                          "v-tabs-items",
+                          {
+                            attrs: { value: _vm.tab },
+                            on: {
+                              change: function($event) {
+                                return _vm.SET_TAB($event)
+                              }
+                            }
+                          },
+                          [
+                            !_vm.isLoginWithPhoneShown
+                              ? _c(
+                                  "v-tab-item",
+                                  { staticClass: "pt-5" },
+                                  [_c("Login")],
+                                  1
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.isLoginWithPhoneShown
+                              ? _c(
+                                  "v-tab-item",
+                                  { staticClass: "pt-5" },
+                                  [_c("LoginWithPhone")],
+                                  1
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            !_vm.isResetPasswordScreenShown &&
+                            _vm.isUserRegistrationAllowed
+                              ? _c(
+                                  "v-tab-item",
+                                  { staticClass: "pt-5" },
+                                  [_c("Register")],
+                                  1
+                                )
+                              : _vm._e(),
+                            _vm._v(" "),
+                            _vm.isResetPasswordScreenShown ||
+                            !_vm.isUserRegistrationAllowed
+                              ? _c(
+                                  "v-tab-item",
+                                  { staticClass: "pt-5" },
+                                  [_c("PasswordReset")],
+                                  1
+                                )
+                              : _vm._e()
+                          ],
+                          1
+                        )
+                      ],
+                      1
+                    ),
+                _vm._v(" "),
+                !_vm.isEmailVerificationScrenShown
+                  ? _c("v-card-actions", [_c("LoginWithProvider")], 1)
+                  : _vm._e()
               ],
               1
             )
@@ -3100,10 +3049,15 @@
 
   function AuthGuardMiddleware (to, from, next) {
     var store = Vue__default['default'].prototype.$authGuardStore;
-    var ref = store.state.auth.config;
-    var debug = ref.debug;
 
-    if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
+    if (!store) {
+      console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!");
+    } else {
+      var ref = store.state.auth.config;
+      var debug = ref.debug;
+
+      if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
+    }
 
     var allowRoute = authCheck();
 
@@ -3151,6 +3105,7 @@
 
     // save store in Vue.prototype to be accessible authcheck.js
     Vue.prototype.$authGuardStore = store;
+    Vue.prototype.$authGuardFirebaseApp = firebase;
 
     delete config.store;
 
@@ -3178,11 +3133,9 @@
     GlobalVue.use(plugin);
   }
 
-  var auth = AuthStore; // export vuex store namespace
   var AuthMiddleware = AuthGuardMiddleware; // export vue router middleware
 
   exports.AuthMiddleware = AuthMiddleware;
-  exports.auth = auth;
   exports['default'] = plugin;
   exports.install = install;
 

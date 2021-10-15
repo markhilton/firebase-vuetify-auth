@@ -52,6 +52,7 @@ export function install(Vue, options = {}) {
 
   // save store in Vue.prototype to be accessible authcheck.js
   Vue.prototype.$authGuardStore = store
+  Vue.prototype.$authGuardFirebaseApp = firebase
 
   delete config.store
 
@@ -79,7 +80,6 @@ if (GlobalVue) {
   GlobalVue.use(plugin)
 }
 
-export const auth = AuthStore // export vuex store namespace
 export const AuthMiddleware = AuthGuardMiddleware // export vue router middleware
 
 export default plugin // export plugin install function

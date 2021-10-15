@@ -1,5 +1,20 @@
-import firebaseProvider from "firebase/compat/app"
+import Vue from "vue"
+import { GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth"
 import authcheck from "../../components/authcheck"
+import {
+  getAuth,
+  signOut,
+  updateProfile,
+  setPersistence,
+  browserSessionPersistence,
+  signInWithRedirect,
+  signInWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  createUserWithEmailAndPassword,
+} from "firebase/auth"
+
+const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
 export default {
   authGuardOnRouterReady({ state, getters, commit }) {
@@ -9,8 +24,7 @@ export default {
 
     // check current route when router is ready
     router.onReady(() => {
-      const { firebase } = state.config
-      const isAuthenticated = firebase.auth().currentUser ? true : false
+      const isAuthenticated = auth.currentUser ? true : false
       const isCurrentRoutePublic = getters.isCurrentRoutePublic
 
       if (debug) {
@@ -36,8 +50,7 @@ export default {
   //
   initializeGuard({ state, commit, dispatch }) {
     const config = state.config
-    const { debug, firebase } = config
-    const auth = firebase.auth()
+    const { debug } = config
     const user = auth.currentUser
 
     if (debug) console.log("[ auth guard ]: component initialized for user: [", user, "]")
@@ -56,18 +69,14 @@ export default {
       try {
         commit("SET_LOADING", true)
 
-        const { router, firebase } = state.config
+        const { router } = state.config
 
-        // set user session persistance
-        // https://firebase.google.com/docs/auth/web/auth-state-persistence
-        const persistance = state.is_session_persistant ? "local" : "session"
-
-        await firebase.auth().signOut()
-        await firebase.auth().setPersistence(persistance)
-        await firebase.auth().signInWithEmailAndPassword(email, password)
+        await signOut(auth)
+        await setPersistence(auth, browserSessionPersistence)
+        await signInWithEmailAndPassword(auth, email, password)
 
         // this is needed to reload route that was not loaded if user was not authenticated
-        if (router.currentRoute.name === null) router.push(router.currentRoute.path)
+        if (router.currentRoute.name === null) router.push(router.currentRoute.path).catch(() => {})
 
         commit("SET_LOADING", false)
 
@@ -83,30 +92,22 @@ export default {
 
   //
   loginWithGoogle({ state }) {
-    const { firebase } = state.config
+    const provider = new GoogleAuthProvider()
 
-    const provider = new firebaseProvider.auth.GoogleAuthProvider()
-
-    firebase.auth().useDeviceLanguage()
-    firebase.auth().signInWithRedirect(provider)
+    // useDeviceLanguage(auth)
+    signInWithRedirect(auth, provider)
   },
 
   //
   loginWithFacebook({ state }) {
-    const { firebase } = state.config
-    const provider = new firebaseProvider.auth.FacebookAuthProvider()
+    const provider = new FacebookAuthProvider()
 
-    firebase.auth().useDeviceLanguage()
-    firebase.auth().signInWithRedirect(provider)
+    // useDeviceLanguage(auth)
+    signInWithRedirect(auth, provider)
   },
 
   //
-  loginWithPhone({ state }) {
-    const { firebase } = state.config
-
-    // Turn off phone auth app verification.
-    firebase.auth().settings.appVerificationDisabledForTesting = true
-  },
+  loginWithPhone({ state }) {},
 
   //
   async textPhoneVerificationCode({ state, commit }, { phoneNumber, recaptchaVerifier }) {
@@ -114,16 +115,8 @@ export default {
       commit("SET_LOADING", true)
       commit("SET_PHONE_TEXT_CONFIRMATION", null)
 
-      const { firebase } = state.config
-
-      // TESTING: turn on for testing on localhost
-      if (window.location.hostname === "localhost") {
-        firebase.auth().settings.appVerificationDisabledForTesting = true
-        console.log("TESTING: setting firebase appVerificationDisabledForTesting", true)
-      }
-
       const phone = "+1" + phoneNumber.replace(/\D/g, "")
-      const confirmationResult = await firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+      const confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
 
       commit("SET_LOADING", false)
       commit("SET_SIGN_BY_PHONE_STEP", 2)
@@ -157,16 +150,15 @@ export default {
     try {
       commit("SET_LOADING", true)
 
-      const { firebase } = state.config
       const verification = state.config.email
 
-      await firebase.auth().createUserWithEmailAndPassword(email, password)
-      await firebase.auth().signInWithEmailAndPassword(email, password)
-      await firebase.auth().currentUser.updateProfile({ displayName })
+      await createUserWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(auth, email, password)
+      await updateProfile(auth.currentUser, { displayName })
 
       // send email to verify user email address if config option is not set to false
       if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
-        await firebase.auth().currentUser.sendEmailVerification()
+        await sendEmailVerification(auth.currentUser)
       }
 
       commit("SET_LOADING", false)
@@ -180,9 +172,7 @@ export default {
     try {
       commit("SET_LOADING", true)
 
-      const { firebase } = state.config
-
-      await firebase.auth().sendPasswordResetEmail(email)
+      await sendPasswordResetEmail(auth, email)
 
       commit("SET_ERROR", false)
       commit("SET_LOADING", false)
@@ -195,11 +185,11 @@ export default {
 
   //
   signOut({ state }) {
-    const { firebase, debug } = state.config
+    const { debug } = state.config
 
-    if (debug) console.log("[ auth guard ]: signOut request", firebase.auth())
+    if (debug) console.log("[ auth guard ]: signOut request")
 
-    return firebase.auth().signOut()
+    return signOut(auth)
   },
 
   //
@@ -208,9 +198,7 @@ export default {
       try {
         commit("SET_LOADING", true)
 
-        const { firebase } = state.config
-
-        await firebase.auth().currentUser.sendEmailVerification()
+        await sendEmailVerification(auth.currentUser)
 
         commit("SET_LOADING", false)
         commit("SET_EMAIL_VERIFICATION_LINK_SENT", true)

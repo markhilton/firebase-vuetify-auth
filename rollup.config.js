@@ -14,14 +14,13 @@ export default {
       vuex: "vuex",
       "v-mask": "v-mask",
       firebase: "firebase",
-      "firebase/compat/app": "firebase/compat/app",
-      "firebase/compat/auth": "firebase/compat/auth",
+      "firebase/auth": "firebase/auth",
       "@mdi/font": "@mdi/font",
       "vuetify/lib": "vuetify/lib",
       "@/middleware": "./src/middleware",
     },
   },
-  external: ["vue", "vuex", "vuetify/lib", "firebase", "firebase/compat/app", "firebase/compat/auth"],
+  external: ["vue", "vuex", "vuetify/lib", "firebase", "firebase/auth", "firebase/compat/app", "firebase/compat/auth"],
   plugins: [
     resolve(),
     commonjs({

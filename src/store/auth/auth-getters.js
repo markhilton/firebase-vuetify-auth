@@ -1,3 +1,6 @@
+import Vue from "vue"
+import { getAuth } from "firebase/auth"
+
 export default {
   getError(state) {
     return state.error
@@ -6,12 +9,9 @@ export default {
     return state.is_session_persistant
   },
   getCurrentUser(state) {
-    // this getter has to fetch current user state directly from firebase sdk
-    // to avoid issue with onAuthStateChanged listener priority between this package and main app
-    // IMPORTANT: this was a bug causing entire vue devtools vuex debugger not working
-    // because of failed getter when firebase config state is not defined
-    const { firebase } = state.config
-    return firebase ? firebase.auth().currentUser : null
+    const user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser
+
+    return user ? { ...user } : null
   },
   getUid(state, getters) {
     const user = getters.getCurrentUser
@@ -55,6 +55,9 @@ export default {
   // check if the current route is public to set negative persisten dialog
   isCurrentRoutePublic(state) {
     const { router, debug } = state.config
+
+    if (!router) return false
+
     const route = router.currentRoute
 
     let isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false

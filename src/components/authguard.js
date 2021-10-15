@@ -23,9 +23,14 @@ import authCheck from "./authcheck"
 
 export default (to, from, next) => {
   const store = Vue.prototype.$authGuardStore
-  const { debug } = store.state.auth.config
 
-  if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
+  if (!store) {
+    console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!")
+  } else {
+    const { debug } = store.state.auth.config
+
+    if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
+  }
 
   const allowRoute = authCheck()
 

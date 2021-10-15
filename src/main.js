@@ -4,12 +4,14 @@ import store from "@/store"
 import router from "@/router"
 import "@/plugins/auth"
 import vuetify from "@/plugins/vuetify"
-import firebase from "@/middleware/firebase"
+
+import app from "@/middleware/firebase"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 Vue.config.productionTip = false
 
 // reload VUE app on Firebase auth state change
-firebase.auth().onAuthStateChanged(() => {
+onAuthStateChanged(getAuth(app), () => {
   new Vue({
     store,
     router,

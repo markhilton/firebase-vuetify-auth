@@ -1,5 +1,4 @@
-import firebase from "firebase/compat/app"
-import "firebase/compat/auth"
+import { initializeApp } from "firebase/app"
 
 const config = {
   appId: process.env.VUE_APP_FIREBASE_APP_ID,
@@ -12,5 +11,7 @@ const config = {
   measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID,
 }
 
+const app = initializeApp(config)
+
 // export default firebase
-export default firebase.initializeApp(config)
+export default app

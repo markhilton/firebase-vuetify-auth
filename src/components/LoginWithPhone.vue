@@ -77,8 +77,9 @@
 </template>
 
 <script>
-import firebase from "firebase/compat/app"
+import Vue from "vue"
 import Branding from "./Branding.vue"
+import { getAuth, RecaptchaVerifier } from "firebase/auth"
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 
 export default {
@@ -109,7 +110,11 @@ export default {
   },
 
   mounted() {
-    this.recaptchaVerifier = new firebase.auth.RecaptchaVerifier("recaptcha-container", { size: "invisible" })
+    this.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      { size: "invisible" },
+      getAuth(Vue.prototype.$authGuardFirebaseApp)
+    )
     this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))
 
     // window.grecaptcha.reset(this.recaptchaWidgetId)
