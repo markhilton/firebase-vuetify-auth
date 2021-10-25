@@ -112,7 +112,7 @@ export default {
     },
   },
 
-  created() {
+  mounted() {
     // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
     this.initializeGuard()
   },

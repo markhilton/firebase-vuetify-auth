@@ -51,8 +51,13 @@ export default {
   initializeGuard({ state, commit, dispatch }) {
     const config = state.config
     const debug = Vue.prototype.$authGuardDebug
-    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
-    const user = auth.currentUser
+    const user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser
+
+    if (user) {
+      const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
+      const currentUser = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      commit("SET_CURRENT_USER", { ...currentUser })
+    } else commit("SET_CURRENT_USER", null)
 
     if (debug) console.log("[ auth guard ]: component initialized for user: [", user, "]")
 

@@ -11,17 +11,11 @@ export default {
     return state.is_session_persistant
   },
   getCurrentUser(state) {
-    const user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser
-
-    if (!user) return null
-
-    const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
-
-    return { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+    return state.current_user
   },
   getUid(state, getters) {
     const user = getters.getCurrentUser
-    return user ? user.uid : null
+    return user ? user && user.uid : null
   },
   getDisplayName(state, getters) {
     const user = getters.getCurrentUser

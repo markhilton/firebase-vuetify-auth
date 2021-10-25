@@ -82,6 +82,6 @@ if (GlobalVue) {
   GlobalVue.use(plugin)
 }
 
-export const AuthMiddleware = AuthGuardMiddleware // export vue router middleware
+export const AuthMiddleware = null // AuthGuardMiddleware // export vue router middleware
 
 export default plugin // export plugin install function

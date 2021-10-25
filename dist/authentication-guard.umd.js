@@ -531,6 +531,8 @@
     config: null, // package init configuration
     error: null, // error from last operation
 
+    current_user: null, // current user
+
     text_confirmation: null, // log in by phone text
     sign_by_phone_step: 1, // sign in by phone step
 
@@ -556,23 +558,11 @@
       return state.is_session_persistant
     },
     getCurrentUser: function getCurrentUser(state) {
-      var user = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp).currentUser;
-
-      if (!user) { return null }
-
-      var uid = user.uid;
-      var displayName = user.displayName;
-      var email = user.email;
-      var emailVerified = user.emailVerified;
-      var isAnonymous = user.isAnonymous;
-      var phoneNumber = user.phoneNumber;
-      var photoURL = user.photoURL;
-
-      return { uid: uid, displayName: displayName, email: email, emailVerified: emailVerified, isAnonymous: isAnonymous, phoneNumber: phoneNumber, photoURL: photoURL }
+      return state.current_user
     },
     getUid: function getUid(state, getters) {
       var user = getters.getCurrentUser;
-      return user ? user.uid : null
+      return user ? user && user.uid : null
     },
     getDisplayName: function getDisplayName(state, getters) {
       var user = getters.getCurrentUser;
@@ -784,8 +774,19 @@
 
       var config = state.config;
       var debug = Vue__default["default"].prototype.$authGuardDebug;
-      var auth$1 = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
-      var user = auth$1.currentUser;
+      var user = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp).currentUser;
+
+      if (user) {
+        var uid = user.uid;
+        var displayName = user.displayName;
+        var email = user.email;
+        var emailVerified = user.emailVerified;
+        var isAnonymous = user.isAnonymous;
+        var phoneNumber = user.phoneNumber;
+        var photoURL = user.photoURL;
+        var currentUser = { uid: uid, displayName: displayName, email: email, emailVerified: emailVerified, isAnonymous: isAnonymous, phoneNumber: phoneNumber, photoURL: photoURL };
+        commit("SET_CURRENT_USER", Object.assign({}, currentUser));
+      } else { commit("SET_CURRENT_USER", null); }
 
       if (debug) { console.log("[ auth guard ]: component initialized for user: [", user, "]"); }
 
@@ -995,6 +996,7 @@
     SET_ERROR: function (state, error) { return (state.error = error); },
     SET_CONFIG: function (state, config) { return (state.config = config); },
     SET_LOADING: function (state, status) { return (state.is_login = status); },
+    SET_CURRENT_USER: function (state, user) { return (state.current_user = user); },
     SET_SIGN_BY_PHONE_STEP: function (state, step) { return (state.sign_by_phone_step = step); },
     SET_SESSION_PERSISTANCE: function (state, status) { return (state.is_session_persistant = status); },
     SET_AUTH_GUARD_DIALOG_SHOWN: function (state, status) { return (state.is_authguard_dialog_shown = status); },
@@ -2872,7 +2874,7 @@
       },
     },
 
-    created: function created() {
+    mounted: function mounted() {
       // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
       this.initializeGuard();
     },
@@ -3066,37 +3068,6 @@
       undefined
     );
 
-  /**
-   * use cases:
-   * 1. NOT authenticated user:
-   * - user opens app on public route
-   * - user opens app on protected route
-   * - user navigates from public route to protected route
-   *
-   * 2. authenticated user, without confirmed email:
-   * - user opens app on public route
-   * - user opens app on protected route
-   * - user navigates from public route to protected route
-   * - user navigates from protected route to public route
-   *
-   * 3. authenticated user with confirmed email
-   * - user opens app on public route
-   * - user opens app on protected route
-   * - user navigates from public route to protected route
-   * - user navigates from protected route to public route
-   *
-   */
-
-  function AuthGuardMiddleware (to, from, next) {
-    var store = Vue__default["default"].prototype.$authGuardStore;
-    var debug = Vue__default["default"].prototype.$authGuardDebug;
-
-    if (!store) { console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!"); }
-    else if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
-
-    return authCheck() ? next() : null
-  }
-
   // Declare install function executed by Vue.use()
   function install(Vue, options) {
     if ( options === void 0 ) options = {};
@@ -3169,7 +3140,7 @@
     GlobalVue.use(plugin);
   }
 
-  var AuthMiddleware = AuthGuardMiddleware; // export vue router middleware
+  var AuthMiddleware = null; // AuthGuardMiddleware // export vue router middleware
 
   exports.AuthMiddleware = AuthMiddleware;
   exports["default"] = plugin;
