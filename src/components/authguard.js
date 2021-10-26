@@ -28,5 +28,5 @@ export default (to, from, next) => {
   if (!store) console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!")
   else if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
 
-  return authCheck() ? next() : null
+  return authCheck() ? next() : next(false)
 }

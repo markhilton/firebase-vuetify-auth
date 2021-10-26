@@ -12,7 +12,7 @@ import defaultSettings from "./store/defaultSettings"
 import AuthGuard from "./components/Guard.vue"
 
 // Import router middleware
-import AuthGuardMiddleware from "./components/authguard"
+import AuthMiddleware from "./components/authguard"
 
 // Declare install function executed by Vue.use()
 export function install(Vue, options = {}) {
@@ -82,6 +82,6 @@ if (GlobalVue) {
   GlobalVue.use(plugin)
 }
 
-export const AuthMiddleware = AuthGuardMiddleware // export vue router middleware
+export { AuthMiddleware } // export vue router middleware
 
 export default plugin // export plugin install function

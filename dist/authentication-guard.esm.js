@@ -3083,14 +3083,14 @@ __vue_render__._withStripped = true;
  *
  */
 
-function AuthGuardMiddleware (to, from, next) {
+function authguard (to, from, next) {
   var store = Vue.prototype.$authGuardStore;
   var debug = Vue.prototype.$authGuardDebug;
 
   if (!store) { console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!"); }
   else if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
 
-  return authCheck() ? next() : null
+  return authCheck() ? next() : next(false)
 }
 
 // Declare install function executed by Vue.use()
@@ -3165,6 +3165,4 @@ if (GlobalVue) {
   GlobalVue.use(plugin);
 }
 
-var AuthMiddleware = AuthGuardMiddleware; // export vue router middleware
-
-export { AuthMiddleware, plugin as default, install };
+export { authguard as AuthMiddleware, plugin as default, install };
