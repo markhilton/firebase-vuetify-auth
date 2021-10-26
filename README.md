@@ -11,20 +11,18 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 
 ![Login Registration Example](./src/assets/auth-example.png)
 
-**WARNING** this package contains bugs and its still under development.
-
 ## Requirements
 
-This package assumes your VUE project is already integrated with Firebase:
+This package assumes your VUE project is already integrated with Firebase & Vuetify. Example integration:
 
 1. `.env` file containing Firebase application environment variables is set up
-2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase SDK
+2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase Modular v9 SDK
 
 example:
 
 ```javascript
-import firebase from "firebase/app"
-import "firebase/auth"
+import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
 
 const config = {
   appId: process.env.VUE_APP_FIREBASE_APP_ID,
@@ -37,8 +35,9 @@ const config = {
   measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID,
 }
 
-// export default firebase
-export default !firebase.apps.length ? firebase.initializeApp(config) : firebase.app()
+const app = initializeApp(config)
+
+export default app
 ```
 
 ## Install
@@ -62,8 +61,10 @@ import Vue from "vue"
 import App from "@/App"
 import router from "@/router"
 import vuetify from "@/plugins/vuetify"
-import firebase from "@/middleware/firebase"
 import AuthGuard from "@nerd305/firebase-vuetify-auth"
+
+import app from "@/middleware/firebase"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 Vue.config.productionTip = false
 
@@ -81,7 +82,7 @@ const authGuardSettings = {
 Vue.use(AuthGuard, authGuardSettings)
 
 // reload VUE app on Firebase auth state change
-firebase.auth().onAuthStateChanged(() => {
+onAuthStateChanged(getAuth(app), () => {
   new Vue({
     router,
     vuetify,
@@ -109,6 +110,12 @@ Example of `router.js` implementation. Import your authentication guard middlewa
 
 ```javascript
 import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
+```
+
+This will work fine, but for some reason it impacts Chrome extension: [devtools](https://developer.chrome.com/docs/devtools/) which is not able to load VueX state. As a work around you can use this import instead.
+
+```javascript
+import AuthMiddleware from "@nerd305/firebase-vuetify-auth/src/components/authguard"
 ```
 
 and add `beforeEnter: AuthMiddleware` for any route that would requre authentication.
@@ -150,9 +157,7 @@ const router = new VueRouter({
 export default router
 ```
 
-This will trigger `AuthMiddleware` to be executed before entering `/protected` route, which will validate if the user
-is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middeware
-will redirect the route to "Login" view, which has implemented `AuthenticationGuard` component and render the login use authentication page.
+This will trigger `AuthMiddleware` to be executed before entering `/protected` route, which will validate if the user is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middeware will render a full screen modal "Login" view.
 
 ### Thats it!
 
@@ -164,7 +169,7 @@ After following implementation instruction requests to protected views, should r
 | ------------ | ---------------- | --------------------------------------------- | --------------------------------------------------------------------------------------- |
 | store        | Object           | null                                          | VueX store                                                                              |
 | router       | Object           | null                                          | VUE router                                                                              |
-| firebase     | Object           | null                                          | Firebase middleware                                                                     |
+| firebase     | Object           | null                                          | Firebase middleware - initialized app                                                   |
 | verification | Boolean or array | true                                          | require email verification to sign in for all accounts or for specific domains in array |
 | registration | Boolean          | true                                          | allow new user registrations                                                            |
 | phone        | Boolean          | true                                          | allow users to singin using phone number                                                |
