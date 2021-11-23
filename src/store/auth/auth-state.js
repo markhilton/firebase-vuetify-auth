@@ -1,6 +1,7 @@
 export default {
   config: null, // package init configuration
   error: null, // error from last operation
+  reload: false, // route reload is needed after login
 
   current_user: null, // current user
 

@@ -524,6 +524,7 @@ var backupStore = new Vuex.Store({});
 var state = {
   config: null, // package init configuration
   error: null, // error from last operation
+  reload: false, // route reload is needed after login
 
   current_user: null, // current user
 
@@ -731,12 +732,14 @@ var actions = {
 
     var debug = Vue.prototype.$authGuardDebug;
     var router = Vue.prototype.$authGuardRouter;
+    var store = Vue.prototype.$authGuardStore;
     var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
     if (debug) { console.log("[ auth guard ]: revalidate when vue router ready"); }
 
     // check current route when router is ready
     router.onReady(function () {
+      var reload = store.state.auth.reload;
       var isAuthenticated = auth.currentUser ? true : false;
       var isCurrentRoutePublic = getters.isCurrentRoutePublic;
 
@@ -756,6 +759,10 @@ var actions = {
       } else if (!isAuthenticated) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", true);
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true);
+      } else if (isAuthenticated && reload) {
+        // vue-router does not trigger beforeEnter again after onAuthStateChanged
+        // so we check if we have to reload route after user is authenticated
+        router.go();
       }
     });
   },
@@ -782,13 +789,14 @@ var actions = {
       commit("SET_CURRENT_USER", Object.assign({}, currentUser));
     } else { commit("SET_CURRENT_USER", null); }
 
-    if (debug) { console.log("[ auth guard ]: component initialized for user: [", user, "]"); }
+    if (debug) { console.log("[ auth guard ]: component initialized for user: [", user ? user.uid : null, "]"); }
 
     commit("SET_CONFIG", null); // have to commit null to make firebase auth reactive
     commit("SET_CONFIG", config);
     commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false);
 
     authCheck();
+
     dispatch("authGuardOnRouterReady"); // revalidate auth guard for vue router
   },
 
@@ -989,6 +997,7 @@ var mutations = {
   SET_TAB: function (state, index) { return (state.tab = index); },
   SET_ERROR: function (state, error) { return (state.error = error); },
   SET_CONFIG: function (state, config) { return (state.config = config); },
+  SET_RELOAD: function (state, reload) { return (state.reload = reload); },
   SET_LOADING: function (state, status) { return (state.is_login = status); },
   SET_CURRENT_USER: function (state, user) { return (state.current_user = user); },
   SET_SIGN_BY_PHONE_STEP: function (state, step) { return (state.sign_by_phone_step = step); },
@@ -1134,7 +1143,7 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
 var __vue_script__$7 = script$7;
 
 /* template */
-var __vue_render__$7 = function() {
+var __vue_render__$7 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1153,10 +1162,10 @@ var __vue_render__$7 = function() {
                 { staticClass: "title" },
                 [
                   _c("v-icon", { attrs: { color: _vm.config.iconColor } }, [
-                    _vm._v(_vm._s(_vm.config.icon))
-                  ]),
-                  _vm._v("\n\n        " + _vm._s(_vm.config.title) + "\n      ")
-                ],
+                    _vm._v(_vm._s(_vm.config.icon)) ]),
+                  _vm._v(
+                    "\n\n        " + _vm._s(_vm.config.title) + "\n      "
+                  ) ],
                 1
               ),
               _vm._v(" "),
@@ -1164,16 +1173,11 @@ var __vue_render__$7 = function() {
                 _c("div", { staticClass: "ml-1" }, [
                   _vm._v(
                     "\n          " + _vm._s(_vm.config.subtitle) + "\n        "
-                  )
-                ])
-              ])
-            ],
+                  ) ]) ]) ],
             1
-          )
-        ],
+          ) ],
         1
-      )
-    ],
+      ) ],
     1
   )
 };
@@ -1247,7 +1251,7 @@ var script$6 = {
 var __vue_script__$6 = script$6;
 
 /* template */
-var __vue_render__$6 = function() {
+var __vue_render__$6 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1264,10 +1268,10 @@ var __vue_render__$6 = function() {
                 {
                   attrs: { type: "error", dismissible: "" },
                   on: {
-                    click: function($event) {
+                    click: function ($event) {
                       return _vm.SET_ERROR(null)
-                    }
-                  }
+                    },
+                  },
                 },
                 [_vm._v("\n      " + _vm._s(_vm.getError.message) + "\n    ")]
               )
@@ -1282,15 +1286,15 @@ var __vue_render__$6 = function() {
                 attrs: {
                   required: "",
                   label: "Email",
-                  "prepend-icon": "mdi-account"
+                  "prepend-icon": "mdi-account",
                 },
                 model: {
                   value: _vm.email,
-                  callback: function($$v) {
+                  callback: function ($$v) {
                     _vm.email = $$v;
                   },
-                  expression: "email"
-                }
+                  expression: "email",
+                },
               }),
               _vm._v(" "),
               _c("v-text-field", {
@@ -1300,34 +1304,33 @@ var __vue_render__$6 = function() {
                   name: "password",
                   type: "password",
                   label: "Password",
-                  "prepend-icon": "mdi-lock"
+                  "prepend-icon": "mdi-lock",
                 },
                 model: {
                   value: _vm.password,
-                  callback: function($$v) {
+                  callback: function ($$v) {
                     _vm.password = $$v;
                   },
-                  expression: "password"
-                }
+                  expression: "password",
+                },
               }),
               _vm._v(" "),
               _c("v-checkbox", {
                 staticClass: "ml-8",
                 attrs: { dense: "", name: "remember", label: "remember me" },
                 on: {
-                  change: function($event) {
+                  change: function ($event) {
                     return _vm.SET_SESSION_PERSISTANCE(_vm.remember)
-                  }
+                  },
                 },
                 model: {
                   value: _vm.remember,
-                  callback: function($$v) {
+                  callback: function ($$v) {
                     _vm.remember = $$v;
                   },
-                  expression: "remember"
-                }
-              })
-            ],
+                  expression: "remember",
+                },
+              }) ],
             1
           ),
           _vm._v(" "),
@@ -1340,14 +1343,13 @@ var __vue_render__$6 = function() {
                 {
                   attrs: { text: "", "x-small": "", color: "primary" },
                   on: {
-                    click: function($event) {
+                    click: function ($event) {
                       return _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(true)
-                    }
-                  }
+                    },
+                  },
                 },
                 [_vm._v(" Forgot Password? ")]
-              )
-            ],
+              ) ],
             1
           ),
           _vm._v(" "),
@@ -1363,26 +1365,23 @@ var __vue_render__$6 = function() {
                     large: "",
                     color: "primary",
                     type: "submit",
-                    disabled: _vm.email === "" || _vm.password === ""
+                    disabled: _vm.email === "" || _vm.password === "",
                   },
                   on: {
-                    click: function($event) {
+                    click: function ($event) {
                       return _vm.loginWithEmail({
                         email: _vm.email,
-                        password: _vm.password
+                        password: _vm.password,
                       })
-                    }
-                  }
+                    },
+                  },
                 },
                 [_vm._v("\n        Login\n      ")]
-              )
-            ],
+              ) ],
             1
-          )
-        ],
+          ) ],
         1
-      )
-    ],
+      ) ],
     1
   )
 };
@@ -1468,7 +1467,7 @@ var script$5 = {
 var __vue_script__$5 = script$5;
 
 /* template */
-var __vue_render__$5 = function() {
+var __vue_render__$5 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1484,18 +1483,18 @@ var __vue_render__$5 = function() {
             {
               ref: "form",
               on: {
-                submit: function($event) {
+                submit: function ($event) {
                   $event.preventDefault();
                   return _vm.register()
-                }
+                },
               },
               model: {
                 value: _vm.valid,
-                callback: function($$v) {
+                callback: function ($$v) {
                   _vm.valid = $$v;
                 },
-                expression: "valid"
-              }
+                expression: "valid",
+              },
             },
             [
               Boolean(_vm.getError)
@@ -1504,16 +1503,15 @@ var __vue_render__$5 = function() {
                     {
                       attrs: { type: "error", dismissible: "" },
                       on: {
-                        click: function($event) {
+                        click: function ($event) {
                           return _vm.SET_ERROR(null)
-                        }
-                      }
+                        },
+                      },
                     },
                     [
                       _vm._v(
                         "\n        " + _vm._s(_vm.getError.message) + "\n      "
-                      )
-                    ]
+                      ) ]
                   )
                 : _c("branding", { staticClass: "text-center" }),
               _vm._v(" "),
@@ -1527,15 +1525,15 @@ var __vue_render__$5 = function() {
                       required: "",
                       label: "Name",
                       "prepend-icon": "mdi-account",
-                      rules: [_vm.rules.displayName]
+                      rules: [_vm.rules.displayName],
                     },
                     model: {
                       value: _vm.displayName,
-                      callback: function($$v) {
+                      callback: function ($$v) {
                         _vm.displayName = $$v;
                       },
-                      expression: "displayName"
-                    }
+                      expression: "displayName",
+                    },
                   }),
                   _vm._v(" "),
                   _c("v-text-field", {
@@ -1544,15 +1542,15 @@ var __vue_render__$5 = function() {
                       required: "",
                       label: "Email",
                       "prepend-icon": "mdi-email",
-                      rules: [_vm.rules.email]
+                      rules: [_vm.rules.email],
                     },
                     model: {
                       value: _vm.email,
-                      callback: function($$v) {
+                      callback: function ($$v) {
                         _vm.email = $$v;
                       },
-                      expression: "email"
-                    }
+                      expression: "email",
+                    },
                   }),
                   _vm._v(" "),
                   _c("v-text-field", {
@@ -1563,15 +1561,15 @@ var __vue_render__$5 = function() {
                       type: "password",
                       label: "Password",
                       "prepend-icon": "mdi-lock",
-                      rules: [_vm.rules.password]
+                      rules: [_vm.rules.password],
                     },
                     model: {
                       value: _vm.password,
-                      callback: function($$v) {
+                      callback: function ($$v) {
                         _vm.password = $$v;
                       },
-                      expression: "password"
-                    }
+                      expression: "password",
+                    },
                   }),
                   _vm._v(" "),
                   _c("v-text-field", {
@@ -1582,17 +1580,16 @@ var __vue_render__$5 = function() {
                       type: "password",
                       label: "Confirm password",
                       "prepend-icon": "mdi-lock",
-                      rules: [_vm.rules.confirm]
+                      rules: [_vm.rules.confirm],
                     },
                     model: {
                       value: _vm.confirm,
-                      callback: function($$v) {
+                      callback: function ($$v) {
                         _vm.confirm = $$v;
                       },
-                      expression: "confirm"
-                    }
-                  })
-                ],
+                      expression: "confirm",
+                    },
+                  }) ],
                 1
               ),
               _vm._v(" "),
@@ -1608,21 +1605,17 @@ var __vue_render__$5 = function() {
                         depressed: "",
                         color: "primary",
                         type: "submit",
-                        disabled: !_vm.valid
-                      }
+                        disabled: !_vm.valid,
+                      },
                     },
                     [_vm._v(" Register ")]
-                  )
-                ],
+                  ) ],
                 1
-              )
-            ],
+              ) ],
             1
-          )
-        ],
+          ) ],
         1
-      )
-    ],
+      ) ],
     1
   )
 };
@@ -1698,7 +1691,7 @@ var script$4 = {
 var __vue_script__$4 = script$4;
 
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$4 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1714,18 +1707,18 @@ var __vue_render__$4 = function() {
             {
               ref: "form",
               on: {
-                submit: function($event) {
+                submit: function ($event) {
                   $event.preventDefault();
                   return _vm.emailPasswordResetLink(_vm.email)
-                }
+                },
               },
               model: {
                 value: _vm.valid,
-                callback: function($$v) {
+                callback: function ($$v) {
                   _vm.valid = $$v;
                 },
-                expression: "valid"
-              }
+                expression: "valid",
+              },
             },
             [
               Boolean(_vm.getError)
@@ -1734,16 +1727,15 @@ var __vue_render__$4 = function() {
                     {
                       attrs: { type: "error", dismissible: "" },
                       on: {
-                        click: function($event) {
+                        click: function ($event) {
                           return _vm.SET_ERROR(null)
-                        }
-                      }
+                        },
+                      },
                     },
                     [
                       _vm._v(
                         "\n        " + _vm._s(_vm.getError.message) + "\n      "
-                      )
-                    ]
+                      ) ]
                   )
                 : _c("branding", { staticClass: "text-center" }),
               _vm._v(" "),
@@ -1758,8 +1750,7 @@ var __vue_render__$4 = function() {
                           _c("div", { staticClass: "mb-5" }, [
                             _vm._v(
                               "\n            Enter registered user email address and we will send you a link to reset your password.\n          "
-                            )
-                          ]),
+                            ) ]),
                           _vm._v(" "),
                           _c("v-text-field", {
                             staticClass: "mr-2",
@@ -1768,17 +1759,16 @@ var __vue_render__$4 = function() {
                               error: Boolean(_vm.getError),
                               label: "Email",
                               "prepend-icon": "mdi-account",
-                              rules: [_vm.rules.email]
+                              rules: [_vm.rules.email],
                             },
                             model: {
                               value: _vm.email,
-                              callback: function($$v) {
+                              callback: function ($$v) {
                                 _vm.email = $$v;
                               },
-                              expression: "email"
-                            }
-                          })
-                        ],
+                              expression: "email",
+                            },
+                          }) ],
                         1
                       ),
                       _vm._v(" "),
@@ -1794,19 +1784,16 @@ var __vue_render__$4 = function() {
                                 depressed: "",
                                 color: "primary",
                                 type: "submit",
-                                disabled: _vm.isLoading
-                              }
+                                disabled: _vm.isLoading,
+                              },
                             },
                             [
                               _vm._v(
                                 "\n            Email Password Reset Link\n          "
-                              )
-                            ]
-                          )
-                        ],
+                              ) ]
+                          ) ],
                         1
-                      )
-                    ],
+                      ) ],
                     1
                   )
                 : _vm._e(),
@@ -1817,14 +1804,12 @@ var __vue_render__$4 = function() {
                     { staticClass: "pa-4 text-center" },
                     [
                       _c("v-card-text", { staticClass: "text-h5" }, [
-                        _vm._v(" Email has been sent! ")
-                      ]),
+                        _vm._v(" Email has been sent! ") ]),
                       _vm._v(" "),
                       _c("v-card-text", [
                         _vm._v(
                           "Please check your inbox and follow the instructions in the email to reset your account\n          password"
-                        )
-                      ]),
+                        ) ]),
                       _vm._v(" "),
                       _c(
                         "v-card-actions",
@@ -1836,32 +1821,27 @@ var __vue_render__$4 = function() {
                                 block: "",
                                 large: "",
                                 depressed: "",
-                                color: "primary"
+                                color: "primary",
                               },
                               on: {
-                                click: function($event) {
+                                click: function ($event) {
                                   return _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(
                                     false
                                   )
-                                }
-                              }
+                                },
+                              },
                             },
                             [_vm._v(" Login ")]
-                          )
-                        ],
+                          ) ],
                         1
-                      )
-                    ],
+                      ) ],
                     1
                   )
-                : _vm._e()
-            ],
+                : _vm._e() ],
             1
-          )
-        ],
+          ) ],
         1
-      )
-    ],
+      ) ],
     1
   )
 };
@@ -2043,7 +2023,7 @@ function addStyle(id, css) {
 var __vue_script__$3 = script$3;
 
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$3 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2062,10 +2042,10 @@ var __vue_render__$3 = function() {
                 {
                   attrs: { type: "error", dismissible: "" },
                   on: {
-                    click: function($event) {
+                    click: function ($event) {
                       return _vm.SET_ERROR(null)
-                    }
-                  }
+                    },
+                  },
                 },
                 [_vm._v("\n      " + _vm._s(_vm.getError.message) + "\n    ")]
               )
@@ -2080,21 +2060,21 @@ var __vue_render__$3 = function() {
                     {
                       ref: "form",
                       on: {
-                        submit: function($event) {
+                        submit: function ($event) {
                           $event.preventDefault();
                           return _vm.textPhoneVerificationCode({
                             phoneNumber: _vm.phoneNumber,
-                            recaptchaVerifier: _vm.recaptchaVerifier
+                            recaptchaVerifier: _vm.recaptchaVerifier,
                           })
-                        }
+                        },
                       },
                       model: {
                         value: _vm.valid,
-                        callback: function($$v) {
+                        callback: function ($$v) {
                           _vm.valid = $$v;
                         },
-                        expression: "valid"
-                      }
+                        expression: "valid",
+                      },
                     },
                     [
                       _c(
@@ -2106,26 +2086,24 @@ var __vue_render__$3 = function() {
                                 name: "mask",
                                 rawName: "v-mask",
                                 value: _vm.phoneMask,
-                                expression: "phoneMask"
-                              }
-                            ],
+                                expression: "phoneMask",
+                              } ],
                             staticClass: "mx-15 px-5 large-font",
                             attrs: {
                               autocomplete: "off",
                               label: "Phone Number",
                               "prepend-icon": "mdi-cellphone",
                               prefix: "+1",
-                              rules: [_vm.rules.phoneNumber]
+                              rules: [_vm.rules.phoneNumber],
                             },
                             model: {
                               value: _vm.phoneNumber,
-                              callback: function($$v) {
+                              callback: function ($$v) {
                                 _vm.phoneNumber = $$v;
                               },
-                              expression: "phoneNumber"
-                            }
-                          })
-                        ],
+                              expression: "phoneNumber",
+                            },
+                          }) ],
                         1
                       ),
                       _vm._v(" "),
@@ -2141,18 +2119,15 @@ var __vue_render__$3 = function() {
                                 large: "",
                                 depressed: "",
                                 disabled: !_vm.valid,
-                                type: "submit"
-                              }
+                                type: "submit",
+                              },
                             },
                             [_vm._v(" Send Code ")]
-                          )
-                        ],
+                          ) ],
                         1
-                      )
-                    ],
+                      ) ],
                     1
-                  )
-                ],
+                  ) ],
                 1
               )
             : _vm._e(),
@@ -2166,13 +2141,12 @@ var __vue_render__$3 = function() {
                     _c("br"),
                     _vm._v(
                       "\n        you have recived on your mobile phone\n      "
-                    )
-                  ]),
+                    ) ]),
                   _vm._v(" "),
                   _c(
                     "v-row",
                     { staticClass: "centered-input" },
-                    _vm._l(6, function(element, index) {
+                    _vm._l(6, function (element, index) {
                       return _c(
                         "v-col",
                         { key: index, attrs: { cols: "2" } },
@@ -2183,9 +2157,8 @@ var __vue_render__$3 = function() {
                                 name: "mask",
                                 rawName: "v-mask",
                                 value: _vm.digitMask,
-                                expression: "digitMask"
-                              }
-                            ],
+                                expression: "digitMask",
+                              } ],
                             key: index,
                             ref: "code" + index,
                             refInFor: true,
@@ -2194,23 +2167,22 @@ var __vue_render__$3 = function() {
                               "item-value": _vm.code[index],
                               "item-text": _vm.code[index],
                               outlined: "",
-                              maxlength: "1"
+                              maxlength: "1",
                             },
                             on: {
-                              keyup: function($event) {
+                              keyup: function ($event) {
                                 return _vm.nextElementFocus(index, $event)
                               },
-                              paste: _vm.onPaste
+                              paste: _vm.onPaste,
                             },
                             model: {
                               value: _vm.code[index],
-                              callback: function($$v) {
+                              callback: function ($$v) {
                                 _vm.$set(_vm.code, index, $$v);
                               },
-                              expression: "code[index]"
-                            }
-                          })
-                        ],
+                              expression: "code[index]",
+                            },
+                          }) ],
                         1
                       )
                     }),
@@ -2225,17 +2197,16 @@ var __vue_render__$3 = function() {
                         block: "",
                         large: "",
                         depressed: "",
-                        disabled: _vm.code.length < 6
+                        disabled: _vm.code.length < 6,
                       },
                       on: {
-                        click: function($event) {
+                        click: function ($event) {
                           return _vm.confirmCode(_vm.code)
-                        }
-                      }
+                        },
+                      },
                     },
                     [_vm._v("\n        Confirm Code\n      ")]
-                  )
-                ],
+                  ) ],
                 1
               )
             : _vm._e(),
@@ -2249,20 +2220,17 @@ var __vue_render__$3 = function() {
                 {
                   attrs: { text: "", "x-small": "", color: "primary" },
                   on: {
-                    click: function($event) {
+                    click: function ($event) {
                       return _vm.SET_SHOW_LOGIN_WITH_PHONE(false)
-                    }
-                  }
+                    },
+                  },
                 },
                 [_vm._v(" Sign In with email ")]
-              )
-            ],
+              ) ],
             1
-          )
-        ],
+          ) ],
         1
-      )
-    ],
+      ) ],
     1
   )
 };
@@ -2325,7 +2293,7 @@ var script$2 = {
 var __vue_script__$2 = script$2;
 
 /* template */
-var __vue_render__$2 = function() {
+var __vue_render__$2 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2338,8 +2306,7 @@ var __vue_render__$2 = function() {
               "div",
               [
                 _c("div", { staticClass: "display-1 grey--text mb-3" }, [
-                  _vm._v("Error!")
-                ]),
+                  _vm._v("Error!") ]),
                 _vm._v(" "),
                 Boolean(_vm.getError)
                   ? _c(
@@ -2347,18 +2314,17 @@ var __vue_render__$2 = function() {
                       {
                         attrs: { type: "error", dismissible: "" },
                         on: {
-                          click: function($event) {
+                          click: function ($event) {
                             return _vm.SET_ERROR(null)
-                          }
-                        }
+                          },
+                        },
                       },
                       [
                         _vm._v(
                           "\n        " +
                             _vm._s(_vm.getError.message) +
                             "\n      "
-                        )
-                      ]
+                        ) ]
                     )
                   : _vm._e(),
                 _vm._v(" "),
@@ -2367,14 +2333,13 @@ var __vue_render__$2 = function() {
                   {
                     attrs: { color: "primary" },
                     on: {
-                      click: function($event) {
+                      click: function ($event) {
                         return _vm.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)
-                      }
-                    }
+                      },
+                    },
                   },
                   [_vm._v(" Back to Login ")]
-                )
-              ],
+                ) ],
               1
             )
           : _c(
@@ -2394,11 +2359,10 @@ var __vue_render__$2 = function() {
                           "v-icon",
                           {
                             staticClass: "ma-4",
-                            attrs: { size: "100", color: "grey" }
+                            attrs: { size: "100", color: "grey" },
                           },
                           [_vm._v("mdi-account")]
-                        )
-                      ],
+                        ) ],
                       1
                     )
                   : _vm._e(),
@@ -2417,11 +2381,10 @@ var __vue_render__$2 = function() {
                           "v-icon",
                           {
                             staticClass: "ma-4",
-                            attrs: { size: "100", color: "grey" }
+                            attrs: { size: "100", color: "grey" },
                           },
                           [_vm._v("mdi-email")]
-                        )
-                      ],
+                        ) ],
                       1
                     )
                   : _vm._e(),
@@ -2433,9 +2396,7 @@ var __vue_render__$2 = function() {
                     _c("p", [
                       _vm._v(
                         "\n          Please check your email to verify your address. Click at the link in the email we've sent you to confirm\n          your account access.\n        "
-                      )
-                    ])
-                  ]
+                      ) ]) ]
                 ),
                 _vm._v(" "),
                 !_vm.isEmailResetPasswordLinkSent
@@ -2445,15 +2406,15 @@ var __vue_render__$2 = function() {
                         _c(
                           "p",
                           {
-                            staticClass: "grey--text text--darken-2 mb-7 body-2"
+                            staticClass:
+                              "grey--text text--darken-2 mb-7 body-2",
                           },
                           [
                             _vm._v(
                               "\n          If you have not received verification email"
                             ),
                             _c("br"),
-                            _vm._v("click at the button below.\n        ")
-                          ]
+                            _vm._v("click at the button below.\n        ") ]
                         ),
                         _vm._v(" "),
                         _c(
@@ -2461,21 +2422,19 @@ var __vue_render__$2 = function() {
                           {
                             attrs: {
                               disabled: _vm.isLoading,
-                              color: "primary"
+                              color: "primary",
                             },
                             on: {
-                              click: function($event) {
+                              click: function ($event) {
                                 return _vm.sendVerificationEmail()
-                              }
-                            }
+                              },
+                            },
                           },
                           [
                             _vm._v(
                               "\n          Send Verification Email\n        "
-                            )
-                          ]
-                        )
-                      ],
+                            ) ]
+                        ) ],
                       1
                     )
                   : _vm._e(),
@@ -2489,16 +2448,15 @@ var __vue_render__$2 = function() {
                           {
                             attrs: { color: "primary" },
                             on: {
-                              click: function($event) {
+                              click: function ($event) {
                                 return _vm.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(
                                   false
                                 )
-                              }
-                            }
+                              },
+                            },
                           },
                           [_vm._v(" Back to Login ")]
-                        )
-                      ],
+                        ) ],
                       1
                     )
                   : _vm._e(),
@@ -2507,15 +2465,14 @@ var __vue_render__$2 = function() {
                   "v-container",
                   [
                     _c("div", { staticClass: "caption mb-2" }, [
-                      _vm._v("- or -")
-                    ]),
+                      _vm._v("- or -") ]),
                     _vm._v(" "),
                     _vm.isAuthenticated
                       ? _c(
                           "v-btn",
                           {
                             attrs: { color: "primary", outlined: "" },
-                            on: { click: _vm.signOut }
+                            on: { click: _vm.signOut },
                           },
                           [_vm._v(" SignOut ")]
                         )
@@ -2524,23 +2481,19 @@ var __vue_render__$2 = function() {
                           {
                             attrs: { color: "primary", outlined: "" },
                             on: {
-                              click: function($event) {
+                              click: function ($event) {
                                 return _vm.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(
                                   false
                                 )
-                              }
-                            }
+                              },
+                            },
                           },
                           [_vm._v(" SignIn ")]
-                        )
-                  ],
+                        ) ],
                   1
-                )
-              ],
+                ) ],
               1
-            )
-      ])
-    ],
+            ) ]) ],
     1
   )
 };
@@ -2595,7 +2548,7 @@ var script$1 = {
 var __vue_script__$1 = script$1;
 
 /* template */
-var __vue_render__$1 = function() {
+var __vue_render__$1 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2618,7 +2571,7 @@ var __vue_render__$1 = function() {
                         [
                           {
                             key: "activator",
-                            fn: function(ref) {
+                            fn: function (ref) {
                               var on = ref.on;
                               var attrs = ref.attrs;
                               return [
@@ -2632,13 +2585,13 @@ var __vue_render__$1 = function() {
                                           color: "#db3236",
                                           fab: "",
                                           dark: "",
-                                          small: ""
+                                          small: "",
                                         },
                                         on: {
-                                          click: function($event) {
+                                          click: function ($event) {
                                             return _vm.loginWithGoogle()
-                                          }
-                                        }
+                                          },
+                                        },
                                       },
                                       "v-btn",
                                       attrs,
@@ -2648,20 +2601,17 @@ var __vue_render__$1 = function() {
                                   ),
                                   [_c("v-icon", [_vm._v("mdi-google")])],
                                   1
-                                )
-                              ]
-                            }
-                          }
-                        ],
+                                ) ]
+                            },
+                          } ],
                         null,
                         false,
                         1615720320
-                      )
+                      ),
                     },
                     [
                       _vm._v(" "),
-                      _c("span", [_vm._v("Authenticate with Gmail Account")])
-                    ]
+                      _c("span", [_vm._v("Authenticate with Gmail Account")]) ]
                   )
                 : _vm._e(),
               _vm._v(" "),
@@ -2674,7 +2624,7 @@ var __vue_render__$1 = function() {
                         [
                           {
                             key: "activator",
-                            fn: function(ref) {
+                            fn: function (ref) {
                               var on = ref.on;
                               var attrs = ref.attrs;
                               return [
@@ -2688,13 +2638,13 @@ var __vue_render__$1 = function() {
                                           color: "#3b5998",
                                           fab: "",
                                           dark: "",
-                                          small: ""
+                                          small: "",
                                         },
                                         on: {
-                                          click: function($event) {
+                                          click: function ($event) {
                                             return _vm.loginWithFacebook()
-                                          }
-                                        }
+                                          },
+                                        },
                                       },
                                       "v-btn",
                                       attrs,
@@ -2704,20 +2654,18 @@ var __vue_render__$1 = function() {
                                   ),
                                   [_c("v-icon", [_vm._v("mdi-facebook")])],
                                   1
-                                )
-                              ]
-                            }
-                          }
-                        ],
+                                ) ]
+                            },
+                          } ],
                         null,
                         false,
                         1465959198
-                      )
+                      ),
                     },
                     [
                       _vm._v(" "),
-                      _c("span", [_vm._v("Authenticate with Facebook Account")])
-                    ]
+                      _c("span", [
+                        _vm._v("Authenticate with Facebook Account") ]) ]
                   )
                 : _vm._e(),
               _vm._v(" "),
@@ -2730,7 +2678,7 @@ var __vue_render__$1 = function() {
                         [
                           {
                             key: "activator",
-                            fn: function(ref) {
+                            fn: function (ref) {
                               var on = ref.on;
                               var attrs = ref.attrs;
                               return [
@@ -2743,15 +2691,15 @@ var __vue_render__$1 = function() {
                                           color: "primary",
                                           fab: "",
                                           dark: "",
-                                          small: ""
+                                          small: "",
                                         },
                                         on: {
-                                          click: function($event) {
+                                          click: function ($event) {
                                             return _vm.SET_SHOW_LOGIN_WITH_PHONE(
                                               true
                                             )
-                                          }
-                                        }
+                                          },
+                                        },
                                       },
                                       "v-btn",
                                       attrs,
@@ -2761,28 +2709,22 @@ var __vue_render__$1 = function() {
                                   ),
                                   [_c("v-icon", [_vm._v("mdi-cellphone")])],
                                   1
-                                )
-                              ]
-                            }
-                          }
-                        ],
+                                ) ]
+                            },
+                          } ],
                         null,
                         false,
                         3730036540
-                      )
+                      ),
                     },
                     [
                       _vm._v(" "),
                       _c("span", [
-                        _vm._v("Authenticate with Text Message To Your Phone")
-                      ])
-                    ]
+                        _vm._v("Authenticate with Text Message To Your Phone") ]) ]
                   )
-                : _vm._e()
-            ],
+                : _vm._e() ],
             1
-          )
-        ],
+          ) ],
         1
       )
     : _vm._e()
@@ -2881,7 +2823,7 @@ var script = {
 var __vue_script__ = script;
 
 /* template */
-var __vue_render__ = function() {
+var __vue_render__ = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2893,13 +2835,13 @@ var __vue_render__ = function() {
         persistent: _vm.isAuthGuardDialogPersistent,
         "retain-focus": false,
         "overlay-opacity": "0.95",
-        "content-class": "elevation-0"
+        "content-class": "elevation-0",
       },
       on: {
-        input: function($event) {
+        input: function ($event) {
           return _vm.SET_AUTH_GUARD_DIALOG_SHOWN($event)
-        }
-      }
+        },
+      },
     },
     [
       _c(
@@ -2911,7 +2853,7 @@ var __vue_render__ = function() {
             { attrs: { flat: "", outlined: "" } },
             [
               _c("v-progress-linear", {
-                attrs: { indeterminate: _vm.isLoading }
+                attrs: { indeterminate: _vm.isLoading },
               }),
               _vm._v(" "),
               _vm.isEmailVerificationScrenShown
@@ -2924,10 +2866,10 @@ var __vue_render__ = function() {
                         {
                           attrs: { value: _vm.tab, grow: "" },
                           on: {
-                            change: function($event) {
+                            change: function ($event) {
                               return _vm.SET_TAB($event)
-                            }
-                          }
+                            },
+                          },
                         },
                         [
                           !_vm.isLoginWithPhoneShown
@@ -2935,11 +2877,11 @@ var __vue_render__ = function() {
                                 "v-tab",
                                 {
                                   on: {
-                                    click: function($event) {
+                                    click: function ($event) {
                                       _vm.SET_TAB(0);
                                       _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(false);
-                                    }
-                                  }
+                                    },
+                                  },
                                 },
                                 [_vm._v("\n            Sign In\n          ")]
                               )
@@ -2957,8 +2899,7 @@ var __vue_render__ = function() {
                           _vm.isResetPasswordScreenShown ||
                           !_vm.isUserRegistrationAllowed
                             ? _c("v-tab", [_vm._v(" Reset Password ")])
-                            : _vm._e()
-                        ],
+                            : _vm._e() ],
                         1
                       ),
                       _vm._v(" "),
@@ -2967,10 +2908,10 @@ var __vue_render__ = function() {
                         {
                           attrs: { value: _vm.tab },
                           on: {
-                            change: function($event) {
+                            change: function ($event) {
                               return _vm.SET_TAB($event)
-                            }
-                          }
+                            },
+                          },
                         },
                         [
                           !_vm.isLoginWithPhoneShown
@@ -3009,24 +2950,19 @@ var __vue_render__ = function() {
                                 [_c("PasswordReset")],
                                 1
                               )
-                            : _vm._e()
-                        ],
+                            : _vm._e() ],
                         1
-                      )
-                    ],
+                      ) ],
                     1
                   ),
               _vm._v(" "),
               !_vm.isEmailVerificationScrenShown
                 ? _c("v-card-actions", [_c("LoginWithProvider")], 1)
-                : _vm._e()
-            ],
+                : _vm._e() ],
             1
-          )
-        ],
+          ) ],
         1
-      )
-    ],
+      ) ],
     1
   )
 };
@@ -3090,7 +3026,15 @@ function authguard (to, from, next) {
   if (!store) { console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!"); }
   else if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
 
-  return authCheck() ? next() : next(false)
+  var isAllowed = authCheck();
+
+  // vue-router does not trigger beforeEnter again after onAuthStateChanged
+  // so we store this state to know we have to reload router after log in
+  store.commit("auth/SET_RELOAD", !isAllowed);
+
+  if (debug) { console.log("[ auth guard ]: is route ALLOWED: [", isAllowed, "]"); }
+
+  return isAllowed ? next() : next(false)
 }
 
 // Declare install function executed by Vue.use()
