@@ -549,8 +549,6 @@
     is_reset_password_screen_shown: false, // show reset password screen,
   };
 
-  var router$1 = Vue__default["default"].prototype.$authGuardRouter;
-
   var getters = {
     getError: function getError(state) {
       return state.error
@@ -630,10 +628,8 @@
     // check if the current route is public to set negative persisten dialog
     isCurrentRoutePublic: function isCurrentRoutePublic(state) {
       var debug = Vue__default["default"].prototype.$authGuardDebug;
-
-      if (!router$1) { return false }
-
-      var route = router$1.currentRoute;
+      var router = Vue__default["default"].prototype.$authGuardRouter;
+      var route = router.currentRoute;
 
       var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
 
@@ -732,7 +728,6 @@
 
   var actions = {
     authGuardOnRouterReady: function authGuardOnRouterReady(ref) {
-      ref.state;
       var getters = ref.getters;
       var commit = ref.commit;
 
@@ -768,7 +763,12 @@
         } else if (isAuthenticated && reload) {
           // vue-router does not trigger beforeEnter again after onAuthStateChanged
           // so we check if we have to reload route after user is authenticated
-          router.go();
+          var ref = auth$1.currentUser;
+          var emailVerified = ref.emailVerified;
+
+          // QUICKFIX: page reloads in loops if user requires email verification
+          // TODO: verify if emailVerified is required by config before
+          if (emailVerified) { router.go(); }
         }
       });
     },

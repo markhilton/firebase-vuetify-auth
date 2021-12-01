@@ -15,7 +15,7 @@ import {
 } from "firebase/auth"
 
 export default {
-  authGuardOnRouterReady({ state, getters, commit }) {
+  authGuardOnRouterReady({ getters, commit }) {
     const debug = Vue.prototype.$authGuardDebug
     const router = Vue.prototype.$authGuardRouter
     const store = Vue.prototype.$authGuardStore
@@ -48,7 +48,11 @@ export default {
       } else if (isAuthenticated && reload) {
         // vue-router does not trigger beforeEnter again after onAuthStateChanged
         // so we check if we have to reload route after user is authenticated
-        router.go()
+        const { emailVerified } = auth.currentUser
+
+        // QUICKFIX: page reloads in loops if user requires email verification
+        // TODO: verify if emailVerified is required by config before
+        if (emailVerified) router.go()
       }
     })
   },

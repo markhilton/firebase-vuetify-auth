@@ -1,8 +1,6 @@
 import Vue from "vue"
 import { getAuth } from "firebase/auth"
 
-const router = Vue.prototype.$authGuardRouter
-
 export default {
   getError(state) {
     return state.error
@@ -82,9 +80,7 @@ export default {
   // check if the current route is public to set negative persisten dialog
   isCurrentRoutePublic(state) {
     const debug = Vue.prototype.$authGuardDebug
-
-    if (!router) return false
-
+    const router = Vue.prototype.$authGuardRouter
     const route = router.currentRoute
 
     let isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
