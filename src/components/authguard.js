@@ -30,10 +30,6 @@ export default (to, from, next) => {
 
   const isAllowed = authCheck()
 
-  // vue-router does not trigger beforeEnter again after onAuthStateChanged
-  // so we store this state to know we have to reload router after log in
-  store.commit("auth/SET_RELOAD", !isAllowed)
-
   if (debug) console.log("[ auth guard ]: is route ALLOWED: [", isAllowed, "]")
 
   return isAllowed ? next() : next(false)

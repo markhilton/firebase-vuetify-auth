@@ -18,14 +18,12 @@ export default {
   authGuardOnRouterReady({ getters, commit }) {
     const debug = Vue.prototype.$authGuardDebug
     const router = Vue.prototype.$authGuardRouter
-    const store = Vue.prototype.$authGuardStore
     const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
     if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
 
     // check current route when router is ready
     router.onReady(() => {
-      const reload = store.state.auth.reload
       const isAuthenticated = auth.currentUser ? true : false
       const isCurrentRoutePublic = getters.isCurrentRoutePublic
 
@@ -45,14 +43,6 @@ export default {
       } else if (!isAuthenticated) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", true)
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
-      } else if (isAuthenticated && reload) {
-        // vue-router does not trigger beforeEnter again after onAuthStateChanged
-        // so we check if we have to reload route after user is authenticated
-        const { emailVerified } = auth.currentUser
-
-        // QUICKFIX: page reloads in loops if user requires email verification
-        // TODO: verify if emailVerified is required by config before
-        if (emailVerified) router.go()
       }
     })
   },
@@ -85,6 +75,7 @@ export default {
     return new Promise(async (resolve, reject) => {
       try {
         const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+        const router = Vue.prototype.$authGuardRouter
 
         commit("SET_LOADING", true)
 

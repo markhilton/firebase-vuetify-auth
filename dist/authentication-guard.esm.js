@@ -524,7 +524,6 @@ var backupStore = new Vuex.Store({});
 var state = {
   config: null, // package init configuration
   error: null, // error from last operation
-  reload: false, // route reload is needed after login
 
   current_user: null, // current user
 
@@ -727,14 +726,12 @@ var actions = {
 
     var debug = Vue.prototype.$authGuardDebug;
     var router = Vue.prototype.$authGuardRouter;
-    var store = Vue.prototype.$authGuardStore;
     var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
 
     if (debug) { console.log("[ auth guard ]: revalidate when vue router ready"); }
 
     // check current route when router is ready
     router.onReady(function () {
-      var reload = store.state.auth.reload;
       var isAuthenticated = auth.currentUser ? true : false;
       var isCurrentRoutePublic = getters.isCurrentRoutePublic;
 
@@ -754,15 +751,6 @@ var actions = {
       } else if (!isAuthenticated) {
         commit("SET_AUTH_GUARD_DIALOG_SHOWN", true);
         commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true);
-      } else if (isAuthenticated && reload) {
-        // vue-router does not trigger beforeEnter again after onAuthStateChanged
-        // so we check if we have to reload route after user is authenticated
-        var ref = auth.currentUser;
-        var emailVerified = ref.emailVerified;
-
-        // QUICKFIX: page reloads in loops if user requires email verification
-        // TODO: verify if emailVerified is required by config before
-        if (emailVerified) { router.go(); }
       }
     });
   },
@@ -810,6 +798,7 @@ var actions = {
     return new Promise(async function (resolve, reject) {
       try {
         var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
+        var router = Vue.prototype.$authGuardRouter;
 
         commit("SET_LOADING", true);
 
@@ -997,7 +986,6 @@ var mutations = {
   SET_TAB: function (state, index) { return (state.tab = index); },
   SET_ERROR: function (state, error) { return (state.error = error); },
   SET_CONFIG: function (state, config) { return (state.config = config); },
-  SET_RELOAD: function (state, reload) { return (state.reload = reload); },
   SET_LOADING: function (state, status) { return (state.is_login = status); },
   SET_CURRENT_USER: function (state, user) { return (state.current_user = user); },
   SET_SIGN_BY_PHONE_STEP: function (state, step) { return (state.sign_by_phone_step = step); },
@@ -3027,10 +3015,6 @@ function authguard (to, from, next) {
   else if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
 
   var isAllowed = authCheck();
-
-  // vue-router does not trigger beforeEnter again after onAuthStateChanged
-  // so we store this state to know we have to reload router after log in
-  store.commit("auth/SET_RELOAD", !isAllowed);
 
   if (debug) { console.log("[ auth guard ]: is route ALLOWED: [", isAllowed, "]"); }
 
