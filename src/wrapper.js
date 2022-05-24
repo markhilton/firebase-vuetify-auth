@@ -22,7 +22,7 @@ export function install(Vue, options = {}) {
 
   // merge default settings with user settings
   const config = { ...defaultSettings, ...options }
-  const { router, firebase, session, debug } = config
+  const { router, firebase, session = "local", debug } = config
 
   let { store } = config
 

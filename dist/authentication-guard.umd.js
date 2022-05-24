@@ -809,7 +809,14 @@
           commit("SET_LOADING", true);
 
           await auth.signOut(auth$1);
-          await auth.setPersistence(auth$1, auth.browserSessionPersistence);
+
+          // set session persistence
+          if (Vue__default["default"].prototype.$authGuardSession === "browser") {
+            await auth.setPersistence(auth$1, auth.browserSessionPersistence);
+          } else {
+            await auth.setPersistence(auth$1, auth.browserLocalPersistence);
+          }
+
           await auth.signInWithEmailAndPassword(auth$1, email, password);
 
           // this is needed to reload route that was not loaded if user was not authenticated
@@ -3039,6 +3046,7 @@
     var config = Object.assign({}, defaultSettings, options);
     var router = config.router;
     var firebase = config.firebase;
+    var session = config.session; if ( session === void 0 ) session = "local";
     var debug = config.debug;
 
     var store = config.store;
@@ -3069,6 +3077,7 @@
     Vue.prototype.$authGuardDebug = debug;
     Vue.prototype.$authGuardStore = store;
     Vue.prototype.$authGuardRouter = router;
+    Vue.prototype.$authGuardSession = session;
     Vue.prototype.$authGuardFirebaseApp = firebase;
 
     delete config.store;

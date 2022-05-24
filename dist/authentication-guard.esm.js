@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex, { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
-import { getAuth, signOut, setPersistence, browserSessionPersistence, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, RecaptchaVerifier } from 'firebase/auth';
+import { getAuth, signOut, setPersistence, browserSessionPersistence, browserLocalPersistence, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, RecaptchaVerifier } from 'firebase/auth';
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VCard, VContainer, VForm, VCol, VRow, VTooltip, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems, VDialog } from 'vuetify/lib';
 
 function ownKeys(object, enumerableOnly) {
@@ -803,7 +803,14 @@ var actions = {
         commit("SET_LOADING", true);
 
         await signOut(auth);
-        await setPersistence(auth, browserSessionPersistence);
+
+        // set session persistence
+        if (Vue.prototype.$authGuardSession === "browser") {
+          await setPersistence(auth, browserSessionPersistence);
+        } else {
+          await setPersistence(auth, browserLocalPersistence);
+        }
+
         await signInWithEmailAndPassword(auth, email, password);
 
         // this is needed to reload route that was not loaded if user was not authenticated
@@ -3033,6 +3040,7 @@ function install(Vue, options) {
   var config = Object.assign({}, defaultSettings, options);
   var router = config.router;
   var firebase = config.firebase;
+  var session = config.session; if ( session === void 0 ) session = "local";
   var debug = config.debug;
 
   var store = config.store;
@@ -3063,6 +3071,7 @@ function install(Vue, options) {
   Vue.prototype.$authGuardDebug = debug;
   Vue.prototype.$authGuardStore = store;
   Vue.prototype.$authGuardRouter = router;
+  Vue.prototype.$authGuardSession = session;
   Vue.prototype.$authGuardFirebaseApp = firebase;
 
   delete config.store;
