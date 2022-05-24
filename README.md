@@ -71,6 +71,7 @@ Vue.config.productionTip = false
 const authGuardSettings = {
   debug: true, // enable debug messages in console log
   router, // routes
+  session: "local", // session persistance
   firebase, // pass on firebase middleware app init
   verification: false, // require user email to be verified before granting access
   registration: true, // allow new user registrations
@@ -165,17 +166,18 @@ After following implementation instruction requests to protected views, should r
 
 ## Available settings
 
-| Prop         | Type             | Default                                       | Description                                                                             |
-| ------------ | ---------------- | --------------------------------------------- | --------------------------------------------------------------------------------------- |
-| store        | Object           | null                                          | VueX store                                                                              |
-| router       | Object           | null                                          | VUE router                                                                              |
-| firebase     | Object           | null                                          | Firebase middleware - initialized app                                                   |
-| verification | Boolean or array | true                                          | require email verification to sign in for all accounts or for specific domains in array |
-| registration | Boolean          | true                                          | allow new user registrations                                                            |
-| phone        | Boolean          | true                                          | allow users to singin using phone number                                                |
-| google       | Boolean          | true                                          | allow users to singin using gmail                                                       |
-| facebook     | Boolean          | true                                          | allow users to singin using facebook                                                    |
-| title        | String           | "Authenticate"                                | authentication prompt title                                                             |
-| subtitle     | String           | "Firebase Vuetify Authentication NPM package" | authentication prompt subtitle                                                          |
-| icon         | String           | "mdi-brightness-7"                            | authentication prompt icon                                                              |
-| iconColor    | String           | "orange"                                      | authentication prompt icon                                                              |
+| Prop         | Type             | Default                                       | Description                                                                                                    |
+| ------------ | ---------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| store        | Object           | null                                          | VueX store                                                                                                     |
+| router       | Object           | null                                          | VUE router                                                                                                     |
+| firebase     | Object           | null                                          | Firebase middleware - initialized app                                                                          |
+| session      | String           | "local"                                       | Firebase auth state session persistence, see: https://firebase.google.com/docs/auth/web/auth-state-persistence |
+| verification | Boolean or array | true                                          | require email verification to sign in for all accounts or for specific domains in array                        |
+| registration | Boolean          | true                                          | allow new user registrations                                                                                   |
+| phone        | Boolean          | true                                          | allow users to singin using phone number                                                                       |
+| google       | Boolean          | true                                          | allow users to singin using gmail                                                                              |
+| facebook     | Boolean          | true                                          | allow users to singin using facebook                                                                           |
+| title        | String           | "Authenticate"                                | authentication prompt title                                                                                    |
+| subtitle     | String           | "Firebase Vuetify Authentication NPM package" | authentication prompt subtitle                                                                                 |
+| icon         | String           | "mdi-brightness-7"                            | authentication prompt icon                                                                                     |
+| iconColor    | String           | "orange"                                      | authentication prompt icon                                                                                     |

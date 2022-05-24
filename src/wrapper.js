@@ -52,6 +52,7 @@ export function install(Vue, options = {}) {
   Vue.prototype.$authGuardDebug = debug
   Vue.prototype.$authGuardStore = store
   Vue.prototype.$authGuardRouter = router
+  Vue.prototype.$authGuardSession = session
   Vue.prototype.$authGuardFirebaseApp = firebase
 
   delete config.store

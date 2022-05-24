@@ -5,6 +5,7 @@ import firebase from "@/middleware/firebase"
 import AuthGuard from "../wrapper"
 
 const debug = true
+const session = "local" // or "browser" see: https://firebase.google.com/docs/auth/web/auth-state-persistence
 const phone = true
 const google = true
 const facebook = true
@@ -14,6 +15,7 @@ const authGuardSettings = {
   debug,
   store,
   router,
+  session,
   firebase,
   phone,
   google,

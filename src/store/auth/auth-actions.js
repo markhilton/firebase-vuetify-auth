@@ -6,6 +6,7 @@ import {
   signOut,
   updateProfile,
   setPersistence,
+  browserLocalPersistence,
   browserSessionPersistence,
   signInWithRedirect,
   signInWithEmailAndPassword,
@@ -80,7 +81,14 @@ export default {
         commit("SET_LOADING", true)
 
         await signOut(auth)
-        await setPersistence(auth, browserSessionPersistence)
+
+        // set session persistence
+        if (Vue.prototype.$authGuardSession === "browser") {
+          await setPersistence(auth, browserSessionPersistence)
+        } else {
+          await setPersistence(auth, browserLocalPersistence)
+        }
+
         await signInWithEmailAndPassword(auth, email, password)
 
         // this is needed to reload route that was not loaded if user was not authenticated
