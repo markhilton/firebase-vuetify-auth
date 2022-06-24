@@ -6,6 +6,8 @@ export default {
   SET_CURRENT_USER: (state, user) => (state.current_user = user),
   SET_SIGN_BY_PHONE_STEP: (state, step) => (state.sign_by_phone_step = step),
   SET_SESSION_PERSISTANCE: (state, status) => (state.is_session_persistant = status),
+  SET_IS_ROUTE_PUBLIC: (state, status) => (state.is_route_public = status),
+  SET_IS_FROM_PUBLIC_TO_AUTH: (state, status) => (state.is_from_public_to_auth = status),
   SET_AUTH_GUARD_DIALOG_SHOWN: (state, status) => (state.is_authguard_dialog_shown = status),
   SET_PHONE_TEXT_CONFIRMATION: (state, confirmation) => (state.text_confirmation = confirmation),
   SET_AUTH_GUARD_DIALOG_PERSISTENT: (state, status) => (state.is_authguard_dialog_persistent = status),

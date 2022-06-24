@@ -1,11 +1,9 @@
-import { guard as AuthGuard } from "@/middleware"
-
 export default [
   {
     name: "Home",
     path: "/",
     component: () => import(/* webpackChunkName: "home" */ "@/views/Home"),
-    beforeEnter: AuthGuard,
+    meta: { requiresAuth: true },
   },
   {
     name: "Public",
@@ -15,7 +13,7 @@ export default [
   {
     name: "Protected",
     path: "/protected",
-    beforeEnter: AuthGuard,
+    meta: { requiresAuth: true },
     component: () => import(/* webpackChunkName: "protected" */ "@/views/Protected"),
   },
 ]

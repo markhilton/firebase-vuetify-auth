@@ -50,6 +50,12 @@ export default {
     const user = getters.getCurrentUser
     return user ? user.emailVerified : null
   },
+  isRoutePublic(state) {
+    return state.is_route_public
+  },
+  isFromPublicToAuth(state) {
+    return state.is_from_public_to_auth
+  },
   isAuthGuardDialogShown(state) {
     return state.is_authguard_dialog_shown
   },
