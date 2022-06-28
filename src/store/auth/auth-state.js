@@ -17,4 +17,6 @@ export default {
   is_email_reset_password_link_sent: false, // confirmation for successful reset password link email
   is_email_verification_screen_shown: false, // show email verification screen,
   is_reset_password_screen_shown: false, // show reset password screen,
+  is_route_public: false, // is current route public
+  is_from_public_to_auth: false, // is route going from public page to protected
 }

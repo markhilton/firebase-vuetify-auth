@@ -1,10 +1,15 @@
 import Vue from "vue"
-import routes from "./routes"
 import VueRouter from "vue-router"
+import routes from "./routes"
+import { guard } from "@/middleware"
 
 Vue.use(VueRouter)
 
-export default new VueRouter({
+const router = new VueRouter({
   routes: routes,
   mode: "history",
 })
+
+router.beforeEach(guard)
+
+export default router
