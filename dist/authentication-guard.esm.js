@@ -540,6 +540,8 @@ var state = {
   is_email_reset_password_link_sent: false, // confirmation for successful reset password link email
   is_email_verification_screen_shown: false, // show email verification screen,
   is_reset_password_screen_shown: false, // show reset password screen,
+  is_route_public: false, // is current route public
+  is_from_public_to_auth: false, // is route going from public page to protected
 };
 
 var getters = {
@@ -590,6 +592,12 @@ var getters = {
   isVerified: function isVerified(state, getters) {
     var user = getters.getCurrentUser;
     return user ? user.emailVerified : null
+  },
+  isRoutePublic: function isRoutePublic(state) {
+    return state.is_route_public
+  },
+  isFromPublicToAuth: function isFromPublicToAuth(state) {
+    return state.is_from_public_to_auth
   },
   isAuthGuardDialogShown: function isAuthGuardDialogShown(state) {
     return state.is_authguard_dialog_shown
@@ -655,13 +663,23 @@ function authCheck () {
   var currentUser = auth.currentUser;
   var isAuthenticated = currentUser ? true : false;
   var verification = store.state.auth.config.verification;
-
+  var isRoutePublic = store.getters["auth/isRoutePublic"];
+  var fromPublicToAuth = store.getters["auth/isFromPublicToAuth"];
   if (verification) { debug("[ auth check ]: email verification required: [", verification, "]"); }
 
   // anonymous authenticated currentUser
   if (verification && currentUser && currentUser.isAnonymous) {
     debug("[ auth check ]: anonymous user BLOCKED unable to verify email!");
 
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true);
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
+  }
+
+  // not show login dialog if page is public
+  else if (isRoutePublic) {
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", false);
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
+  } else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
     store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true);
     store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
   }
@@ -702,7 +720,9 @@ function authCheck () {
       store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
     } else {
       store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true);
-      store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true);
+      if (fromPublicToAuth) {
+        store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
+      } else { store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true); }
     }
   }
 
@@ -997,6 +1017,8 @@ var mutations = {
   SET_CURRENT_USER: function (state, user) { return (state.current_user = user); },
   SET_SIGN_BY_PHONE_STEP: function (state, step) { return (state.sign_by_phone_step = step); },
   SET_SESSION_PERSISTANCE: function (state, status) { return (state.is_session_persistant = status); },
+  SET_IS_ROUTE_PUBLIC: function (state, status) { return (state.is_route_public = status); },
+  SET_IS_FROM_PUBLIC_TO_AUTH: function (state, status) { return (state.is_from_public_to_auth = status); },
   SET_AUTH_GUARD_DIALOG_SHOWN: function (state, status) { return (state.is_authguard_dialog_shown = status); },
   SET_PHONE_TEXT_CONFIRMATION: function (state, confirmation) { return (state.text_confirmation = confirmation); },
   SET_AUTH_GUARD_DIALOG_PERSISTENT: function (state, status) { return (state.is_authguard_dialog_persistent = status); },
@@ -3015,17 +3037,29 @@ __vue_render__._withStripped = true;
  */
 
 function authguard (to, from, next) {
+  var isRequired = to.meta.requiresAuth; // is current path required authentication
+  var fromRequiresAuth = from.meta.requiresAuth; // from which page is request
   var store = Vue.prototype.$authGuardStore;
   var debug = Vue.prototype.$authGuardDebug;
 
   if (!store) { console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!"); }
   else if (debug) { console.log("[ auth guard ]: vue router AuthMiddleware"); }
 
-  var isAllowed = authCheck();
+  // check if we are going from public page to auth required page
+  if (isRequired && !fromRequiresAuth) {
+    store.commit("auth/SET_IS_FROM_PUBLIC_TO_AUTH", true);
+  } else { store.commit("auth/SET_IS_FROM_PUBLIC_TO_AUTH", false); }
+
+  // change public route state depending on route
+  if (!isRequired) {
+    store.commit("auth/SET_IS_ROUTE_PUBLIC", true);
+  } else { store.commit("auth/SET_IS_ROUTE_PUBLIC", false); }
+
+  var isAllowed = authCheck(); // is user Authenticated
 
   if (debug) { console.log("[ auth guard ]: is route ALLOWED: [", isAllowed, "]"); }
 
-  return isAllowed ? next() : next(false)
+  return (isRequired && isAllowed) || !isRequired ? next() : next(false)
 }
 
 // Declare install function executed by Vue.use()
