@@ -19,13 +19,23 @@ export default () => {
   const currentUser = auth.currentUser
   const isAuthenticated = currentUser ? true : false
   const verification = store.state.auth.config.verification
-
+  const isRoutePublic = store.getters["auth/isRoutePublic"]
+  const fromPublicToAuth = store.getters["auth/isFromPublicToAuth"]
   if (verification) debug("[ auth check ]: email verification required: [", verification, "]")
 
   // anonymous authenticated currentUser
   if (verification && currentUser && currentUser.isAnonymous) {
     debug("[ auth check ]: anonymous user BLOCKED unable to verify email!")
 
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+  }
+
+  // not show login dialog if page is public
+  else if (isRoutePublic) {
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", false)
+    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+  } else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
     store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
     store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
   }
@@ -66,7 +76,9 @@ export default () => {
       store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
     } else {
       store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
-      store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
+      if (fromPublicToAuth) {
+        store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+      } else store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
     }
   }
 

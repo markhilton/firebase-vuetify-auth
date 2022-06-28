@@ -119,7 +119,13 @@ This will work fine, but for some reason it impacts Chrome extension: [devtools]
 import AuthMiddleware from "@nerd305/firebase-vuetify-auth/src/components/authguard"
 ```
 
-and add `beforeEnter: AuthMiddleware` for any route that would requre authentication.
+Call router beforeEach method and pass middleware like argument
+
+```javascript
+router.beforeEach(AuthMiddleware)
+```
+
+and just add `meta: { requiresAuth: true }` for any route that would require authentication.
 
 Full example:
 
@@ -143,7 +149,7 @@ const routes = [
   },
   {
     path: "/protected",
-    beforeEnter: AuthMiddleware, // this route requires authentication guard
+    meta: { requiresAuth: true }, // this route requires authentication guard
     name: "protected",
     component: () => import(/* webpackChunkName: "protected" */ "@/views/Protected.vue"), // example protected route
   },
@@ -155,10 +161,12 @@ const router = new VueRouter({
   routes,
 })
 
+router.beforeEach(AuthMiddleware)
+
 export default router
 ```
 
-This will trigger `AuthMiddleware` to be executed before entering `/protected` route, which will validate if the user is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middeware will render a full screen modal "Login" view.
+This will trigger `AuthMiddleware` to be executed before entering `/protected` route, which will validate if the user is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middleware will render a full screen modal "Login" view.
 
 ### Thats it!
 

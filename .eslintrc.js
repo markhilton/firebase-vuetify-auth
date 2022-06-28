@@ -69,9 +69,12 @@ module.exports = {
 
   rules: {
     "vue/no-v-html": 0,
+    "vue/valid-v-slot": 0,
+    "vue/html-self-closing": 0,
     "vue/require-prop-types": 0,
     "vue/require-default-prop": 0,
     "vue/max-attributes-per-line": 0,
+    "vue/multi-word-component-names": 0,
     "vue/singleline-html-element-content-newline": 0,
     "prettier-vue/prettier": [
       "error",
