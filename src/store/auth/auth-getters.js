@@ -83,18 +83,4 @@ export default {
   isLoginWithPhoneShown(state) {
     return state.is_login_with_phone_shown
   },
-  // check if the current route is public to set negative persisten dialog
-  isCurrentRoutePublic(state) {
-    const debug = Vue.prototype.$authGuardDebug
-    const router = Vue.prototype.$authGuardRouter
-    const route = router.currentRoute
-
-    let isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false
-
-    if (route.matched[0] && route.matched[0].path !== window.location.pathname) isPublicRoute = false
-
-    if (debug) console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]")
-
-    return isPublicRoute
-  },
 }
