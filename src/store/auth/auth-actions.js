@@ -26,7 +26,7 @@ export default {
     // check current route when router is ready
     router.onReady(() => {
       const isAuthenticated = auth.currentUser ? true : false
-      const isCurrentRoutePublic = getters.isCurrentRoutePublic
+      const isCurrentRoutePublic = getters.isRoutePublic
 
       if (debug) {
         console.log(
