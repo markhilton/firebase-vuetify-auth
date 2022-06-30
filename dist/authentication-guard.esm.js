@@ -626,20 +626,6 @@ var getters = {
   isLoginWithPhoneShown: function isLoginWithPhoneShown(state) {
     return state.is_login_with_phone_shown
   },
-  // check if the current route is public to set negative persisten dialog
-  isCurrentRoutePublic: function isCurrentRoutePublic(state) {
-    var debug = Vue.prototype.$authGuardDebug;
-    var router = Vue.prototype.$authGuardRouter;
-    var route = router.currentRoute;
-
-    var isPublicRoute = route.matched[0] && typeof route.matched[0].beforeEnter === "undefined" ? true : false;
-
-    if (route.matched[0] && route.matched[0].path !== window.location.pathname) { isPublicRoute = false; }
-
-    if (debug) { console.log("[ auth guard ]: isCurrentRoutePublic: [", isPublicRoute, "]"); }
-
-    return isPublicRoute
-  },
 };
 
 var debug = function () {
@@ -677,6 +663,7 @@ function authCheck () {
 
   // not show login dialog if page is public
   else if (isRoutePublic) {
+    allowRoute = true;
     store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", false);
     store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false);
   } else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
@@ -753,7 +740,7 @@ var actions = {
     // check current route when router is ready
     router.onReady(function () {
       var isAuthenticated = auth.currentUser ? true : false;
-      var isCurrentRoutePublic = getters.isCurrentRoutePublic;
+      var isCurrentRoutePublic = getters.isRoutePublic;
 
       if (debug) {
         console.log(
