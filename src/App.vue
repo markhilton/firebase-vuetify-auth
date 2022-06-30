@@ -44,8 +44,22 @@ import { mapGetters, mapActions } from "vuex"
 export default {
   name: "App",
 
+  data() {
+    return {
+      top: this.$vuetify.application.top,
+    }
+  },
+
   computed: {
     ...mapGetters("auth", ["isAuthenticated", "getDisplayName"]),
+  },
+
+  updated() {
+    const topClone = this.top
+    this.top = this.$vuetify.application.top
+    if (this.$vuetify.application.top - topClone > 0) {
+      this.$vuetify.application.top -= topClone
+    }
   },
 
   methods: {
