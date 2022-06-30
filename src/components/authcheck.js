@@ -33,6 +33,7 @@ export default () => {
 
   // not show login dialog if page is public
   else if (isRoutePublic) {
+    allowRoute = true
     store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", false)
     store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
   } else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
