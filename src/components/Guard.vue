@@ -81,6 +81,12 @@ export default {
     LoginWithProvider,
   },
 
+  data() {
+    return {
+      top: this.$vuetify.application.top,
+    }
+  },
+
   computed: {
     ...mapState("auth", ["config", "tab"]),
     ...mapGetters("auth", [
@@ -115,6 +121,12 @@ export default {
   mounted() {
     // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
     this.initializeGuard()
+  },
+
+  updated() {
+    if (this.$vuetify.application.top > this.top) {
+      this.$vuetify.application.top = this.top
+    }
   },
 
   methods: {
