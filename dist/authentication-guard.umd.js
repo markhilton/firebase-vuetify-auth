@@ -2792,6 +2792,12 @@
       VDialog: lib.VDialog
     },
 
+    data: function data() {
+      return {
+        top: this.$vuetify.application.top,
+      }
+    },
+
     computed: Object.assign({}, Vuex.mapState("auth", ["config", "tab"]),
       Vuex.mapGetters("auth", [
         "isLoading",
@@ -2823,6 +2829,14 @@
     mounted: function mounted() {
       // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
       this.initializeGuard();
+    },
+
+    beforeUpdate: function beforeUpdate() {
+      if (this.top === 0) { this.top = this.$vuetify.application.top; }
+    },
+
+    updated: function updated() {
+      if (this.top !== 0) { this.$vuetify.application.top = this.top; }
     },
 
     methods: Object.assign({}, Vuex.mapActions("auth", ["initializeGuard", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),

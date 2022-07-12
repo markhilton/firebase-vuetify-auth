@@ -2786,6 +2786,12 @@ var script = {
     VDialog: VDialog
   },
 
+  data: function data() {
+    return {
+      top: this.$vuetify.application.top,
+    }
+  },
+
   computed: Object.assign({}, mapState("auth", ["config", "tab"]),
     mapGetters("auth", [
       "isLoading",
@@ -2817,6 +2823,14 @@ var script = {
   mounted: function mounted() {
     // this is equivalent to onAuthStateChanged if the app is correctly integrated with firebase
     this.initializeGuard();
+  },
+
+  beforeUpdate: function beforeUpdate() {
+    if (this.top === 0) { this.top = this.$vuetify.application.top; }
+  },
+
+  updated: function updated() {
+    if (this.top !== 0) { this.$vuetify.application.top = this.top; }
   },
 
   methods: Object.assign({}, mapActions("auth", ["initializeGuard", "loginWithEmail", "registerUser", "signOut", "sendVerificationEmail"]),
