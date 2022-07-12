@@ -123,10 +123,12 @@ export default {
     this.initializeGuard()
   },
 
+  beforeUpdate() {
+    if (this.top === 0) this.top = this.$vuetify.application.top
+  },
+
   updated() {
-    if (this.$vuetify.application.top > this.top) {
-      this.$vuetify.application.top = this.top
-    }
+    if (this.top !== 0) this.$vuetify.application.top = this.top
   },
 
   methods: {
