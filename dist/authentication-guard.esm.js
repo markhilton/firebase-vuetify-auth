@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Vuex, { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
-import { getAuth, signOut, setPersistence, browserSessionPersistence, browserLocalPersistence, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, RecaptchaVerifier } from 'firebase/auth';
+import { getAuth, signOut, setPersistence, browserSessionPersistence, browserLocalPersistence, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, SAMLAuthProvider, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, RecaptchaVerifier } from 'firebase/auth';
 import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VCard, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VContainer, VForm, VCol, VRow, VTooltip, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems, VDialog } from 'vuetify/lib';
 
 function ownKeys(object, enumerableOnly) {

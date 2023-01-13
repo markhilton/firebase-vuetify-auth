@@ -885,7 +885,7 @@
     loginWithSaml: function loginWithSaml(ref) {
       var state = ref.state;
 
-      var provider = new SAMLAuthProvider(state.config.saml_provider_id);
+      var provider = new auth.SAMLAuthProvider(state.config.saml_provider_id);
       var auth$1 = auth.getAuth(Vue__default["default"].prototype.$authGuardFirebaseApp);
 
       auth.signInWithRedirect(auth$1, provider);
