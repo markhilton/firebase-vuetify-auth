@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, { mapState, mapGetters, mapActions, mapMutations } from 'vuex';
 import { getAuth, signOut, setPersistence, browserSessionPersistence, browserLocalPersistence, signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, FacebookAuthProvider, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, RecaptchaVerifier } from 'firebase/auth';
-import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VCard, VContainer, VForm, VCol, VRow, VTooltip, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems, VDialog } from 'vuetify/lib';
+import { VIcon, VListItemTitle, VListItemSubtitle, VListItemContent, VListItem, VList, VAlert, VCard, VTextField, VCheckbox, VCardText, VBtn, VCardActions, VContainer, VForm, VCol, VRow, VTooltip, VProgressLinear, VTab, VTabs, VTabItem, VTabsItems, VDialog } from 'vuetify/lib';
 
 function ownKeys(object, enumerableOnly) {
   var keys = Object.keys(object);
@@ -626,6 +626,20 @@ var getters = {
   isLoginWithPhoneShown: function isLoginWithPhoneShown(state) {
     return state.is_login_with_phone_shown
   },
+  isLoginWithProvidersActive: function isLoginWithProvidersActive(state) {
+    return state.config.google || state.config.facebook || state.config.phone || state.config.saml
+  },
+  isOnlySingleProvider: function isOnlySingleProvider(state) {
+    var cc = 0;
+    var check = ["google", "facebook", "phone", "saml"];
+
+    check.forEach(function (c) {
+      if (state.config[c] === true) { cc++; }
+    });
+
+    // to render large button instead icon
+    return cc === 1
+  },
 };
 
 var debug = function () {
@@ -862,6 +876,15 @@ var actions = {
     ref.state;
 },
 
+  loginWithSaml: function loginWithSaml(ref) {
+    var state = ref.state;
+
+    var provider = new SAMLAuthProvider(state.config.saml_provider_id);
+    var auth = getAuth(Vue.prototype.$authGuardFirebaseApp);
+
+    signInWithRedirect(auth, provider);
+  },
+
   //
   textPhoneVerificationCode: async function textPhoneVerificationCode(ref, ref$1) {
     ref.state;
@@ -1044,15 +1067,24 @@ var defaultSettings = {
   store: null, // vuex store
   router: null, // routes
   firebase: null, // pass on firebase middleware app init
-  verification: false, // require user email to be verified before granting access
-  registration: true, // allow new user registrations
+
+  saml: false, // allow authentication with saml
+  saml_text: "Login with SAML", // saml button text
+  saml_provider_id: "saml.okta", // saml provider id
+
+  email: true, // allow authentication with email
   phone: false, // allow authentication with phone
   google: false, // allow authentication with gmail account
   facebook: false, // allow authentication with facebook account
+
   title: "Authenticate",
   subtitle: "Firebase Vuetify Authentication NPM package",
+
   icon: "mdi-brightness-7", // authentication prompt icon
   iconColor: "orange", // authentication prompt icon color
+
+  verification: false, // require user email to be verified before granting access
+  registration: true, // allow new user registrations
 };
 
 var script$7 = {
@@ -1221,12 +1253,12 @@ var script$6 = {
   components: {
     Branding: __vue_component__$7,
     VAlert: VAlert,
+    VCard: VCard,
     VTextField: VTextField,
     VCheckbox: VCheckbox,
     VCardText: VCardText,
     VBtn: VBtn,
     VCardActions: VCardActions,
-    VCard: VCard,
     VContainer: VContainer
   },
 
@@ -1236,7 +1268,8 @@ var script$6 = {
     remember: true,
   }); },
 
-  computed: Object.assign({}, mapGetters("auth", ["getSessionPersistence", "isLoading", "getError"])),
+  computed: Object.assign({}, mapState("auth", ["config"]),
+    mapGetters("auth", ["getSessionPersistence", "isLoading", "getError"])),
 
   created: function created() {
     this.remember = this.getSessionPersistence;
@@ -1279,113 +1312,125 @@ var __vue_render__$6 = function () {
                 },
                 [_vm._v("\n      " + _vm._s(_vm.getError.message) + "\n    ")]
               )
-            : _c("branding", { staticClass: "text-center" }),
-          _vm._v(" "),
-          _c(
-            "v-card-text",
-            { staticClass: "mb-0 pb-0" },
-            [
-              _c("v-text-field", {
-                staticClass: "mr-2",
-                attrs: {
-                  required: "",
-                  label: "Email",
-                  "prepend-icon": "mdi-account",
-                },
-                model: {
-                  value: _vm.email,
-                  callback: function ($$v) {
-                    _vm.email = $$v;
-                  },
-                  expression: "email",
-                },
-              }),
-              _vm._v(" "),
-              _c("v-text-field", {
-                staticClass: "mr-2",
-                attrs: {
-                  autocomplete: "off",
-                  name: "password",
-                  type: "password",
-                  label: "Password",
-                  "prepend-icon": "mdi-lock",
-                },
-                model: {
-                  value: _vm.password,
-                  callback: function ($$v) {
-                    _vm.password = $$v;
-                  },
-                  expression: "password",
-                },
-              }),
-              _vm._v(" "),
-              _c("v-checkbox", {
-                staticClass: "ml-8",
-                attrs: { dense: "", name: "remember", label: "remember me" },
-                on: {
-                  change: function ($event) {
-                    return _vm.SET_SESSION_PERSISTANCE(_vm.remember)
-                  },
-                },
-                model: {
-                  value: _vm.remember,
-                  callback: function ($$v) {
-                    _vm.remember = $$v;
-                  },
-                  expression: "remember",
-                },
-              }) ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "text-center pb-4" },
-            [
-              _c(
-                "v-btn",
-                {
-                  attrs: { text: "", "x-small": "", color: "primary" },
-                  on: {
-                    click: function ($event) {
-                      return _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(true)
-                    },
-                  },
-                },
-                [_vm._v(" Forgot Password? ")]
-              ) ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "v-card-actions",
-            [
-              _c(
-                "v-btn",
-                {
-                  attrs: {
-                    depressed: "",
-                    block: "",
-                    large: "",
-                    color: "primary",
-                    type: "submit",
-                    disabled: _vm.email === "" || _vm.password === "",
-                  },
-                  on: {
-                    click: function ($event) {
-                      return _vm.loginWithEmail({
-                        email: _vm.email,
-                        password: _vm.password,
-                      })
-                    },
-                  },
-                },
-                [_vm._v("\n        Login\n      ")]
-              ) ],
-            1
-          ) ],
+            : _c("branding", { staticClass: "text-center" }) ],
         1
-      ) ],
+      ),
+      _vm._v(" "),
+      _vm.config.email
+        ? _c(
+            "v-card",
+            { attrs: { flat: "" } },
+            [
+              _c(
+                "v-card-text",
+                { staticClass: "mb-0 pb-0" },
+                [
+                  _c("v-text-field", {
+                    staticClass: "mr-2",
+                    attrs: {
+                      required: "",
+                      label: "Email",
+                      "prepend-icon": "mdi-account",
+                    },
+                    model: {
+                      value: _vm.email,
+                      callback: function ($$v) {
+                        _vm.email = $$v;
+                      },
+                      expression: "email",
+                    },
+                  }),
+                  _vm._v(" "),
+                  _c("v-text-field", {
+                    staticClass: "mr-2",
+                    attrs: {
+                      autocomplete: "off",
+                      name: "password",
+                      type: "password",
+                      label: "Password",
+                      "prepend-icon": "mdi-lock",
+                    },
+                    model: {
+                      value: _vm.password,
+                      callback: function ($$v) {
+                        _vm.password = $$v;
+                      },
+                      expression: "password",
+                    },
+                  }),
+                  _vm._v(" "),
+                  _c("v-checkbox", {
+                    staticClass: "ml-8",
+                    attrs: {
+                      dense: "",
+                      name: "remember",
+                      label: "remember me",
+                    },
+                    on: {
+                      change: function ($event) {
+                        return _vm.SET_SESSION_PERSISTANCE(_vm.remember)
+                      },
+                    },
+                    model: {
+                      value: _vm.remember,
+                      callback: function ($$v) {
+                        _vm.remember = $$v;
+                      },
+                      expression: "remember",
+                    },
+                  }) ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "text-center pb-4" },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { text: "", "x-small": "", color: "primary" },
+                      on: {
+                        click: function ($event) {
+                          return _vm.SET_PASSWORD_RESET_SCREEN_SHOWN(true)
+                        },
+                      },
+                    },
+                    [_vm._v(" Forgot Password? ")]
+                  ) ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: {
+                        depressed: "",
+                        block: "",
+                        large: "",
+                        color: "primary",
+                        type: "submit",
+                        disabled: _vm.email === "" || _vm.password === "",
+                      },
+                      on: {
+                        click: function ($event) {
+                          return _vm.loginWithEmail({
+                            email: _vm.email,
+                            password: _vm.password,
+                          })
+                        },
+                      },
+                    },
+                    [_vm._v("\n        Login\n      ")]
+                  ) ],
+                1
+              ) ],
+            1
+          )
+        : _vm._e() ],
     1
   )
 };
@@ -2542,9 +2587,9 @@ var script$1 = {
   },
 
   computed: Object.assign({}, mapState("auth", ["config"]),
-    mapGetters("auth", ["isLoading"])),
+    mapGetters("auth", ["isLoading", "isLoginWithProvidersActive", "isOnlySingleProvider"])),
 
-  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone"]),
+  methods: Object.assign({}, mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "loginWithPhone", "loginWithSaml"]),
     mapMutations("auth", ["SET_SHOW_LOGIN_WITH_PHONE"]))
 };
 
@@ -2556,12 +2601,14 @@ var __vue_render__$1 = function () {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _vm.config.google || _vm.config.facebook || _vm.config.phone
+  return _vm.isLoginWithProvidersActive
     ? _c(
         "v-container",
         { staticClass: "text-center ma-0 pa-0" },
         [
-          _c("div", { staticClass: "caption" }, [_vm._v("or login with")]),
+          _c("div", { staticClass: "caption" }, [
+            _vm.config.email ? _c("span", [_vm._v("or ")]) : _vm._e(),
+            _vm._v("login with") ]),
           _vm._v(" "),
           _c(
             "v-container",
@@ -2587,7 +2634,7 @@ var __vue_render__$1 = function () {
                                         staticClass: "mr-2",
                                         attrs: {
                                           color: "#db3236",
-                                          fab: "",
+                                          fab: !_vm.isOnlySingleProvider,
                                           dark: "",
                                           small: "",
                                         },
@@ -2610,7 +2657,7 @@ var __vue_render__$1 = function () {
                           } ],
                         null,
                         false,
-                        1615720320
+                        2619599060
                       ),
                     },
                     [
@@ -2640,7 +2687,7 @@ var __vue_render__$1 = function () {
                                         staticClass: "mr-2",
                                         attrs: {
                                           color: "#3b5998",
-                                          fab: "",
+                                          fab: !_vm.isOnlySingleProvider,
                                           dark: "",
                                           small: "",
                                         },
@@ -2663,7 +2710,7 @@ var __vue_render__$1 = function () {
                           } ],
                         null,
                         false,
-                        1465959198
+                        1832197962
                       ),
                     },
                     [
@@ -2691,9 +2738,10 @@ var __vue_render__$1 = function () {
                                   _vm._g(
                                     _vm._b(
                                       {
+                                        staticClass: "mr-2",
                                         attrs: {
                                           color: "primary",
-                                          fab: "",
+                                          fab: !_vm.isOnlySingleProvider,
                                           dark: "",
                                           small: "",
                                         },
@@ -2718,13 +2766,71 @@ var __vue_render__$1 = function () {
                           } ],
                         null,
                         false,
-                        3730036540
+                        1894239944
                       ),
                     },
                     [
                       _vm._v(" "),
                       _c("span", [
                         _vm._v("Authenticate with Text Message To Your Phone") ]) ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.config.saml
+                ? _c(
+                    "v-tooltip",
+                    {
+                      attrs: { top: "" },
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "activator",
+                            fn: function (ref) {
+                              var on = ref.on;
+                              var attrs = ref.attrs;
+                              return [
+                                _c(
+                                  "v-btn",
+                                  _vm._g(
+                                    _vm._b(
+                                      {
+                                        attrs: {
+                                          color: "secondary",
+                                          fab: !_vm.isOnlySingleProvider,
+                                          dark: "",
+                                          small: !_vm.isOnlySingleProvider,
+                                        },
+                                        on: {
+                                          click: function ($event) {
+                                            return _vm.loginWithSaml()
+                                          },
+                                        },
+                                      },
+                                      "v-btn",
+                                      attrs,
+                                      false
+                                    ),
+                                    on
+                                  ),
+                                  [
+                                    _c("v-icon", [_vm._v("mdi-onepassword")]),
+                                    _vm._v(" "),
+                                    _vm.isOnlySingleProvider
+                                      ? _c("span", { staticClass: "ml-2" }, [
+                                          _vm._v(_vm._s(_vm.config.saml_text)) ])
+                                      : _vm._e() ],
+                                  1
+                                ) ]
+                            },
+                          } ],
+                        null,
+                        false,
+                        1818462210
+                      ),
+                    },
+                    [
+                      _vm._v(" "),
+                      _c("span", [_vm._v("Authenticate with SAML provider")]) ]
                   )
                 : _vm._e() ],
             1
@@ -2914,8 +3020,9 @@ var __vue_render__ = function () {
                             ? _c("v-tab", [_vm._v(" Register ")])
                             : _vm._e(),
                           _vm._v(" "),
-                          _vm.isResetPasswordScreenShown ||
-                          !_vm.isUserRegistrationAllowed
+                          (_vm.isResetPasswordScreenShown ||
+                            !_vm.isUserRegistrationAllowed) &&
+                          _vm.config.email
                             ? _c("v-tab", [_vm._v(" Reset Password ")])
                             : _vm._e() ],
                         1
@@ -2960,8 +3067,9 @@ var __vue_render__ = function () {
                               )
                             : _vm._e(),
                           _vm._v(" "),
-                          _vm.isResetPasswordScreenShown ||
-                          !_vm.isUserRegistrationAllowed
+                          (_vm.isResetPasswordScreenShown ||
+                            !_vm.isUserRegistrationAllowed) &&
+                          !_vm.config.email
                             ? _c(
                                 "v-tab-item",
                                 { staticClass: "pt-5" },
