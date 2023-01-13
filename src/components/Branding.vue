@@ -7,6 +7,7 @@
 
           {{ config.title }}
         </v-list-item-title>
+
         <v-list-item-subtitle>
           <div class="ml-1">
             {{ config.subtitle }}

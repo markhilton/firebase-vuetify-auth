@@ -8,7 +8,9 @@
 
       <!-- application branding -->
       <branding v-else class="text-center" />
+    </v-card>
 
+    <v-card v-if="config.email" flat>
       <!-- login form -->
       <v-card-text class="mb-0 pb-0">
         <v-text-field v-model="email" required class="mr-2" label="Email" prepend-icon="mdi-account" />
@@ -56,7 +58,7 @@
 
 <script>
 import Branding from "./Branding.vue"
-import { mapGetters, mapMutations, mapActions } from "vuex"
+import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
 
 export default {
   components: { Branding },
@@ -68,6 +70,7 @@ export default {
   }),
 
   computed: {
+    ...mapState("auth", ["config"]),
     ...mapGetters("auth", ["getSessionPersistence", "isLoading", "getError"]),
   },
 

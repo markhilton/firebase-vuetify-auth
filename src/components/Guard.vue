@@ -28,7 +28,7 @@
             </v-tab>
             <v-tab v-if="isLoginWithPhoneShown"> Sign In </v-tab>
             <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"> Register </v-tab>
-            <v-tab v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed"> Reset Password </v-tab>
+            <v-tab v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email"> Reset Password </v-tab>
           </v-tabs>
 
           <v-tabs-items :value="tab" @change="SET_TAB($event)">
@@ -44,7 +44,7 @@
               <Register />
             </v-tab-item>
 
-            <v-tab-item v-if="isResetPasswordScreenShown || !isUserRegistrationAllowed" class="pt-5">
+            <v-tab-item v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && !config.email" class="pt-5">
               <PasswordReset />
             </v-tab-item>
           </v-tabs-items>
