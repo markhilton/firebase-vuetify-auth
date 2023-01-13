@@ -24,7 +24,7 @@
     "build:script": "vue-cli-service build --mode production --dest dist --inline-vue --name insights"
   },
   "dependencies": {
-    "@mdi/font": "^6.7.96",
+    "@mdi/font": "^7.1.96",
     "firebase": "^9.8.4",
     "v-mask": "^2.3.0",
     "vue": "^2.6.14",
