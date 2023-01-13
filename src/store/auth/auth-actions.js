@@ -1,5 +1,5 @@
 import Vue from "vue"
-import { GoogleAuthProvider, FacebookAuthProvider } from "firebase/auth"
+import { GoogleAuthProvider, FacebookAuthProvider, SAMLAuthProvider } from "firebase/auth"
 import authcheck from "../../components/authcheck"
 import {
   getAuth,
