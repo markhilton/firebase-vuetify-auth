@@ -127,6 +127,13 @@ export default {
   //
   loginWithPhone({ state }) {},
 
+  loginWithSaml({ state }) {
+    const provider = new SAMLAuthProvider(state.config.saml_provider_id)
+    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+
+    signInWithRedirect(auth, provider)
+  },
+
   //
   async textPhoneVerificationCode({ state, commit }, { phoneNumber, recaptchaVerifier }) {
     try {

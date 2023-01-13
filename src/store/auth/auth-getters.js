@@ -83,4 +83,18 @@ export default {
   isLoginWithPhoneShown(state) {
     return state.is_login_with_phone_shown
   },
+  isLoginWithProvidersActive(state) {
+    return state.config.google || state.config.facebook || state.config.phone || state.config.saml
+  },
+  isOnlySingleProvider(state) {
+    let cc = 0
+    const check = ["google", "facebook", "phone", "saml"]
+
+    check.forEach((c) => {
+      if (state.config[c] === true) cc++
+    })
+
+    // to render large button instead icon
+    return cc === 1
+  },
 }
