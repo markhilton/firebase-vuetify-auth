@@ -70,14 +70,22 @@ Vue.config.productionTip = false
 
 const authGuardSettings = {
   debug: true, // enable debug messages in console log
-  router, // routes
   session: "local", // session persistance
+
+  router, // routes
   firebase, // pass on firebase middleware app init
-  verification: false, // require user email to be verified before granting access
-  registration: true, // allow new user registrations
+
+  saml: false, // allow authentication with SAML
+  saml_text: "Login with OKTA", // text for large login button
+  saml_provider_id: "saml.okta", // firebase provider ID for SAML
+
+  email: true, // allow authentication with email
   phone: false, // allow authentication with phone
   google: true, // allow authentication with gmail account
   facebook: false, // allow authentication with facebook account
+
+  verification: false, // require user email to be verified before granting access
+  registration: true, // allow new user registrations
 }
 
 Vue.use(AuthGuard, authGuardSettings)
