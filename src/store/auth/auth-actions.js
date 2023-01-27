@@ -131,6 +131,8 @@ export default {
     const provider = new SAMLAuthProvider(state.config.saml_provider_id)
     const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
 
+    provider.addScope("profile")
+
     signInWithRedirect(auth, provider)
   },
 
