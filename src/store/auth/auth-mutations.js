@@ -2,7 +2,7 @@ export default {
   SET_TAB: (state, index) => (state.tab = index),
   SET_ERROR: (state, error) => (state.error = error),
   SET_CONFIG: (state, config) => (state.config = config),
-  SET_LOADING: (state, status) => (state.is_login = status),
+  SET_LOADING: (state, status) => (state.is_loading = status),
   SET_CURRENT_USER: (state, user) => (state.current_user = user),
   SET_SIGN_BY_PHONE_STEP: (state, step) => (state.sign_by_phone_step = step),
   SET_SESSION_PERSISTANCE: (state, status) => (state.is_session_persistant = status),

@@ -1,6 +1,7 @@
 import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs" // Convert CommonJS modules to ES6
 import vue from "rollup-plugin-vue" // Handle .vue SFC files
+import peerDepsExternal from "rollup-plugin-peer-deps-external"
 import vuetify from "rollup-plugin-vuetify"
 import buble from "@rollup/plugin-buble" // Transpile/polyfill with reasonable browser support
 
@@ -23,6 +24,7 @@ export default {
   external: ["vue", "vuex", "vuetify/lib", "firebase", "firebase/auth", "firebase/compat/app", "firebase/compat/auth"],
   plugins: [
     resolve(),
+    peerDepsExternal(),
     commonjs({
       include: "node_modules/**",
     }),

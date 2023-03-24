@@ -148,7 +148,7 @@ const routes = [
   {
     name: "Login",
     path: "/login",
-    component: () => import(/* webpackChunkName: "login" */ "@/views/Login"),
+    component: () => import(/* webpackChunkName: "login" */ "@/views/LoginCard.vue"),
   },
   {
     path: "/public", // this route is public, no `beforeEnter`

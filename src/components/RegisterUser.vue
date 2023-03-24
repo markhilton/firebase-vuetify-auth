@@ -8,7 +8,7 @@
         </v-alert>
 
         <!-- application branding -->
-        <branding v-else class="text-center" />
+        <AuthBranding v-else class="text-center" />
 
         <!-- registration form -->
         <v-card-text class="mb-0 pb-0">
@@ -61,44 +61,36 @@
   </v-container>
 </template>
 
-<script>
-import Branding from "./Branding.vue"
-import { mapGetters, mapMutations, mapActions } from "vuex"
+<script setup>
+import AuthBranding from "./AuthBranding.vue"
+import { computed } from "vue"
 
-export default {
-  components: { Branding },
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
 
-  data: () => ({
-    email: "",
-    password: "",
-    confirm: "",
-    displayName: "",
-    valid: false,
-  }),
+const store = useAuthStore()
+const { registerUser } = store
+const { getError } = storeToRefs(store)
 
-  computed: {
-    ...mapGetters("auth", ["isLoading", "getError"]),
+let email = ""
+let password = ""
+let confirm = ""
+let displayName = ""
+let valid = false
 
-    rules() {
-      const validation = {
-        email: this.email == "" ? "Email cannot be empty" : true,
-        password: this.password == "" ? "Password cannot be empty" : true,
-        displayName: this.displayName == "" ? "Name cannot be empty" : true,
-        confirm: this.password !== this.confirm ? "Passwords do not match" : true,
-      }
+const rules = computed(() => {
+  const validation = {
+    email: this.email == "" ? "Email cannot be empty" : true,
+    password: this.password == "" ? "Password cannot be empty" : true,
+    displayName: this.displayName == "" ? "Name cannot be empty" : true,
+    confirm: this.password !== this.confirm ? "Passwords do not match" : true,
+  }
 
-      return validation
-    },
-  },
+  return validation
+})
 
-  methods: {
-    ...mapActions("auth", ["registerUser"]),
-    ...mapMutations("auth", ["SET_ERROR"]),
-
-    register() {
-      const { displayName, email, password } = this
-      if (this.$refs.form.validate()) this.registerUser({ displayName, email, password })
-    },
-  },
+const register = () => {
+  const { displayName, email, password } = this
+  if (this.$refs.form.validate()) registerUser({ displayName, email, password })
 }
 </script>

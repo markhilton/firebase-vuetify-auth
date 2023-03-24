@@ -62,24 +62,12 @@
   </v-container>
 </template>
 
-<script>
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
+<script setup>
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
 
-export default {
-  computed: {
-    ...mapState("auth", ["config"]),
-    ...mapGetters("auth", [
-      "getError",
-      "isLoading",
-      "isAuthenticated",
-      "isEmailResetPasswordLinkSent",
-      "isEmailVerificationLinkSent",
-    ]),
-  },
-
-  methods: {
-    ...mapActions("auth", ["signIn", "signOut", "sendVerificationEmail"]),
-    ...mapMutations("auth", ["SET_EMAIL_VERIFICATION_SCREEN_SHOWN"]),
-  },
-}
+const store = useAuthStore()
+const { signOut, sendVerificationEmail, SET_EMAIL_VERIFICATION_SCREEN_SHOWN } = store
+const { getError, isLoading, isAuthenticated, isEmailResetPasswordLinkSent, isEmailVerificationLinkSent } =
+  storeToRefs(store)
 </script>

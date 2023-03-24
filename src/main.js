@@ -1,21 +1,30 @@
 import Vue from "vue"
-import App from "@/App"
-import store from "@/store"
+import App from "./App.vue"
 import router from "@/router"
-import "@/plugins/auth"
+import { AuthGuard, authGuardSettings } from "@/plugins/auth"
 import vuetify from "@/plugins/vuetify"
-
-import app from "@/middleware/firebase"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 Vue.config.productionTip = false
 
-// reload VUE app on Firebase auth state change
-onAuthStateChanged(getAuth(app), () => {
-  new Vue({
-    store,
-    router,
-    vuetify,
-    render: (h) => h(App),
-  }).$mount("#app")
+import { createApp } from "vue"
+import { createPinia } from "pinia"
+import { loadFonts } from "./plugins/webfontloader"
+
+loadFonts()
+
+const pinia = createPinia()
+
+import { auth, analytics } from "@/middleware/firebase"
+import { logEvent } from "firebase/analytics"
+import { onAuthStateChanged } from "firebase/auth"
+
+// initialize firebase and VUE
+onAuthStateChanged(auth, (user) => {
+  logEvent(analytics, "userAuthStateChanged", {
+    currentUser: user?.uid || null,
+  })
+
+  console.log(user)
+
+  createApp(App).use(AuthGuard, authGuardSettings).use(pinia).use(router).use(vuetify).mount("#app")
 })

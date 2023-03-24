@@ -18,12 +18,10 @@
   </v-list>
 </template>
 
-<script>
-import { mapState } from "vuex"
+<script setup>
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
 
-export default {
-  computed: {
-    ...mapState("auth", ["config"]),
-  },
-}
+const store = useAuthStore()
+const { config } = storeToRefs(store)
 </script>

@@ -1,10 +1,15 @@
-import Vue from "vue"
 import { getAuth } from "firebase/auth"
+import { getCurrentInstance } from "vue"
+import { useAuthStore } from "@/store/auth"
+
+const store = useAuthStore()
+
+const app = getCurrentInstance()
 
 const debug = (...text) => {
-  const debug = Vue.prototype.$authGuardDebug
+  const debug = app.appContext.config.globalProperties.$authGuardDebug
 
-  if (!Boolean(debug)) return
+  if (!debug) return
 
   console.log.apply(console, text)
 }
@@ -14,8 +19,7 @@ export default () => {
 
   let allowRoute = false // default state
 
-  const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
-  const store = Vue.prototype.$authGuardStore
+  const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
   const currentUser = auth.currentUser
   const isAuthenticated = currentUser ? true : false
   const verification = store.state.auth.config.verification
@@ -27,18 +31,18 @@ export default () => {
   if (verification && currentUser && currentUser.isAnonymous) {
     debug("[ auth check ]: anonymous user BLOCKED unable to verify email!")
 
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+    store.is_authguard_dialog_shown = true
+    store.is_authguard_dialog_persistent = false
   }
 
   // not show login dialog if page is public
   else if (isRoutePublic) {
     allowRoute = true
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", false)
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+    store.is_authguard_dialog_shown = false
+    store.is_authguard_dialog_persistent = false
   } else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+    store.is_authguard_dialog_shown = true
+    store.is_authguard_dialog_persistent = false
   }
 
   // authenticated currentUser
@@ -69,17 +73,19 @@ export default () => {
       allowRoute = true
     } else {
       debug("[ auth check ]: authguard config requires email verification")
-      store.commit("auth/SET_EMAIL_VERIFICATION_SCREEN_SHOWN", true)
+      store.error = null
+      store.is_email_verification_screen_shown = true
     }
 
     if (allowRoute) {
-      store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", false)
-      store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
+      store.is_authguard_dialog_shown = false
+      store.is_authguard_dialog_persistent = false
     } else {
-      store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
+      store.is_authguard_dialog_shown = true
+
       if (fromPublicToAuth) {
-        store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
-      } else store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
+        store.is_authguard_dialog_persistent = false
+      } else store.is_authguard_dialog_persistent = true
     }
   }
 
@@ -87,8 +93,9 @@ export default () => {
   else {
     debug("[ auth check ]: currentUser is NOT authenticated")
 
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_SHOWN", true)
-    store.commit("auth/SET_AUTH_GUARD_DIALOG_PERSISTENT", true) // added v0.5.6 because on log out the dialog was not persistent
+    store.is_authguard_dialog_shown = true
+    store.is_authguard_dialog_persistent = false
+    // added v0.5.6 because on log out the dialog was not persistent
   }
 
   debug("[ auth check ]: is route ALLOWED: [", allowRoute, "]")

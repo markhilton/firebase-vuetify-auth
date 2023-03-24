@@ -6,12 +6,12 @@
     <!-- phone authentication provider: enter phone number -->
     <v-card flat>
       <!-- error alerts -->
-      <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+      <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
         {{ getError.message }}
       </v-alert>
 
       <!-- application branding -->
-      <branding v-else class="text-center" />
+      <AuthBranding v-else class="text-center" />
 
       <!-- send code by text to phone -->
       <div v-if="sign_by_phone_step === 1">
@@ -76,89 +76,78 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import Vue from "vue"
-import Branding from "./Branding.vue"
+import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier } from "firebase/auth"
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
+import { computed, onMounted } from "vue"
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
 
-export default {
-  components: { Branding },
+let valid = false
+let code = [] // text confirmation code
+let digitMask = "#"
+let phoneMask = "(###) ###-####"
+let phoneNumber = "" // phone number field to send code to
+let recaptchaVerifier = null
+// let recaptchaWidgetId = null // TODO
 
-  data: () => ({
-    valid: false,
-    code: [], // text confirmation code
-    digitMask: "#",
-    phoneMask: "(###) ###-####",
-    phoneNumber: "", // phone number field to send code to
-    recaptchaVerifier: null,
-    recaptchaWidgetId: null,
-  }),
+const store = useAuthStore()
+const { textPhoneVerificationCode, confirmCode, SET_SHOW_LOGIN_WITH_PHONE } = store
+const { error, sign_by_phone_step, getError } = storeToRefs(store)
 
-  computed: {
-    ...mapState("auth", ["config", "sign_by_phone_step"]),
-    ...mapGetters("auth", ["isLoading", "getError"]),
+const rules = computed(() => {
+  const validation = {
+    phoneNumber: this.phoneNumber.replace(/\D/g, "") < 1000000000 ? "Please enter a valid US phone number" : true,
+  }
 
-    // phone number validation
-    rules() {
-      const validation = {
-        phoneNumber: this.phoneNumber.replace(/\D/g, "") < 1000000000 ? "Please enter a valid US phone number" : true,
-      }
+  return validation
+})
 
-      return validation
-    },
-  },
+onMounted(() => {
+  recaptchaVerifier = new RecaptchaVerifier(
+    "recaptcha-container",
+    { size: "invisible" },
+    getAuth(Vue.prototype.$authGuardFirebaseApp)
+  )
+  // this.recaptchaVerifier.render().then((widgetId) => (recaptchaWidgetId = widgetId))
 
-  mounted() {
-    this.recaptchaVerifier = new RecaptchaVerifier(
-      "recaptcha-container",
-      { size: "invisible" },
-      getAuth(Vue.prototype.$authGuardFirebaseApp)
-    )
-    this.recaptchaVerifier.render().then((widgetId) => (this.recaptchaWidgetId = widgetId))
+  // window.grecaptcha.reset(this.recaptchaWidgetId)
 
-    // window.grecaptcha.reset(this.recaptchaWidgetId)
+  // // Or, if you haven't stored the widget ID:
+  // this.recaptchaVerifier.render().then(function (widgetId) {
+  //   grecaptcha.reset(widgetId)
+  // })
+})
 
-    // // Or, if you haven't stored the widget ID:
-    // this.recaptchaVerifier.render().then(function (widgetId) {
-    //   grecaptcha.reset(widgetId)
-    // })
-  },
+// paste handler to allow confirmation code paste
+const onPaste = (event) => {
+  const text = event.clipboardData.getData("text").substr(0, 6)
 
-  methods: {
-    ...mapActions("auth", ["loginWithGoogle", "loginWithFacebook", "textPhoneVerificationCode", "confirmCode"]),
-    ...mapMutations("auth", ["SET_SHOW_LOGIN_WITH_PHONE", "SET_ERROR"]),
+  for (var index = 0; index < text.length; index++) {
+    this.$set(this.code, index, text[index])
+  }
+}
 
-    // paste handler to allow confirmation code paste
-    onPaste(event) {
-      const text = event.clipboardData.getData("text").substr(0, 6)
+// form field focus handler to automatically move cursor to the next field
+const nextElementFocus = (index, event) => {
+  let i = index
 
-      for (var index = 0; index < text.length; index++) {
-        this.$set(this.code, index, text[index])
-      }
-    },
+  if (["Backspace", "ArrowLeft"].includes(event.key)) {
+    i = index > 1 ? index - 1 : 0
+  }
 
-    // form field focus handler to automatically move cursor to the next field
-    nextElementFocus(index, event) {
-      let i = index
+  // jeez to figure this out OMG :)
+  // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array
+  if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowRight"].includes(event.key)) {
+    this.$set(this.code, index, event.key)
 
-      if (["Backspace", "ArrowLeft"].includes(event.key)) {
-        i = index > 1 ? index - 1 : 0
-      }
+    i = index > 4 ? index : index + 1
+  }
 
-      // jeez to figure this out OMG :)
-      // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array
-      if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowRight"].includes(event.key)) {
-        this.$set(this.code, index, event.key)
+  const el = "code" + i
 
-        i = index > 4 ? index : index + 1
-      }
-
-      const el = "code" + i
-
-      this.$refs[el][0].focus()
-    },
-  },
+  this.$refs[el][0].focus()
 }
 </script>
 

@@ -1,4 +1,4 @@
-export default {
+export const state = () => ({
   config: null, // package init configuration
   error: null, // error from last operation
 
@@ -19,4 +19,4 @@ export default {
   is_reset_password_screen_shown: false, // show reset password screen,
   is_route_public: false, // is current route public
   is_from_public_to_auth: false, // is route going from public page to protected
-}
+})

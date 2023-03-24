@@ -2,12 +2,12 @@
   <v-container>
     <v-card flat>
       <!-- error alerts -->
-      <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+      <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
         {{ getError.message }}
       </v-alert>
 
       <!-- application branding -->
-      <branding v-else class="text-center" />
+      <AuthBranding v-else class="text-center" />
     </v-card>
 
     <v-card v-if="config.email" flat>
@@ -31,7 +31,7 @@
           class="ml-8"
           name="remember"
           label="remember me"
-          @change="SET_SESSION_PERSISTANCE(remember)"
+          @change="is_session_persistant = remember"
         />
       </v-card-text>
 
@@ -56,37 +56,24 @@
   </v-container>
 </template>
 
-<script>
-import Branding from "./Branding.vue"
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex"
+<script setup>
+import { onCreated } from "vue"
+import AuthBranding from "./AuthBranding.vue"
 
-export default {
-  components: { Branding },
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
 
-  data: () => ({
-    email: "",
-    password: "",
-    remember: true,
-  }),
+const store = useAuthStore()
+const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
+const { config, error, is_session_persistant, getSessionPersistence, getError } = storeToRefs(store)
+// const { config, error, is_session_persistant, is_email_reset_password_link_sent, getSessionPersistence, getError } =
 
-  computed: {
-    ...mapState("auth", ["config"]),
-    ...mapGetters("auth", ["getSessionPersistence", "isLoading", "getError"]),
-  },
+let email = ""
+let password = ""
+let remember = true
 
-  created() {
-    this.remember = this.getSessionPersistence
-    this.SET_EMAIL_PASSWORD_RESET_LINK_SENT(false)
-  },
-
-  methods: {
-    ...mapActions("auth", ["loginWithEmail"]),
-    ...mapMutations("auth", [
-      "SET_SESSION_PERSISTANCE",
-      "SET_EMAIL_PASSWORD_RESET_LINK_SENT",
-      "SET_PASSWORD_RESET_SCREEN_SHOWN",
-      "SET_ERROR",
-    ]),
-  },
-}
+onCreated(() => {
+  remember = getSessionPersistence
+  //   is_email_reset_password_link_sent = false // TODO
+})
 </script>

@@ -38,18 +38,11 @@
   </v-app>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex"
+<script setup>
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
 
-export default {
-  name: "App",
-
-  computed: {
-    ...mapGetters("auth", ["isAuthenticated", "getDisplayName"]),
-  },
-
-  methods: {
-    ...mapActions("auth", ["signOut"]),
-  },
-}
+const store = useAuthStore()
+const { signOut } = store
+const { isAuthenticated, getDisplayName } = storeToRefs(store)
 </script>

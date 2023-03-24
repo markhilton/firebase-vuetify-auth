@@ -18,14 +18,16 @@
  * - user navigates from protected route to public route
  *
  */
-import Vue from "vue"
+import { getCurrentInstance } from "vue"
 import authCheck from "./authcheck"
+
+const app = getCurrentInstance()
 
 export default (to, from, next) => {
   const isRequired = to.meta.requiresAuth // is current path required authentication
   const fromRequiresAuth = from.meta.requiresAuth // from which page is request
-  const store = Vue.prototype.$authGuardStore
-  const debug = Vue.prototype.$authGuardDebug
+  const store = app.appContext.config.globalProperties.$authGuardStore
+  const debug = app.appContext.config.globalProperties.$authGuardDebug
 
   if (!store) console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!")
   else if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
