@@ -3,6 +3,7 @@ export default {
   store: null, // vuex store
   router: null, // routes
   firebase: null, // pass on firebase middleware app init
+  session: "local",
 
   saml: false, // allow authentication with saml
   saml_text: "Login with SAML", // saml button text

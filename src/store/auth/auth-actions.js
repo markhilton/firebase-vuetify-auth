@@ -1,7 +1,4 @@
-import { getCurrentInstance } from "vue"
-
-const app = getCurrentInstance()
-
+import { useRouter } from "vue-router"
 import authcheck from "../../components/authcheck"
 import {
   getAuth,
@@ -41,42 +38,41 @@ export const actions = {
   },
 
   authGuardOnRouterReady() {
-    const debug = app.appContext.config.globalProperties.$authGuardDebug
-    const router = app.appContext.config.globalProperties.$authGuardRouter
-    const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+    const debug = this.config.debug
+    // const router = useRouter()
+    // const auth = getAuth(this.config.firebase)
 
     if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
 
     // check current route when router is ready
-    router.onReady(() => {
-      const isAuthenticated = auth.currentUser ? true : false
-      const isCurrentRoutePublic = this.is_route_public
+    // router.onReady(() => {
+    //   const isAuthenticated = auth.currentUser ? true : false
+    //   const isCurrentRoutePublic = this.is_route_public
 
-      if (debug) {
-        console.log(
-          "[ auth guard ]: vue router READY! isCurrentRoutePublic: [",
-          isCurrentRoutePublic,
-          "] isAuthenticated: [",
-          isAuthenticated,
-          "]"
-        )
-      }
+    //   if (debug) {
+    //     console.log(
+    //       "[ auth guard ]: vue router READY! isCurrentRoutePublic: [",
+    //       isCurrentRoutePublic,
+    //       "] isAuthenticated: [",
+    //       isAuthenticated,
+    //       "]"
+    //     )
+    //   }
 
-      if (isCurrentRoutePublic) {
-        this.is_authguard_dialog_shown = false
-        this.is_authguard_dialog_persistent = false
-      } else if (!isAuthenticated) {
-        this.is_authguard_dialog_shown = true
-        this.is_authguard_dialog_persistent = true
-      }
-    })
+    //   if (isCurrentRoutePublic) {
+    //     this.is_authguard_dialog_shown = false
+    //     this.is_authguard_dialog_persistent = false
+    //   } else if (!isAuthenticated) {
+    //     this.is_authguard_dialog_shown = true
+    //     this.is_authguard_dialog_persistent = true
+    //   }
+    // })
   },
 
   //
   initializeGuard() {
-    const config = this.config
-    const debug = app.appContext.config.globalProperties.$authGuardDebug
-    const user = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp).currentUser
+    const debug = this.config.debug
+    const user = getAuth(this.config.firebase).currentUser
 
     if (user) {
       const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
@@ -86,7 +82,6 @@ export const actions = {
 
     if (debug) console.log("[ auth guard ]: component initialized for user: [", user ? user.uid : null, "]")
 
-    this.config = config // OLD VUEX: have to commit null to make firebase auth reactive
     this.is_email_verification_screen_shown = false
 
     authcheck()
@@ -98,15 +93,15 @@ export const actions = {
   loginWithEmail({ email, password }) {
     return new Promise(async (resolve, reject) => {
       try {
-        const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
-        const router = app.appContext.config.globalProperties.$authGuardRouter
+        const auth = getAuth(this.config.firebase)
+        const router = useRouter()
 
         this.is_loading = true
 
         await signOut(auth)
 
         // set session persistence
-        if (app.appContext.config.globalProperties.$authGuardSession === "browser") {
+        if (this.config.session === "browser") {
           await setPersistence(auth, browserSessionPersistence)
         } else {
           await setPersistence(auth, browserLocalPersistence)
@@ -132,7 +127,7 @@ export const actions = {
   //
   loginWithGoogle() {
     const provider = new GoogleAuthProvider()
-    const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+    const auth = getAuth(this.config.firebase)
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider)
@@ -141,7 +136,7 @@ export const actions = {
   //
   loginWithFacebook() {
     const provider = new FacebookAuthProvider()
-    const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+    const auth = getAuth(this.config.firebase)
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider)
@@ -152,7 +147,7 @@ export const actions = {
 
   loginWithSaml() {
     const provider = new SAMLAuthProvider(this.config.saml_provider_id)
-    const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+    const auth = getAuth(this.config.firebase)
 
     // provider.addScope("profile")
 
@@ -166,7 +161,7 @@ export const actions = {
       this.text_confirmation = null
 
       const phone = "+1" + phoneNumber.replace(/\D/g, "")
-      const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+      const auth = getAuth(this.config.firebase)
       const confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
 
       this.is_loading = false
@@ -202,7 +197,7 @@ export const actions = {
       this.is_loading = true
 
       const verification = this.config.email
-      const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+      const auth = getAuth(this.config.firebase)
 
       await createUserWithEmailAndPassword(auth, email, password)
       await signInWithEmailAndPassword(auth, email, password)
@@ -226,7 +221,7 @@ export const actions = {
     try {
       this.is_loading = true
 
-      const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+      const auth = getAuth(this.config.firebase)
 
       await sendPasswordResetEmail(auth, email)
 
@@ -241,8 +236,8 @@ export const actions = {
 
   //
   signOut() {
-    const debug = app.appContext.config.globalProperties.$authGuardDebug
-    const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+    const debug = this.config.debug
+    const auth = getAuth(this.config.firebase)
 
     if (debug) console.log("[ auth guard ]: signOut request")
 
@@ -255,7 +250,7 @@ export const actions = {
       try {
         this.is_loading = true
 
-        const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+        const auth = getAuth(this.config.firebase)
 
         await sendEmailVerification(auth.currentUser)
 

@@ -1,5 +1,5 @@
 import router from "@/router"
-import firebase from "@/middleware/firebase"
+import { app as firebase } from "@/middleware/firebase"
 import AuthGuard from "../wrapper"
 
 const authGuardSettings = {

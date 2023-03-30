@@ -1,13 +1,9 @@
 import { getAuth } from "firebase/auth"
-import { getCurrentInstance } from "vue"
 import { useAuthStore } from "@/store/auth"
 
-const store = useAuthStore()
-
-const app = getCurrentInstance()
-
 const debug = (...text) => {
-  const debug = app.appContext.config.globalProperties.$authGuardDebug
+  const store = useAuthStore()
+  const debug = store.config.debug
 
   if (!debug) return
 
@@ -15,16 +11,18 @@ const debug = (...text) => {
 }
 
 export default () => {
+  const store = useAuthStore()
+
   debug("[ auth check ]: execution started...")
 
   let allowRoute = false // default state
 
-  const auth = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp)
+  const auth = getAuth(store.config.firebase)
   const currentUser = auth.currentUser
   const isAuthenticated = currentUser ? true : false
-  const verification = store.state.auth.config.verification
-  const isRoutePublic = store.getters["auth/isRoutePublic"]
-  const fromPublicToAuth = store.getters["auth/isFromPublicToAuth"]
+  const verification = store.config.verification
+  const isRoutePublic = store.is_route_public
+  const fromPublicToAuth = store.is_from_public_to_auth
   if (verification) debug("[ auth check ]: email verification required: [", verification, "]")
 
   // anonymous authenticated currentUser

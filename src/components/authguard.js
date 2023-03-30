@@ -18,29 +18,26 @@
  * - user navigates from protected route to public route
  *
  */
-import { getCurrentInstance } from "vue"
 import authCheck from "./authcheck"
-
-const app = getCurrentInstance()
+import { useAuthStore } from "@/store/auth"
 
 export default (to, from, next) => {
+  const store = useAuthStore()
+  const debug = store.config.debug
   const isRequired = to.meta.requiresAuth // is current path required authentication
   const fromRequiresAuth = from.meta.requiresAuth // from which page is request
-  const store = app.appContext.config.globalProperties.$authGuardStore
-  const debug = app.appContext.config.globalProperties.$authGuardDebug
 
-  if (!store) console.error("[ auth guard ]: WARNING: VueX store instance missing in AuthenticationGuard config!")
-  else if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
+  if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
 
   // check if we are going from public page to auth required page
   if (isRequired && !fromRequiresAuth) {
-    store.commit("auth/SET_IS_FROM_PUBLIC_TO_AUTH", true)
-  } else store.commit("auth/SET_IS_FROM_PUBLIC_TO_AUTH", false)
+    store.is_from_public_to_auth = true
+  } else store.is_from_public_to_auth = false
 
   // change public route state depending on route
   if (!isRequired) {
-    store.commit("auth/SET_IS_ROUTE_PUBLIC", true)
-  } else store.commit("auth/SET_IS_ROUTE_PUBLIC", false)
+    store.is_route_public = true
+  } else store.is_route_public = false
 
   const isAllowed = authCheck() // is user Authenticated
 

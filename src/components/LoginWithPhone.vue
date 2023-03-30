@@ -77,7 +77,7 @@
 </template>
 
 <script setup>
-import Vue from "vue"
+import { getCurrentInstance } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier } from "firebase/auth"
 import { computed, onMounted } from "vue"
@@ -93,6 +93,7 @@ let recaptchaVerifier = null
 // let recaptchaWidgetId = null // TODO
 
 const store = useAuthStore()
+const app = getCurrentInstance()
 const { textPhoneVerificationCode, confirmCode, SET_SHOW_LOGIN_WITH_PHONE } = store
 const { error, sign_by_phone_step, getError } = storeToRefs(store)
 
@@ -108,7 +109,7 @@ onMounted(() => {
   recaptchaVerifier = new RecaptchaVerifier(
     "recaptcha-container",
     { size: "invisible" },
-    getAuth(Vue.prototype.$authGuardFirebaseApp)
+    getAuth(app.config.globalProperties.$authGuardFirebaseApp)
   )
   // this.recaptchaVerifier.render().then((widgetId) => (recaptchaWidgetId = widgetId))
 

@@ -13,7 +13,7 @@ export const getters = {
   getPhotoURL: (state) => state?.current_user?.photoURL || null,
   getPhoneNumber: (state) => state?.current_user?.phoneNumber || null,
   getMetadata: () => {
-    const user = getAuth(app.appContext.config.globalProperties.$authGuardFirebaseApp).currentUser
+    const user = getAuth(app.config.globalProperties.$authGuardFirebaseApp).currentUser
     return user ? user.metadata : null
   },
   isLoading: (state) => state.is_loading,

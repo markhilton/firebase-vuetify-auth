@@ -2,18 +2,18 @@ export default [
   {
     name: "Home",
     path: "/",
-    component: () => import(/* webpackChunkName: "home" */ "@/views/Home"),
+    component: () => import("@/views/Home.vue"),
     meta: { requiresAuth: true },
   },
   {
     name: "Public",
     path: "/public",
-    component: () => import(/* webpackChunkName: "public" */ "@/views/Public"),
+    component: () => import("@/views/PublicRoute.vue"),
   },
   {
     name: "Protected",
     path: "/protected",
     meta: { requiresAuth: true },
-    component: () => import(/* webpackChunkName: "protected" */ "@/views/Protected"),
+    component: () => import("@/views/ProtectedRoute.vue"),
   },
 ]

@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { onCreated } from "vue"
+import { onMounted } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
 import { storeToRefs } from "pinia"
@@ -72,7 +72,7 @@ let email = ""
 let password = ""
 let remember = true
 
-onCreated(() => {
+onMounted(() => {
   remember = getSessionPersistence
   //   is_email_reset_password_link_sent = false // TODO
 })

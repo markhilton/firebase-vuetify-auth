@@ -1,4 +1,8 @@
 import { initializeApp } from "firebase/app"
+import { getAuth, connectAuthEmulator } from "firebase/auth"
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore"
+
+const local = false
 
 const config = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
@@ -12,6 +16,12 @@ const config = {
 }
 
 const app = initializeApp(config)
+const db = getFirestore(app)
+const auth = getAuth(app)
 
-// export default firebase
-export default app
+if (local) {
+  connectFirestoreEmulator(db, "localhost", 8081)
+  connectAuthEmulator(auth, "http://localhost:9099")
+}
+
+export { app, auth }

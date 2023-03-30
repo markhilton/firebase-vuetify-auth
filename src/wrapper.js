@@ -1,5 +1,4 @@
-import { getCurrentInstance } from "vue"
-
+import { createPinia } from "pinia"
 import { useAuthStore } from "@/store/auth"
 
 import { VueMaskDirective } from "v-mask"
@@ -13,53 +12,35 @@ import AuthGuard from "./components/AuthGuard.vue"
 // Import router middleware
 import AuthMiddleware from "./components/authguard"
 
-const app = getCurrentInstance()
-
-const plugin = {
-  install(Vue, options = {}) {
-    const authStore = useAuthStore()
-
-    // if (install.installed) return
-
-    // install.installed = true
-
+export default {
+  install: (app, options = {}) => {
     // merge default settings with user settings
     const globalConfig = { ...defaultSettings, ...options }
-    const { router, firebase, session = "local", debug } = globalConfig
-
-    let { store } = globalConfig
+    const { firebase, debug } = globalConfig
 
     // verify if required dependency instances are passed to this package config
     if (debug) {
-      if (router === null) {
-        console.error("[ auth guard ]: ERROR: vue router instance missing in AuthenticationGuard config!")
-      }
+      console.log("[ auth guard ]: wrapper initialization...")
+
       if (firebase === null) {
         console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!")
       }
     }
 
-    if (debug) console.log("[ auth guard ]: registering VueX namespace: auth")
+    // check if pinia jest been created already
+    if (!app.config.globalProperties.$pinia) {
+      console.log("[ auth guard ]: pinia store not detected - creating...")
+      app.use(createPinia())
+    }
 
-    // save store in Vue.prototype to be accessible authcheck.js
-    app.appContext.config.globalProperties.$authGuardDebug = debug
-    app.appContext.config.globalProperties.$authGuardStore = store
-    app.appContext.config.globalProperties.$authGuardRouter = router
-    app.appContext.config.globalProperties.$authGuardSession = session
-    app.appContext.config.globalProperties.$authGuardFirebaseApp = firebase
-
-    delete globalConfig.store
-    delete globalConfig.router
-    delete globalConfig.firebase
+    const authStore = useAuthStore()
 
     // commit npm package config to vuex store
     authStore.config = globalConfig
 
-    Vue.directive("mask", VueMaskDirective)
-    Vue.component("AuthenticationGuard", AuthGuard)
+    app.directive("mask", VueMaskDirective)
+    app.component("AuthenticationGuard", AuthGuard)
   },
 }
 
 export { AuthMiddleware } // export vue router middleware
-
-export default plugin
