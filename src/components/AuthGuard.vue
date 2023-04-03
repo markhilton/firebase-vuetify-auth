@@ -1,14 +1,15 @@
 <template>
   <div>
-    is_authguard_dialog_shown: {{ is_authguard_dialog_shown }}<br />
-    isAuthGuardDialogPersistent: {{ isAuthGuardDialogPersistent }}
+    is_authguard_dialog_shown: {{ store.is_authguard_dialog_shown }}<br />
+    isAuthGuardDialogPersistent: {{ isAuthGuardDialogPersistent }}<br />
+    dialog: {{ dialog }}
+
     <v-dialog
-      :value="is_authguard_dialog_shown"
+      v-model="dialog"
       :persistent="isAuthGuardDialogPersistent"
       :retain-focus="false"
       overlay-opacity="0.95"
       content-class="elevation-0"
-      @input="SET_AUTH_GUARD_DIALOG_SHOWN($event)"
     >
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
@@ -76,8 +77,7 @@ import { useRoute } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
-const { initializeGuard, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_AUTH_GUARD_DIALOG_SHOWN, is_authguard_dialog_shown } =
-  store
+const { initializeGuard, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
 const {
   tab,
   config,
@@ -94,6 +94,11 @@ const route = useRoute()
 
 const debug = computed(() => config.debug)
 const currentRoute = computed(() => route.path)
+
+const dialog = computed({
+  get: () => store.is_authguard_dialog_shown,
+  set: (value) => (store.is_authguard_dialog_shown = value),
+})
 
 onMounted(() => {
   initializeGuard()
