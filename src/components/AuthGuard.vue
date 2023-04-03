@@ -30,26 +30,25 @@
               </v-tab>
             </v-tabs>
 
-            <v-tabs-items :value="tab" @change="tab = $event">
-              <v-tab-item v-if="!isLoginWithPhoneShown" class="pt-5">
-                <LoginCard />
-              </v-tab-item>
+            <v-card-text>
+              <v-window :value="tab" @change="tab = $event">
+                <v-window-item v-if="!isLoginWithPhoneShown" class="pt-5">
+                  <LoginCard />
+                </v-window-item>
 
-              <v-tab-item v-if="isLoginWithPhoneShown" class="pt-5">
-                <LoginWithPhone />
-              </v-tab-item>
+                <v-window-item v-if="isLoginWithPhoneShown" class="pt-5">
+                  <LoginWithPhone />
+                </v-window-item>
 
-              <v-tab-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
-                <RegisterUser />
-              </v-tab-item>
+                <v-window-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
+                  <RegisterUser />
+                </v-window-item>
 
-              <v-tab-item
-                v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && !config.email"
-                class="pt-5"
-              >
-                <PasswordReset />
-              </v-tab-item>
-            </v-tabs-items>
+                <v-window-item v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && !config.email">
+                  <PasswordReset />
+                </v-window-item>
+              </v-window>
+            </v-card-text>
           </div>
 
           <v-card-actions v-if="!isEmailVerificationScrenShown">
