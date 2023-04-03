@@ -1,12 +1,12 @@
 <template>
   <div>
     is_authguard_dialog_shown: {{ store.is_authguard_dialog_shown }}<br />
-    isAuthGuardDialogPersistent: {{ isAuthGuardDialogPersistent }}<br />
+    is_authguard_dialog_persistent: {{ store.is_authguard_dialog_persistent }}<br />
     dialog: {{ dialog }}
 
     <v-dialog
       v-model="dialog"
-      :persistent="isAuthGuardDialogPersistent"
+      :persistent="store.is_authguard_dialog_persistent"
       :retain-focus="false"
       overlay-opacity="0.95"
       content-class="elevation-0"
@@ -83,7 +83,6 @@ const {
   config,
   isLoading,
   isLoginWithPhoneShown,
-  isAuthGuardDialogPersistent,
   isUserRegistrationAllowed,
   isEmailVerificationScrenShown,
   isResetPasswordScreenShown,
