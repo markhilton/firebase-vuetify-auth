@@ -1,19 +1,10 @@
 <template>
-  <v-list dense>
-    <v-list-item>
-      <v-list-item-content>
-        <v-list-item-title class="title">
-          <v-icon :color="config.iconColor">{{ config.icon }}</v-icon>
-
-          {{ config.title }}
-        </v-list-item-title>
-
-        <v-list-item-subtitle>
-          <div class="ml-1">
-            {{ config.subtitle }}
-          </div>
-        </v-list-item-subtitle>
-      </v-list-item-content>
+  <v-list lines="two" dense>
+    <v-list-item :title="config.title" :subtitle="config.subtitle">
+      <template #title>
+        <v-icon :color="config.iconColor">{{ config.icon }}</v-icon>
+        {{ config.title }}
+      </template>
     </v-list-item>
   </v-list>
 </template>
