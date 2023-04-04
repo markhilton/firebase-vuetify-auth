@@ -3,12 +3,12 @@
     <!-- user with no email verification -->
     <v-card flat class="text-center pa-5">
       <!-- email error -->
-      <div v-if="getError">
+      <div v-if="error">
         <div class="display-1 grey--text mb-3">Error!</div>
 
         <!-- error alerts -->
-        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
-          {{ getError.message }}
+        <v-alert v-if="Boolean(error)" type="error" dismissible @click="error = null">
+          {{ error.message }}
         </v-alert>
 
         <v-btn color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)"> Back to Login </v-btn>
@@ -41,7 +41,7 @@
             If you have not received verification email<br />click at the button below.
           </p>
 
-          <v-btn :disabled="isLoading" color="primary" @click="sendVerificationEmail()">
+          <v-btn :disabled="is_loading" color="primary" @click="sendVerificationEmail()">
             Send Verification Email
           </v-btn>
         </div>
@@ -67,7 +67,6 @@ import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
-const { signOut, sendVerificationEmail, SET_EMAIL_VERIFICATION_SCREEN_SHOWN } = store
-const { getError, isLoading, isAuthenticated, isEmailResetPasswordLinkSent, isEmailVerificationLinkSent } =
-  storeToRefs(store)
+const { error, is_loading, signOut, sendVerificationEmail, SET_EMAIL_VERIFICATION_SCREEN_SHOWN } = store
+const { isAuthenticated, isEmailResetPasswordLinkSent, isEmailVerificationLinkSent } = storeToRefs(store)
 </script>

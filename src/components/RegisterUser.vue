@@ -3,8 +3,8 @@
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="register()">
         <!-- error alerts -->
-        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
-          {{ getError.message }}
+        <v-alert v-if="Boolean(error)" type="error" dismissible @click="error = null">
+          {{ error.message }}
         </v-alert>
 
         <!-- application branding -->
@@ -62,15 +62,12 @@
 </template>
 
 <script setup>
-import AuthBranding from "./AuthBranding.vue"
 import { computed } from "vue"
-
-import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
+import AuthBranding from "./AuthBranding.vue"
 
 const store = useAuthStore()
-const { registerUser } = store
-const { getError } = storeToRefs(store)
+const { error, registerUser } = store
 
 let email = ""
 let password = ""
