@@ -60,7 +60,6 @@ import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
-// const { loginWithGoogle, loginWithFacebook, loginWithSaml, SET_SHOW_LOGIN_WITH_PHONE } = store
-const { loginWithGoogle } = store
+const { loginWithGoogle, loginWithFacebook, loginWithSaml, SET_SHOW_LOGIN_WITH_PHONE } = store
 const { config, isLoginWithProvidersActive, isOnlySingleProvider } = storeToRefs(store)
 </script>
