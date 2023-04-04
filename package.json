@@ -19,9 +19,9 @@
     "dev": "vite",
     "build": "rollup -c",
     "build:all": "npm run build:umd & npm run build:es & npm run build:unpkg",
-    "build:umd": "rollup --config rollup.config.js --format umd --file dist/authentication-guard.umd.js",
-    "build:es": "rollup --config rollup.config.js --format es --file dist/authentication-guard.esm.js",
-    "build:unpkg": "rollup --config rollup.config.js --format iife --file dist/authentication-guard.min.js",
+    "build:umd": "rollup --config rollup.config.mjs --format umd --file dist/authentication-guard.umd.js",
+    "build:es": "rollup --config rollup.config.mjs --format es --file dist/authentication-guard.esm.js",
+    "build:unpkg": "rollup --config rollup.config.mjs --format iife --file dist/authentication-guard.min.js",
     "build:script": "vue-cli-service build --mode production --dest dist --inline-vue --name insights"
   },
   "dependencies": {
@@ -54,7 +54,8 @@
     "vite": "^4.2.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
-    "vue-cli-plugin-vuetify": "~2.5.8"
+    "vue-cli-plugin-vuetify": "~2.5.8",
+    "vue-template-compiler": "^2.7.14"
   },
   "browserslist": [
     "> 1%",

@@ -2,7 +2,7 @@ import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs" // Convert CommonJS modules to ES6
 import vue from "rollup-plugin-vue" // Handle .vue SFC files
 import peerDepsExternal from "rollup-plugin-peer-deps-external"
-import vuetify from "rollup-plugin-vuetify"
+//import vuetify from "rollup-plugin-vuetify"
 import buble from "@rollup/plugin-buble" // Transpile/polyfill with reasonable browser support
 
 export default {
@@ -12,7 +12,6 @@ export default {
     exports: "named",
     globals: {
       vue: "vue",
-      vuex: "vuex",
       "v-mask": "v-mask",
       firebase: "firebase",
       "firebase/auth": "firebase/auth",
@@ -21,7 +20,7 @@ export default {
       "@/middleware": "./src/middleware",
     },
   },
-  external: ["vue", "vuex", "vuetify/lib", "firebase", "firebase/auth", "firebase/compat/app", "firebase/compat/auth"],
+  external: ["vue", "vuetify/lib", "firebase", "firebase/auth"],
   plugins: [
     resolve(),
     peerDepsExternal(),
@@ -32,7 +31,7 @@ export default {
       css: true, // Dynamically inject css as a <style> tag
       compileTemplate: true, // Explicitly convert template to render function
     }),
-    vuetify(),
+    // vuetify(),
     buble({
       objectAssign: "Object.assign",
       transforms: { asyncAwait: false },
