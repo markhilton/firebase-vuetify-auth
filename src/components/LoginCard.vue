@@ -36,17 +36,18 @@
       </v-card-text>
 
       <div class="text-center pb-4">
-        <v-btn text x-small color="primary" @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true)"> Forgot Password? </v-btn>
+        <v-btn variant="text" size="x-small" color="primary" @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true)">
+          Forgot Password?
+        </v-btn>
       </div>
 
       <v-card-actions>
         <v-btn
-          depressed
           block
-          large
+          size="large"
+          variant="outlined"
           color="primary"
           type="submit"
-          :disabled="email === '' || password === ''"
           @click="loginWithEmail({ email, password })"
         >
           Login
