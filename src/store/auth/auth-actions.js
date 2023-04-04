@@ -24,12 +24,14 @@ export const actions = {
 
     if (status === false) this.error = null
   },
+
   SET_PASSWORD_RESET_SCREEN_SHOWN(status) {
     this.tab = status ? 1 : 0
     this.is_reset_password_screen_shown = status
 
     if (status === false) this.is_email_reset_password_link_sent = false
   },
+
   SET_SHOW_LOGIN_WITH_PHONE(status) {
     this.tab = 0 // reset tab to Sign In
     this.is_login_with_phone_shown = status
