@@ -43,7 +43,7 @@
       <v-container v-if="sign_by_phone_step === 2">
         <p class="text-center">
           enter confirmation code<br />
-          you have recived on your mobile phone
+          you have received on your mobile phone
         </p>
 
         <v-row class="centered-input">
@@ -154,12 +154,12 @@ const nextElementFocus = (index, event) => {
 
 <style scoped>
 /* styles for phone number field */
-.large-font >>> input {
+.large-font > input {
   font-size: 1.5rem;
 }
 
 /* styles for confirmation code form fields */
-.centered-input >>> input {
+.centered-input > input {
   text-align: center;
   font-weight: bold;
   font-size: 1.5rem;

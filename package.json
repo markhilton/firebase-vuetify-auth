@@ -17,11 +17,7 @@
     "serve": "vite preview",
     "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
     "dev": "vite",
-    "build": "rollup -c",
-    "build:all": "npm run build:umd & npm run build:es & npm run build:unpkg",
-    "build:umd": "rollup --config rollup.config.mjs --format umd --file dist/authentication-guard.umd.js",
-    "build:es": "rollup --config rollup.config.mjs --format es --file dist/authentication-guard.esm.js",
-    "build:unpkg": "rollup --config rollup.config.mjs --format iife --file dist/authentication-guard.min.js",
+    "build": "vite build",
     "build:script": "vue-cli-service build --mode production --dest dist --inline-vue --name insights"
   },
   "dependencies": {
@@ -35,9 +31,6 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@rollup/plugin-buble": "^1.0.2",
-    "@rollup/plugin-commonjs": "^24.0.1",
-    "@rollup/plugin-node-resolve": "^15.0.1",
     "@vitejs/plugin-vue": "^4.1.0",
     "@volar-plugins/vetur": "^0.1.0",
     "css-loader": "^6.7.1",
@@ -46,12 +39,9 @@
     "eslint-plugin-vue": "^9.1.1",
     "postcss": "^8.3.11",
     "prettier": "^2.7.1",
-    "rollup": "^3.20.2",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rollup-plugin-vue": "^6.0.0",
-    "rollup-plugin-vuetify": "^0.2.4",
     "sass": "^1.43.3",
     "vite": "^4.2.1",
+    "vite-plugin-css-injected-by-js": "^3.1.0",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^1.0.0-alpha.12",
     "vue-cli-plugin-vuetify": "~2.5.8",
