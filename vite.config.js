@@ -4,16 +4,34 @@ import path from "path"
 import vue from "@vitejs/plugin-vue"
 import vuetify from "vite-plugin-vuetify"
 import eslintPlugin from "vite-plugin-eslint"
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [vue(), vuetify({ autoImport: true }), eslintPlugin()],
+  plugins: [
+    vue(),
+    vuetify({ autoImport: true }),
+    eslintPlugin(),
+    cssInjectedByJsPlugin()
+  ],
   define: { "process.env": {} },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
   },
+  build: {
+    assetsDir: "",
+    rollupOptions: {
+      input: "src/wrapper.js", // Path relative to package.json
+      output: {
+        name: "AuthGuard",
+        exports: "named",
+        entryFileNames: 'authentication-guard.esm.js',
+        format: "esm"
+      },
+    }
+  }
   /* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions
   resolve: {
     extensions: [

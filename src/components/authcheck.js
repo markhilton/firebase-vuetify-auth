@@ -19,7 +19,7 @@ export default () => {
 
   const auth = getAuth(store.config.firebase)
   const currentUser = auth.currentUser
-  const isAuthenticated = currentUser ? true : false
+  const isAuthenticated = !!currentUser
   const verification = store.config.verification
   const isRoutePublic = store.is_route_public
   const fromPublicToAuth = store.is_from_public_to_auth
