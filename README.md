@@ -176,7 +176,7 @@ export default router
 
 This will trigger `AuthMiddleware` to be executed before entering `/protected` route, which will validate if the user is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middleware will render a full screen modal "Login" view.
 
-### Thats it!
+### That's it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
 
@@ -197,3 +197,94 @@ After following implementation instruction requests to protected views, should r
 | subtitle     | String           | "Firebase Vuetify Authentication NPM package" | authentication prompt subtitle                                                                                 |
 | icon         | String           | "mdi-brightness-7"                            | authentication prompt icon                                                                                     |
 | iconColor    | String           | "orange"                                      | authentication prompt icon                                                                                     |
+
+## Vue3 integration
+
+### Remove Vue global API instances
+If there are any vue global API instances, such as ```Vue.set```, ```Vue.filter``` or ```Vue.delete```, please remove them.
+
+Example:
+instead of ```Vue.set(object, key, value)``` use ```object[key] = value```
+
+### Get rid of direct vue template filters
+Avoid using filters and inline logic executions in Vue templates, as they can negatively impact the performance of the component.
+It will affect the performance every time the component has been rerendered
+
+Example:
+instead of ```{{ user.lastName | uppercase }}``` use ```{{ uppercasedLastName }}``` or ```{{uppercase(lastName)}}```
+
+### Vue directives
+#### v-if, v-for
+Using ```v-if``` conditions with ```v-for``` lists used to be possible with Vue 2. For performance reasons, this behavior has been disabled on Vue 3.
+
+Starting Vue 3, you will have to use computed list properties.
+
+#### if you use "emit"
+It is still possible to emit events from components to their parents, however, all event have to be declared via the new emit option
+
+For instance, if your component has a ```@click``` property, emitted using  ```this.$emit("click")```, you will have to declare the "click" event in your component:
+
+```vue
+props: {
+  name: {
+    type: String,
+    default: ""
+  },
+},
+
+emits: ["click"], // events have to be declared here
+
+data() {
+  return {
+    value: ""
+  }
+}
+```
+
+#### v-model
+ChildComponent needs to be rewritten like this:
+```<ChildComponent v-model="pageTitle" />```
+
+```vue
+props: {
+  modelValue: String
+},
+
+emits: ['update:modelValue'],
+
+methods: {
+  changePageTitle(title) {
+    this.$emit('update:modelValue', title)
+  }
+}
+```
+The cool thing is that it's now possible having multiple v-model custom values along, for example v-model:valueA, v-model:valueB, etc.
+
+in our case, using Pinia instead of direct emits
+
+### Updating Vue Build Tools
+If you have any complex webpack system, avoid using vite, instead use Vue Cli
+
+1. update vue dependency to the latest version
+2. if you want, you can use ```@vue/compat``` package tool, which helps us to migrate smoothly from vue 2 to vue 3. For further instructions: [vue/Compat](https://www.npmjs.com/package/@vue/compat)
+3. replace the ```vue-template-compiler``` with ```@vue/compiler-sfc```
+
+### Updating Vue Router
+Use latest vue router and manually enable history mode using:
+
+```javascript
+import { createWebHistory, createRouter } from "vue-router";
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    // all your routes
+  ]
+});
+```
+
+### Fix errors
+During the migration process, you may encounter errors in your browser's console. However, Vue 3 Compatibility mode includes various logs that can assist you in migrating your application to Vue 3.
+
+### Update related libraries and other packages
+As you develop and troubleshoot your application, you may notice the need for updates to other Vue-dependent packages and libraries.
