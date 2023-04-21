@@ -1,10 +1,10 @@
 import { defineConfig } from "vite"
 
-import path from "path"
 import vue from "@vitejs/plugin-vue"
 import vuetify from "vite-plugin-vuetify"
 import eslintPlugin from "vite-plugin-eslint"
 import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
+import { fileURLToPath, URL } from "node:url";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -17,7 +17,7 @@ export default defineConfig({
   define: { "process.env": {} },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      '@/': fileURLToPath(new URL('./src/', import.meta.url))
     },
   },
   build: {
@@ -26,8 +26,7 @@ export default defineConfig({
       input: "src/wrapper.js", // Path relative to package.json
       output: {
         name: "AuthGuard",
-        exports: "named",
-        entryFileNames: 'authentication-guard.esm.js',
+        entryFileNames: 'authentication-guard.js',
         format: "esm"
       },
     }
