@@ -22,26 +22,15 @@ export default defineConfig({
   },
   build: {
     assetsDir: "",
+    lib: {
+      entry: './src/wrapper.js',
+      name: 'AuthGuard',
+      fileName: (format) => `authentication-guard.${format}.js`,
+    },
     rollupOptions: {
-      input: "src/wrapper.js", // Path relative to package.json
       output: {
-        name: "AuthGuard",
-        entryFileNames: 'authentication-guard.js',
-        format: "esm"
+        exports: "named",
       },
     }
   }
-  /* remove the need to specify .vue files https://vitejs.dev/config/#resolve-extensions
-  resolve: {
-    extensions: [
-      '.js',
-      '.json',
-      '.jsx',
-      '.mjs',
-      '.ts',
-      '.tsx',
-      '.vue',
-    ]
-  },
-  */
 })

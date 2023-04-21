@@ -8,7 +8,8 @@
     "type": "git",
     "url": "https://github.com/markhilton/firebase-vuetify-auth.git"
   },
-  "main": "dist/authentication-guard.js",
+  "main": "dist/authentication-guard.umd.js",
+  "module": "dist/authentication-guard.es.js",
   "browser": {
     "./sfc": "src/authentication-guard.vue"
   },
