@@ -25,11 +25,29 @@ export default defineConfig({
     lib: {
       entry: './src/wrapper.js',
       name: 'AuthGuard',
+      formats: ["es", "cjs"],
       fileName: (format) => `authentication-guard.${format}.js`,
     },
     rollupOptions: {
+      external: [
+        "vue",
+        "pinia",
+        "vue-router",
+        "vuetify",
+        "firebase",
+        "vue-router",
+        "vuetify/lib",
+        "firebase/app",
+        "firebase/auth",
+        "firebase/firestore",
+      ],
       output: {
         exports: "named",
+        globals: {
+          vue: "Vue",
+          pinia: "pinia",
+          "v-mask": "v-mask",
+        }
       },
     }
   }
