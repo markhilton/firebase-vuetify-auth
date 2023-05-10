@@ -1,4 +1,4 @@
-import { useRouter } from "vue-router"
+// import { useRouter } from "vue-router"
 import authcheck from "../../components/authcheck"
 import {
   getAuth,
@@ -96,7 +96,7 @@ export const actions = {
     return new Promise(async (resolve, reject) => {
       try {
         const auth = getAuth(this.config.firebase)
-        const router = useRouter()
+        // const router = useRouter()
 
         this.is_loading = true
 
@@ -112,7 +112,7 @@ export const actions = {
         await signInWithEmailAndPassword(auth, email, password)
 
         // this is needed to reload route that was not loaded if user was not authenticated
-        if (router.currentRoute.name === null) router.push(router.currentRoute.path).catch(() => {})
+        // if (router.currentRoute.name === null) router.push(router.currentRoute.path).catch(() => {})
 
         this.is_loading = false
 

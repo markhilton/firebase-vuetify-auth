@@ -45,8 +45,6 @@ export default defineConfig({
         exports: "named",
         globals: {
           vue: "Vue",
-          pinia: "pinia",
-          "v-mask": "v-mask",
         }
       },
     }
