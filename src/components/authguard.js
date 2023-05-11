@@ -19,7 +19,7 @@
  *
  */
 import authCheck from "./authcheck"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "../store/auth"
 
 export default (to, from, next) => {
   const store = useAuthStore()

@@ -18,6 +18,8 @@ This package assumes your VUE project is already integrated with Firebase & Vuet
 1. `.env` file containing Firebase application environment variables is set up
 2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase Modular v9 SDK
 
+Vue 3 and Pinia required.
+
 example:
 
 ```javascript
@@ -40,6 +42,14 @@ const app = initializeApp(config)
 export default app
 ```
 
+Additionally, please ensure that you have installed the mdi/fonts package.
+
+example of integration:
+```javascript
+import "@mdi/font/css/materialdesignicons.css"
+```
+add this into your vuetify.js
+
 ## Install
 
 ```bash
@@ -53,20 +63,20 @@ npm i @nerd305/firebase-vuetify-auth
 Wrap up VUE class initialization into Firebase onAuthStateChanged listener.
 This will auto reload VUE app when Firebase auth state changes (user logs in our signs out of the app).
 It will provide a way to automatically update user page based on current authentication state.
-This example assumes that you're using `vue-router` and `vuex` packages with your app, so we initialize
+This example assumes that you're using `vue-router` and `pinia` packages with your app, so we initialize
 VUE class by passing in `router`, `store` & `vuetify` objects.
 
 ```javascript
-import Vue from "vue"
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+
 import App from "@/App"
 import router from "@/router"
 import vuetify from "@/plugins/vuetify"
 import AuthGuard from "@nerd305/firebase-vuetify-auth"
 
-import app from "@/middleware/firebase"
+import firebase from "@/middleware/firebase"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
-
-Vue.config.productionTip = false
 
 const authGuardSettings = {
   debug: true, // enable debug messages in console log
@@ -88,15 +98,17 @@ const authGuardSettings = {
   registration: true, // allow new user registrations
 }
 
-Vue.use(AuthGuard, authGuardSettings)
-
 // reload VUE app on Firebase auth state change
-onAuthStateChanged(getAuth(app), () => {
-  new Vue({
-    router,
-    vuetify,
-    render: (h) => h(App),
-  }).$mount("#app")
+onAuthStateChanged(getAuth(firebase), () => {
+   const app = createApp(App)
+
+   app.config.productionTip = false
+
+   app.use(createPinia())
+   app.use(router)
+   app.use(vuetify)
+   app.use(AuthGuard, authGuardSettings)
+   app.mount('#app')
 })
 ```
 
@@ -121,7 +133,7 @@ Example of `router.js` implementation. Import your authentication guard middlewa
 import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
 ```
 
-This will work fine, but for some reason it impacts Chrome extension: [devtools](https://developer.chrome.com/docs/devtools/) which is not able to load VueX state. As a work around you can use this import instead.
+This will work fine, but for some reason it impacts Chrome extension: [devtools](https://developer.chrome.com/docs/devtools/) so you can use this import instead.
 
 ```javascript
 import AuthMiddleware from "@nerd305/firebase-vuetify-auth/src/components/authguard"
@@ -138,35 +150,31 @@ and just add `meta: { requiresAuth: true }` for any route that would require aut
 Full example:
 
 ```javascript
-import Vue from "vue"
-import VueRouter from "vue-router"
+import { createRouter, createWebHistory } from 'vue-router'
 import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
 
-Vue.use(VueRouter)
-
 const routes = [
-  {
-    name: "Login",
-    path: "/login",
-    component: () => import(/* webpackChunkName: "login" */ "@/views/LoginCard.vue"),
-  },
-  {
-    path: "/public", // this route is public, no `beforeEnter`
-    name: "public",
-    component: () => import(/* webpackChunkName: "public" */ "@/views/Public.vue"), // example public route
-  },
-  {
-    path: "/protected",
-    meta: { requiresAuth: true }, // this route requires authentication guard
-    name: "protected",
-    component: () => import(/* webpackChunkName: "protected" */ "@/views/Protected.vue"), // example protected route
-  },
+   {
+      name: "Login",
+      path: "/login",
+      component: () => import(/* webpackChunkName: "login" */ "@/views/LoginCard.vue"),
+   },
+   {
+      path: "/public", // this route is public, no `beforeEnter`
+      name: "public",
+      component: () => import(/* webpackChunkName: "public" */ "@/views/Public.vue"), // example public route
+   },
+   {
+      path: "/protected",
+      meta: { requiresAuth: true }, // this route requires authentication guard
+      name: "protected",
+      component: () => import(/* webpackChunkName: "protected" */ "@/views/Protected.vue"), // example protected route
+   },
 ]
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
-  routes,
+const router = createRouter({
+   history: createWebHistory(process.env.BASE_URL),
+   routes: routes
 })
 
 router.beforeEach(AuthMiddleware)
@@ -180,11 +188,12 @@ This will trigger `AuthMiddleware` to be executed before entering `/protected` r
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
 
+for more usage examples(how to log in/sign out and so on) please check the package source code
+
 ## Available settings
 
 | Prop         | Type             | Default                                       | Description                                                                                                    |
 | ------------ | ---------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| store        | Object           | null                                          | VueX store                                                                                                     |
 | router       | Object           | null                                          | VUE router                                                                                                     |
 | firebase     | Object           | null                                          | Firebase middleware - initialized app                                                                          |
 | session      | String           | "local"                                       | Firebase auth state session persistence, see: https://firebase.google.com/docs/auth/web/auth-state-persistence |

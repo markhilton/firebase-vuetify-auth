@@ -17,7 +17,7 @@ export const getters = {
     return user ? user.metadata : null
   },
   isLoading: (state) => state.is_loading,
-  isAuthenticated: (state) => (state?.current_user ? true : false),
+  isAuthenticated: (state) => (!!state?.current_user),
   isAnonymous: (state) => state?.current_user?.isAnonymous || null,
   isVerified: (state) => state?.current_user?.emailVerified || null,
   isRoutePublic: (state) => state.is_route_public,

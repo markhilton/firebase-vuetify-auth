@@ -1,9 +1,5 @@
 <template>
   <div>
-    is_authguard_dialog_shown: {{ store.is_authguard_dialog_shown }}<br />
-    is_authguard_dialog_persistent: {{ store.is_authguard_dialog_persistent }}<br />
-    dialog: {{ dialog }}
-
     <v-dialog
       v-model="dialog"
       :persistent="store.is_authguard_dialog_persistent"
@@ -74,7 +70,7 @@ import LoginWithProvider from "./LoginWithProvider.vue"
 
 import { storeToRefs } from "pinia"
 import { useRoute } from "vue-router"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "../store/auth"
 
 const store = useAuthStore()
 const { initializeGuard, SET_PASSWORD_RESET_SCREEN_SHOWN } = store

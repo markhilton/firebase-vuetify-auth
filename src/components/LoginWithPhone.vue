@@ -82,7 +82,7 @@ import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier } from "firebase/auth"
 import { computed, onMounted } from "vue"
 import { storeToRefs } from "pinia"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "../store/auth"
 
 let valid = false
 let code = [] // text confirmation code

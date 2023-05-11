@@ -63,7 +63,7 @@
 
 <script setup>
 import { computed } from "vue"
-import { useAuthStore } from "@/store/auth"
+import { useAuthStore } from "../store/auth"
 import AuthBranding from "./AuthBranding.vue"
 
 const store = useAuthStore()
