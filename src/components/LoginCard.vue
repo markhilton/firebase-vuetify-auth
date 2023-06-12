@@ -3,7 +3,8 @@
     <v-card flat>
       <!-- error alerts -->
       <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
-        {{ getError.message }}
+        Provided credentials are invalid.
+        <!-- {{ getError.message }} -->
       </v-alert>
 
       <!-- application branding -->
@@ -58,7 +59,7 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue"
+import { ref, onMounted } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
 import { storeToRefs } from "pinia"
@@ -69,12 +70,12 @@ const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
 const { config, error, is_session_persistant, getSessionPersistence, getError } = storeToRefs(store)
 // const { config, error, is_session_persistant, is_email_reset_password_link_sent, getSessionPersistence, getError } =
 
-let email = ""
-let password = ""
-let remember = true
+const email = ref("")
+const password = ref("")
+const remember = ref(true)
 
 onMounted(() => {
-  remember = getSessionPersistence
+  remember.value = getSessionPersistence
   //   is_email_reset_password_link_sent = false // TODO
 })
 </script>
