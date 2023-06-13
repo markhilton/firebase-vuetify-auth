@@ -30,7 +30,7 @@ export default {
       return "Provided credentials are invalid."
     }
 
-    return getters.getError.message
+    return error
   },
   getPhotoURL(state, getters) {
     const user = getters.getCurrentUser
