@@ -3,7 +3,7 @@
     <v-card flat>
       <!-- error alerts -->
       <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
-        {{ getError.message }}
+        {{ getLoginErrorMessage }}
       </v-alert>
 
       <!-- application branding -->
@@ -71,7 +71,7 @@ export default {
 
   computed: {
     ...mapState("auth", ["config"]),
-    ...mapGetters("auth", ["getSessionPersistence", "isLoading", "getError"]),
+    ...mapGetters("auth", ["getSessionPersistence", "isLoading", "getError", "getLoginErrorMessage"]),
   },
 
   created() {

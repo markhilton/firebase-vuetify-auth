@@ -23,6 +23,15 @@ export default {
     const user = getters.getCurrentUser
     return user ? user.email : null
   },
+  getLoginErrorMessage(state, getters) {
+    const error = getters.getError.message
+
+    if (error.includes("user-not-found") || error.includes("wrong-password")) {
+      return "Provided credentials are invalid."
+    }
+
+    return getters.getError.message
+  },
   getPhotoURL(state, getters) {
     const user = getters.getCurrentUser
     return user ? user.photoURL : null
