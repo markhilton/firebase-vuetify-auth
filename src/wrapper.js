@@ -43,4 +43,4 @@ export default {
   },
 }
 
-export { AuthMiddleware } // export vue router middleware
+export { AuthMiddleware, useAuthStore } // export vue router middleware
