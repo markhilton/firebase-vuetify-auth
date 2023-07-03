@@ -27,8 +27,6 @@ export default (to, from, next) => {
   const isRequired = to.meta.requiresAuth // is current path required authentication
   const fromRequiresAuth = from.meta.requiresAuth // from which page is request
 
-  if (debug) console.log("[ auth guard ]: vue router AuthMiddleware")
-
   // check if we are going from public page to auth required page
   if (isRequired && !fromRequiresAuth) {
     store.is_from_public_to_auth = true

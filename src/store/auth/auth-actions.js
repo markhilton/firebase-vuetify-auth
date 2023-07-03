@@ -1,5 +1,3 @@
-// import { useRouter } from "vue-router"
-import authcheck from "../../components/authcheck"
 import {
   getAuth,
   signOut,
@@ -39,16 +37,12 @@ export const actions = {
     if (status === false) this.sign_by_phone_step = 1 // reset sign by phone step
   },
 
-  authGuardOnRouterReady() {
-    const debug = this.config.debug
-
-    if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
-  },
-
   //
   initializeGuard() {
     const debug = this.config.debug
     const user = getAuth(this.config.firebase).currentUser
+
+    if (debug) console.log("[ auth guard ]: component initialization")
 
     if (user) {
       const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
@@ -56,13 +50,7 @@ export const actions = {
       this.current_user = { ...currentUser }
     } else this.current_user = null
 
-    if (debug) console.log("[ auth guard ]: component initialized for user: [", user ? user.uid : null, "]")
-
     this.is_email_verification_screen_shown = false
-
-    authcheck()
-
-    this.authGuardOnRouterReady() // revalidate auth guard for vue router
   },
 
   //

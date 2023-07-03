@@ -13,18 +13,16 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 
 ## Requirements
 
+Current master branch supports Vue 3 application. For Vue 2 please see vue2 branch.
+
 This package assumes your VUE project is already integrated with Firebase & Vuetify. Example integration:
 
-1. `.env` file containing Firebase application environment variables is set up
-2. The Firebase middleware file, example: `./src/middleware/firebase` is created to initiate Firebase Modular v9 SDK
-
-Vue 3 and Pinia required.
+The Firebase config file, example: `./src/middleware/firebase` is created to initiate Firebase Modular v9 SDK
 
 example:
 
 ```javascript
 import { initializeApp } from "firebase/app"
-import { getAuth } from "firebase/auth"
 
 const config = {
   appId: process.env.VUE_APP_FIREBASE_APP_ID,
@@ -62,11 +60,7 @@ npm i @nerd305/firebase-vuetify-auth
 
 #### STEP 1: Update your `main.js` app file
 
-Wrap up VUE class initialization into Firebase onAuthStateChanged listener.
-This will auto reload VUE app when Firebase auth state changes (user logs in our signs out of the app).
-It will provide a way to automatically update user page based on current authentication state.
-This example assumes that you're using `vue-router` and `pinia` packages with your app, so we initialize
-VUE class by passing in `router`, `store` & `vuetify` objects.
+This example assumes that you're using `vue-router` and `pinia` packages with your app, so we initialize VUE class by passing in `router`, `store` & `vuetify` objects.
 
 ```javascript
 import { createApp } from "vue"
@@ -78,7 +72,7 @@ import vuetify from "@/plugins/vuetify"
 import AuthGuard from "@nerd305/firebase-vuetify-auth"
 
 import firebase from "@/middleware/firebase"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { getAuth } from "firebase/auth"
 
 const authGuardSettings = {
   debug: true, // enable debug messages in console log
@@ -114,9 +108,9 @@ app.mount("#app")
 
 #### STEP 2: Add AuthenticationGuard to your App.vue template
 
-3. Update your App.vue to include global `AuthGuard` component.
-   This component will monitor Firebase user authentication status and open a fullscreen modal dialog
-   with login screen if user is not autthenticated.
+Update your `App.vue` to include global `AuthGuard` component.
+
+This component will monitor Firebase user auth state and open a fullscreen modal dialog with login screen if user is not autthenticated.
 
 ```html
     [ ... ]
@@ -127,68 +121,46 @@ app.mount("#app")
 
 #### STEP 3: Update vue router to protect desired routes
 
-Example of `router.js` implementation. Import your authentication guard middleware:
+Example of `router.js` implementation.
 
-```javascript
-import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
-```
-
-This will work fine, but for some reason it impacts Chrome extension: [devtools](https://developer.chrome.com/docs/devtools/) so you can use this import instead.
-
-```javascript
-import AuthMiddleware from "@nerd305/firebase-vuetify-auth/src/components/authguard"
-```
-
-Call router beforeEach method and pass middleware like argument
-
-```javascript
-router.beforeEach(AuthMiddleware)
-```
-
-and just add `meta: { requiresAuth: true }` for any route that would require authentication.
-
-Full example:
-
-```javascript
-import { createRouter, createWebHistory } from "vue-router"
-import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
-
-const routes = [
-  {
-    name: "Login",
-    path: "/login",
-    component: () => import(/* webpackChunkName: "login" */ "@/views/LoginCard.vue"),
-  },
-  {
-    path: "/public", // this route is public, no `beforeEnter`
-    name: "public",
-    component: () => import(/* webpackChunkName: "public" */ "@/views/Public.vue"), // example public route
-  },
-  {
-    path: "/protected",
-    meta: { requiresAuth: true }, // this route requires authentication guard
-    name: "protected",
-    component: () => import(/* webpackChunkName: "protected" */ "@/views/Protected.vue"), // example protected route
-  },
-]
+```js
+import { createWebHistory, createRouter } from "vue-router"
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes: routes,
+  history: createWebHistory(),
+  routes: [
+    {
+      name: "Home",
+      path: "/",
+      component: () => import("@/views/HomePage.vue"),
+      meta: { requiresAuth: true },
+    },
+    {
+      name: "Public",
+      path: "/public",
+      component: () => import("@/views/PublicRoute.vue"),
+    },
+    {
+      name: "Protected",
+      path: "/protected",
+      meta: { requiresAuth: true },
+      component: () => import("@/views/ProtectedRoute.vue"),
+    },
+  ],
 })
 
-router.beforeEach(AuthMiddleware)
+router.beforeEach(guard)
 
 export default router
 ```
 
-This will trigger `AuthMiddleware` to be executed before entering `/protected` route, which will validate if the user is currently authenticated or not. If yes, the guard middleware will proceed to display requested view. If not, then guard middleware will render a full screen modal "Login" view.
+add `meta: { requiresAuth: true }` for any route that would require authentication.
 
 ### That's it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
 
-for more usage examples(how to log in/sign out and so on) please check the package source code
+For more usage examples (how to log in/sign out and so on) please check the package source code
 
 ## Available settings
 
@@ -206,84 +178,3 @@ for more usage examples(how to log in/sign out and so on) please check the packa
 | subtitle     | String           | "Firebase Vuetify Authentication NPM package" | authentication prompt subtitle                                                                                 |
 | icon         | String           | "mdi-brightness-7"                            | authentication prompt icon                                                                                     |
 | iconColor    | String           | "orange"                                      | authentication prompt icon                                                                                     |
-
-## Vue3 integration
-
-### Remove Vue global API instances
-
-If there are any vue global API instances, such as `Vue.set`, `Vue.filter` or `Vue.delete`, please remove them.
-
-Example:
-instead of `Vue.set(object, key, value)` use `object[key] = value`
-
-### Get rid of direct vue template filters
-
-Avoid using filters and inline logic executions in Vue templates, as they can negatively impact the performance of the component.
-It will affect the performance every time the component has been rerendered
-
-Example:
-instead of `{{ user.lastName | uppercase }}` use `{{ uppercasedLastName }}` or `{{uppercase(lastName)}}`
-
-### Vue directives
-
-#### v-if, v-for
-
-Using `v-if` conditions with `v-for` lists used to be possible with Vue 2. For performance reasons, this behavior has been disabled on Vue 3.
-
-Starting Vue 3, you will have to use computed list properties.
-
-#### if you use "emit"
-
-It is still possible to emit events from components to their parents, however, all event have to be declared via the new emit option
-
-For instance, if your component has a `@click` property, emitted using `this.$emit("click")`, you will have to declare the "click" event in your component:
-
-```vue
-props: { name: { type: String, default: "" }, }, emits: ["click"], // events have to be declared here data() { return {
-value: "" } }
-```
-
-#### v-model
-
-ChildComponent needs to be rewritten like this:
-`<ChildComponent v-model="pageTitle" />`
-
-```vue
-props: { modelValue: String }, emits: ['update:modelValue'], methods: { changePageTitle(title) {
-this.$emit('update:modelValue', title) } }
-```
-
-The cool thing is that it's now possible having multiple v-model custom values along, for example v-model:valueA, v-model:valueB, etc.
-
-in our case, using Pinia instead of direct emits
-
-### Updating Vue Build Tools
-
-If you have any complex webpack system, avoid using vite, instead use Vue Cli
-
-1. update vue dependency to the latest version
-2. if you want, you can use `@vue/compat` package tool, which helps us to migrate smoothly from vue 2 to vue 3. For further instructions: [vue/Compat](https://www.npmjs.com/package/@vue/compat)
-3. replace the `vue-template-compiler` with `@vue/compiler-sfc`
-
-### Updating Vue Router
-
-Use latest vue router and manually enable history mode using:
-
-```javascript
-import { createWebHistory, createRouter } from "vue-router"
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    // all your routes
-  ],
-})
-```
-
-### Fix errors
-
-During the migration process, you may encounter errors in your browser's console. However, Vue 3 Compatibility mode includes various logs that can assist you in migrating your application to Vue 3.
-
-### Update related libraries and other packages
-
-As you develop and troubleshoot your application, you may notice the need for updates to other Vue-dependent packages and libraries.
