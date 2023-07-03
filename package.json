@@ -1,6 +1,6 @@
 {
   "name": "@nerd305/firebase-vuetify-auth",
-  "version": "3.0.5",
+  "version": "3.0.7",
   "description": "Firebase user auth guard with Vuetify templates",
   "author": "Mark Hilton <nerd305@gmail.com>",
   "license": "MIT",

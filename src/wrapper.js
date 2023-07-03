@@ -35,16 +35,12 @@ export default {
 
     const authStore = useAuthStore()
 
-    // commit npm package config to vuex store
+    // commit npm package config to the store
     authStore.config = globalConfig
 
     onAuthStateChanged(getAuth(firebase), (user) => {
-      if (!app.config.globalProperties.$pinia) {
-        const store = useAuthStore()
-
-        store.current_user = user
-      }
-
+      authStore.init = true
+      authStore.current_user = user
       console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
     })
 

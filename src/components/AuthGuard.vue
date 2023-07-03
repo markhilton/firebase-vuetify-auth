@@ -9,7 +9,7 @@
     >
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
-          <v-progress-linear :indeterminate="isLoading" />
+          <v-progress-linear :indeterminate="is_loading" />
 
           <div v-if="isEmailVerificationScrenShown">
             <EmailVerification />
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { computed, watch, onMounted, onBeforeUpdate, onUpdated } from "vue"
+import { computed, watch, onMounted } from "vue"
 import authcheck from "./authcheck"
 
 import LoginCard from "./LoginCard.vue"
@@ -77,7 +77,7 @@ const { initializeGuard, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
 const {
   tab,
   config,
-  isLoading,
+  is_loading,
   isLoginWithPhoneShown,
   isUserRegistrationAllowed,
   isEmailVerificationScrenShown,
@@ -85,26 +85,17 @@ const {
 } = storeToRefs(store)
 
 const route = useRoute()
-// let top = this.$vuetify.application.top
 
 const debug = computed(() => config.debug)
 const currentRoute = computed(() => route.path)
 
 const dialog = computed({
-  get: () => store.is_authguard_dialog_shown,
+  get: () => store.init && store.is_authguard_dialog_shown,
   set: (value) => (store.is_authguard_dialog_shown = value),
 })
 
 onMounted(() => {
   initializeGuard()
-})
-
-onBeforeUpdate(() => {
-  // if (top === 0) top = this.$vuetify.application.top
-})
-
-onUpdated(() => {
-  // if (top !== 0) this.$vuetify.application.top = top
 })
 
 watch(currentRoute, (after, before) => {

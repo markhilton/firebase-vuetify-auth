@@ -29,7 +29,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn block large depressed color="primary" type="submit" :disabled="isLoading">
+            <v-btn block large depressed color="primary" type="submit" :disabled="is_loading">
               Email Password Reset Link
             </v-btn>
           </v-card-actions>
@@ -62,7 +62,7 @@ import { useAuthStore } from "../store/auth"
 
 const store = useAuthStore()
 const { emailPasswordResetLink, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
-const { error, isLoading, getError, isEmailResetPasswordLinkSent } = storeToRefs(store)
+const { error, is_loading, getError, isEmailResetPasswordLinkSent } = storeToRefs(store)
 
 let email = ""
 let valid = false

@@ -41,34 +41,8 @@ export const actions = {
 
   authGuardOnRouterReady() {
     const debug = this.config.debug
-    // const router = useRouter()
-    // const auth = getAuth(this.config.firebase)
 
     if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
-
-    // check current route when router is ready
-    // router.onReady(() => {
-    //   const isAuthenticated = auth.currentUser ? true : false
-    //   const isCurrentRoutePublic = this.is_route_public
-
-    //   if (debug) {
-    //     console.log(
-    //       "[ auth guard ]: vue router READY! isCurrentRoutePublic: [",
-    //       isCurrentRoutePublic,
-    //       "] isAuthenticated: [",
-    //       isAuthenticated,
-    //       "]"
-    //     )
-    //   }
-
-    //   if (isCurrentRoutePublic) {
-    //     this.is_authguard_dialog_shown = false
-    //     this.is_authguard_dialog_persistent = false
-    //   } else if (!isAuthenticated) {
-    //     this.is_authguard_dialog_shown = true
-    //     this.is_authguard_dialog_persistent = true
-    //   }
-    // })
   },
 
   //
