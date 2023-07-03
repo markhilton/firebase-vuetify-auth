@@ -1,6 +1,5 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "../src/store/auth"
-
 import { VueMaskDirective } from "v-mask"
 
 // default npm package init config

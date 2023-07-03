@@ -1,5 +1,5 @@
-import { getAuth } from "firebase/auth"
 import { useAuthStore } from "../store/auth"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 const debug = (...text) => {
   const store = useAuthStore()
@@ -23,6 +23,12 @@ export default () => {
   const verification = store.config.verification
   const isRoutePublic = store.is_route_public
   const fromPublicToAuth = store.is_from_public_to_auth
+
+  onAuthStateChanged(auth, (user) => {
+    store.current_user = user
+    console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
+  })
+
   if (verification) debug("[ auth check ]: email verification required: [", verification, "]")
 
   // anonymous authenticated currentUser
