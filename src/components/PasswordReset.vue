@@ -3,12 +3,12 @@
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="emailPasswordResetLink(email)">
         <!-- error alerts -->
-        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="SET_ERROR(null)">
+        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
           {{ getError.message }}
         </v-alert>
 
         <!-- application branding -->
-        <branding v-else class="text-center" />
+        <AuthBranding v-else class="text-center" />
 
         <!-- login form -->
         <div v-if="!isEmailResetPasswordLinkSent">
@@ -29,7 +29,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn block large depressed color="primary" type="submit" :disabled="isLoading">
+            <v-btn block large depressed color="primary" type="submit" :disabled="is_loading">
               Email Password Reset Link
             </v-btn>
           </v-card-actions>
@@ -53,38 +53,25 @@
   </v-container>
 </template>
 
-<script>
-import Branding from "./Branding.vue"
-import { mapGetters, mapMutations, mapActions } from "vuex"
+<script setup>
+import { computed } from "vue"
+import AuthBranding from "./AuthBranding.vue"
 
-export default {
-  components: { Branding },
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "../store/auth"
 
-  data: () => ({
-    email: "",
-    valid: false,
-  }),
+const store = useAuthStore()
+const { emailPasswordResetLink, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
+const { error, is_loading, getError, isEmailResetPasswordLinkSent } = storeToRefs(store)
 
-  computed: {
-    ...mapGetters("auth", ["isLoading", "getError", "isEmailResetPasswordLinkSent"]),
+let email = ""
+let valid = false
 
-    rules() {
-      const validation = {
-        email: this.email == "" ? "Email cannot be empty" : true,
-      }
+const rules = computed(() => {
+  const validation = {
+    email: this.email == "" ? "Email cannot be empty" : true,
+  }
 
-      return validation
-    },
-  },
-
-  methods: {
-    ...mapActions("auth", ["emailPasswordResetLink"]),
-    ...mapMutations("auth", [
-      "SET_TAB",
-      "SET_ERROR",
-      "SET_PASSWORD_RESET_SCREEN_SHOWN",
-      "SET_EMAIL_PASSWORD_RESET_LINK_SENT",
-    ]),
-  },
-}
+  return validation
+})
 </script>

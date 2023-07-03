@@ -1,6 +1,3 @@
-import Vue from "vue"
-import { GoogleAuthProvider, FacebookAuthProvider, SAMLAuthProvider } from "firebase/auth"
-import authcheck from "../../components/authcheck"
 import {
   getAuth,
   signOut,
@@ -9,81 +6,66 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
   signInWithRedirect,
+  signInWithPhoneNumber,
   signInWithEmailAndPassword,
   sendEmailVerification,
   sendPasswordResetEmail,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  SAMLAuthProvider,
 } from "firebase/auth"
 
-export default {
-  authGuardOnRouterReady({ getters, commit }) {
-    const debug = Vue.prototype.$authGuardDebug
-    const router = Vue.prototype.$authGuardRouter
-    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+export const actions = {
+  SET_EMAIL_VERIFICATION_SCREEN_SHOWN(status) {
+    this.is_email_verification_screen_shown = status
 
-    if (debug) console.log("[ auth guard ]: revalidate when vue router ready")
+    if (status === false) this.error = null
+  },
 
-    // check current route when router is ready
-    router.onReady(() => {
-      const isAuthenticated = auth.currentUser ? true : false
-      const isCurrentRoutePublic = getters.isRoutePublic
+  SET_PASSWORD_RESET_SCREEN_SHOWN(status) {
+    this.tab = status ? 1 : 0
+    this.is_reset_password_screen_shown = status
 
-      if (debug) {
-        console.log(
-          "[ auth guard ]: vue router READY! isCurrentRoutePublic: [",
-          isCurrentRoutePublic,
-          "] isAuthenticated: [",
-          isAuthenticated,
-          "]"
-        )
-      }
+    if (status === false) this.is_email_reset_password_link_sent = false
+  },
 
-      if (isCurrentRoutePublic) {
-        commit("SET_AUTH_GUARD_DIALOG_SHOWN", false)
-        commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", false)
-      } else if (!isAuthenticated) {
-        commit("SET_AUTH_GUARD_DIALOG_SHOWN", true)
-        commit("SET_AUTH_GUARD_DIALOG_PERSISTENT", true)
-      }
-    })
+  SET_SHOW_LOGIN_WITH_PHONE(status) {
+    this.tab = 0 // reset tab to Sign In
+    this.is_login_with_phone_shown = status
+
+    if (status === false) this.sign_by_phone_step = 1 // reset sign by phone step
   },
 
   //
-  initializeGuard({ state, commit, dispatch }) {
-    const config = state.config
-    const debug = Vue.prototype.$authGuardDebug
-    const user = getAuth(Vue.prototype.$authGuardFirebaseApp).currentUser
+  initializeGuard() {
+    const debug = this.config.debug
+    const user = getAuth(this.config.firebase).currentUser
+
+    if (debug) console.log("[ auth guard ]: component initialization")
 
     if (user) {
       const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
       const currentUser = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
-      commit("SET_CURRENT_USER", { ...currentUser })
-    } else commit("SET_CURRENT_USER", null)
+      this.current_user = { ...currentUser }
+    } else this.current_user = null
 
-    if (debug) console.log("[ auth guard ]: component initialized for user: [", user ? user.uid : null, "]")
-
-    commit("SET_CONFIG", null) // have to commit null to make firebase auth reactive
-    commit("SET_CONFIG", config)
-    commit("SET_EMAIL_VERIFICATION_SCREEN_SHOWN", false)
-
-    authcheck()
-
-    dispatch("authGuardOnRouterReady") // revalidate auth guard for vue router
+    this.is_email_verification_screen_shown = false
   },
 
   //
-  loginWithEmail({ state, commit }, { email, password }) {
+  loginWithEmail({ email, password }) {
     return new Promise(async (resolve, reject) => {
       try {
-        const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
-        const router = Vue.prototype.$authGuardRouter
+        const auth = getAuth(this.config.firebase)
+        // const router = useRouter()
 
-        commit("SET_LOADING", true)
+        this.is_loading = true
 
         await signOut(auth)
 
         // set session persistence
-        if (Vue.prototype.$authGuardSession === "browser") {
+        if (this.config.session === "browser") {
           await setPersistence(auth, browserSessionPersistence)
         } else {
           await setPersistence(auth, browserLocalPersistence)
@@ -92,14 +74,14 @@ export default {
         await signInWithEmailAndPassword(auth, email, password)
 
         // this is needed to reload route that was not loaded if user was not authenticated
-        if (router.currentRoute.name === null) router.push(router.currentRoute.path).catch(() => {})
+        // if (router.currentRoute.name === null) router.push(router.currentRoute.path).catch(() => {})
 
-        commit("SET_LOADING", false)
+        this.is_loading = false
 
         return resolve()
       } catch (error) {
-        commit("SET_ERROR", error)
-        commit("SET_LOADING", false)
+        this.error = error
+        this.is_loading = false
 
         return reject()
       }
@@ -107,29 +89,29 @@ export default {
   },
 
   //
-  loginWithGoogle({ state }) {
+  loginWithGoogle() {
     const provider = new GoogleAuthProvider()
-    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+    const auth = getAuth(this.config.firebase)
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider)
   },
 
   //
-  loginWithFacebook({ state }) {
+  loginWithFacebook() {
     const provider = new FacebookAuthProvider()
-    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+    const auth = getAuth(this.config.firebase)
 
     // useDeviceLanguage(auth)
     signInWithRedirect(auth, provider)
   },
 
   //
-  loginWithPhone({ state }) {},
+  loginWithPhone() {},
 
-  loginWithSaml({ state }) {
-    const provider = new SAMLAuthProvider(state.config.saml_provider_id)
-    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+  loginWithSaml() {
+    const provider = new SAMLAuthProvider(this.config.saml_provider_id)
+    const auth = getAuth(this.config.firebase)
 
     // provider.addScope("profile")
 
@@ -137,87 +119,89 @@ export default {
   },
 
   //
-  async textPhoneVerificationCode({ state, commit }, { phoneNumber, recaptchaVerifier }) {
+  async textPhoneVerificationCode({ phoneNumber, recaptchaVerifier }) {
     try {
-      commit("SET_LOADING", true)
-      commit("SET_PHONE_TEXT_CONFIRMATION", null)
+      this.is_loading = true
+      this.text_confirmation = null
 
       const phone = "+1" + phoneNumber.replace(/\D/g, "")
-      const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+      const auth = getAuth(this.config.firebase)
       const confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
 
-      commit("SET_LOADING", false)
-      commit("SET_SIGN_BY_PHONE_STEP", 2)
-      commit("SET_PHONE_TEXT_CONFIRMATION", confirmationResult)
+      this.is_loading = false
+      this.sign_by_phone_step = 2
+      this.text_confirmation = confirmationResult
     } catch (error) {
-      commit("SET_ERROR", error)
-      commit("SET_LOADING", false)
+      this.error = error
+      this.is_loading = false
     }
   },
 
   //
-  async confirmCode({ state, commit }, confirmationCode) {
+  async confirmCode(confirmationCode) {
     try {
-      commit("SET_LOADING", true)
+      this.is_loading = true
 
       console.log("confirmationCode", confirmationCode.join())
 
-      await state.text_confirmation.confirm(confirmationCode.join())
+      await this.text_confirmation.confirm(confirmationCode.join())
 
-      commit("SET_LOADING", false)
-      commit("SET_SIGN_BY_PHONE_STEP", 1)
+      this.is_loading = false
+      this.sign_by_phone_step = 1
     } catch (error) {
-      commit("SET_ERROR", error)
-      commit("SET_LOADING", false)
-      commit("SET_SIGN_BY_PHONE_STEP", 1)
+      this.error = error
+      this.is_loading = false
+      this.sign_by_phone_step = 1
     }
   },
 
   //
-  async registerUser({ state, commit }, { displayName, email, password }) {
+  async registerUser({ displayName, email, password }) {
     try {
-      commit("SET_LOADING", true)
+      this.is_loading = true
 
-      const verification = state.config.email
-      const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+      const verification = this.config.email
+      const auth = getAuth(this.config.firebase)
 
       await createUserWithEmailAndPassword(auth, email, password)
       await signInWithEmailAndPassword(auth, email, password)
       await updateProfile(auth.currentUser, { displayName })
+
+      const domain = "XXX" // TODO: temp fix
 
       // send email to verify user email address if config option is not set to false
       if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
         await sendEmailVerification(auth.currentUser)
       }
 
-      commit("SET_LOADING", false)
+      this.is_loading = false
     } catch (error) {
-      commit("SET_ERROR", error)
-      commit("SET_LOADING", false)
+      this.error = error
+      this.is_loading = false
     }
   },
 
-  async emailPasswordResetLink({ state, commit }, email) {
+  async emailPasswordResetLink(email) {
     try {
-      commit("SET_LOADING", true)
+      this.is_loading = true
 
-      const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+      const auth = getAuth(this.config.firebase)
 
       await sendPasswordResetEmail(auth, email)
 
-      commit("SET_ERROR", false)
-      commit("SET_LOADING", false)
-      commit("SET_EMAIL_PASSWORD_RESET_LINK_SENT", true)
+      this.error = false
+      this.is_loading = false
+      this.is_email_reset_password_link_sent = true
     } catch (error) {
-      commit("SET_ERROR", error)
-      commit("SET_LOADING", false)
+      this.error = error
+      this.is_loading = false
     }
   },
 
   //
-  signOut({ state }) {
-    const debug = Vue.prototype.$authGuardDebug
-    const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+  signOut() {
+    const debug = this.config.debug
+    const auth = getAuth(this.config.firebase)
 
     if (debug) console.log("[ auth guard ]: signOut request")
 
@@ -225,22 +209,22 @@ export default {
   },
 
   //
-  sendVerificationEmail({ state, commit }) {
+  sendVerificationEmail() {
     return new Promise(async (resolve, reject) => {
       try {
-        commit("SET_LOADING", true)
+        this.is_loading = true
 
-        const auth = getAuth(Vue.prototype.$authGuardFirebaseApp)
+        const auth = getAuth(this.config.firebase)
 
         await sendEmailVerification(auth.currentUser)
 
-        commit("SET_LOADING", false)
-        commit("SET_EMAIL_VERIFICATION_LINK_SENT", true)
+        this.is_loading = false
+        this.is_email_verification_link_sent = true
 
         return resolve()
       } catch (error) {
-        commit("SET_ERROR", error)
-        commit("SET_LOADING", false)
+        this.error = error
+        this.is_loading = false
 
         return reject()
       }

@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app dark>
+    <v-app-bar v-if="isAuthenticated" app dark>
       <v-toolbar-title>
         User: <v-chip>{{ getDisplayName }}</v-chip>
       </v-toolbar-title>
@@ -13,7 +13,7 @@
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <v-container v-if="isAuthenticated">
         <h1>Firebase Vuetify Auth</h1>
 
         <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
@@ -30,26 +30,19 @@
       </v-container>
 
       <!-- v-router view -->
-      <router-view />
+      <router-view v-if="isAuthenticated" />
     </v-main>
 
     <!-- auth guard -->
-    <AuthenticationGuard />
+    <AuthenticationGuard v-if="!isAuthenticated" />
   </v-app>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex"
+<script setup>
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "../src/store/auth"
 
-export default {
-  name: "App",
-
-  computed: {
-    ...mapGetters("auth", ["isAuthenticated", "getDisplayName"]),
-  },
-
-  methods: {
-    ...mapActions("auth", ["signOut"]),
-  },
-}
+const store = useAuthStore()
+const { signOut } = store
+const { isAuthenticated, getDisplayName } = storeToRefs(store)
 </script>

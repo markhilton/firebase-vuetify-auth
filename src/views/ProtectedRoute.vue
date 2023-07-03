@@ -53,52 +53,50 @@
   </v-container>
 </template>
 
-<script>
-export default {
-  data: () => ({
-    form: {
-      name: "",
-      password: "",
-      confirm: "",
-      agree: true,
-    },
-    alert: true,
-    valid: false,
-    error: null,
-    progress: false,
-  }),
+<script setup>
+import { onMounted, computed } from "vue"
+import { useAuthStore } from "../store/auth"
 
-  computed: {
-    rules() {
-      const validation = {
-        password: this.form.password == "" ? "Password cannot be empty" : true,
-        name: this.form.name == "" ? "Name cannot be empty" : true,
-        confirm: this.form.password !== this.form.confirm ? "Passwords do not match" : true,
-      }
+const store = useAuthStore()
 
-      if (this.error) {
-        if (this.error.code == "auth/invalid-email") {
-          validation.email = this.error.message
-        }
-        if (this.error.code == "auth/weak-password") {
-          validation.password = this.error.message
-        }
-      }
+const form = {
+  name: "",
+  password: "",
+  confirm: "",
+  agree: true,
+}
 
-      return validation
-    },
-  },
+let alert = true
+let valid = false
+let error = null
+let progress = false
 
-  created() {
-    const currentUser = this.$store.getters["auth/getCurrentUser"]
+onMounted(() => {
+  const currentUser = store.current_user
 
-    this.form.name = (currentUser && currentUser.displayName) || null
-  },
+  form.name = (currentUser && currentUser.displayName) || null
+})
 
-  methods: {
-    updateUser() {
-      alert("this is just a test!")
-    },
-  },
+const rules = computed(() => {
+  const validation = {
+    password: form.password == "" ? "Password cannot be empty" : true,
+    name: form.name == "" ? "Name cannot be empty" : true,
+    confirm: form.password !== form.confirm ? "Passwords do not match" : true,
+  }
+
+  if (error) {
+    if (error.code == "auth/invalid-email") {
+      validation.email = error.message
+    }
+    if (error.code == "auth/weak-password") {
+      validation.password = error.message
+    }
+  }
+
+  return validation
+})
+
+const updateUser = () => {
+  alert("this is just a test!")
 }
 </script>
