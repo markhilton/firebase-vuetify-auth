@@ -1,6 +1,7 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "../src/store/auth"
 import { VueMaskDirective } from "v-mask"
+import { getAuth, onAuthStateChanged } from "firebase/auth"
 
 // default npm package init config
 import defaultSettings from "./store/defaultSettings"
@@ -36,6 +37,16 @@ export default {
 
     // commit npm package config to vuex store
     authStore.config = globalConfig
+
+    onAuthStateChanged(getAuth(firebase), (user) => {
+      if (!app.config.globalProperties.$pinia) {
+        const store = useAuthStore()
+
+        store.current_user = user
+      }
+
+      console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
+    })
 
     app.directive("mask", VueMaskDirective)
     app.component("AuthenticationGuard", AuthGuard)
