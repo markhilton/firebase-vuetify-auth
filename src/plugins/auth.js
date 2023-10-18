@@ -14,7 +14,7 @@ const authGuardSettings = {
   phone: true,
   google: true,
   facebook: true,
-  registration: false,
+  registration: true,
   verification: true,
 
   title: "AUTH DEMO",
