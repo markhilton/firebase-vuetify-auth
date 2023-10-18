@@ -82,7 +82,7 @@ import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier } from "firebase/auth"
 import { computed, onMounted } from "vue"
 import { storeToRefs } from "pinia"
-import { useAuthStore } from "../store/auth"
+import { useAuthStore } from "@/store/auth"
 
 let valid = false
 let code = [] // text confirmation code
@@ -93,23 +93,21 @@ let recaptchaVerifier = null
 // let recaptchaWidgetId = null // TODO
 
 const store = useAuthStore()
-const app = getCurrentInstance()
+const { appContext } = getCurrentInstance()
 const { textPhoneVerificationCode, confirmCode, SET_SHOW_LOGIN_WITH_PHONE } = store
 const { error, sign_by_phone_step, getError } = storeToRefs(store)
 
 const rules = computed(() => {
-  const validation = {
-    phoneNumber: this.phoneNumber.replace(/\D/g, "") < 1000000000 ? "Please enter a valid US phone number" : true,
+  return  {
+    phoneNumber: phoneNumber.replace(/\D/g, "") < 1000000000 ? "Please enter a valid US phone number" : true,
   }
-
-  return validation
 })
 
 onMounted(() => {
   recaptchaVerifier = new RecaptchaVerifier(
     "recaptcha-container",
     { size: "invisible" },
-    getAuth(app.config.globalProperties.$authGuardFirebaseApp)
+    getAuth(appContext.config.globalProperties.$authGuardFirebaseApp)
   )
   // this.recaptchaVerifier.render().then((widgetId) => (recaptchaWidgetId = widgetId))
 

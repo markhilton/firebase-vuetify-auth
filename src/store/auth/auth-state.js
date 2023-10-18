@@ -7,7 +7,7 @@ export const state = () => ({
   text_confirmation: null, // log in by phone text
   sign_by_phone_step: 1, // sign in by phone step
 
-  tab: false,
+  tab: 0,
   init: false,
   is_loading: false,
   is_session_persistant: true,

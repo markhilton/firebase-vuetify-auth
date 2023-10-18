@@ -156,7 +156,7 @@ export const actions = {
   },
 
   //
-  async registerUser({ displayName, email, password }) {
+  async registerUser(displayName, email, password) {
     try {
       this.is_loading = true
 
@@ -165,7 +165,7 @@ export const actions = {
 
       await createUserWithEmailAndPassword(auth, email, password)
       await signInWithEmailAndPassword(auth, email, password)
-      await updateProfile(auth.currentUser, { displayName })
+      await updateProfile(auth.currentUser, displayName)
 
       const domain = "XXX" // TODO: temp fix
 
