@@ -1,4 +1,4 @@
-import useAuthStore from "../store/auth"
+import { useAuthStore } from "../store/auth"
 import { getAuth } from "firebase/auth"
 
 const debug = (...text) => {
