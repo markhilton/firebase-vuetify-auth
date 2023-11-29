@@ -63,7 +63,7 @@
 
 <script setup>
 import { ref, computed } from "vue"
-import { useAuthStore } from "@/store/auth"
+import useAuthStore from "@/store/auth"
 import AuthBranding from "./AuthBranding.vue"
 
 const store = useAuthStore()
@@ -87,6 +87,6 @@ const rules = computed(() => {
 })
 
 const register = () => {
-  if (form.value.validate()) registerUser(displayName.value, email.value, password.value)
+  if (form.value.validate() && registerUser) registerUser(displayName.value, email.value, password.value)
 }
 </script>

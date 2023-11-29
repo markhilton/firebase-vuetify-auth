@@ -82,7 +82,7 @@ import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier } from "firebase/auth"
 import { computed, onMounted } from "vue"
 import { storeToRefs } from "pinia"
-import { useAuthStore } from "@/store/auth"
+import useAuthStore from "@/store/auth"
 
 let valid = false
 let code = [] // text confirmation code
@@ -123,7 +123,7 @@ onMounted(() => {
 const onPaste = (event) => {
   const text = event.clipboardData.getData("text").substr(0, 6)
 
-  for (var index = 0; index < text.length; index++) {
+  for (let index = 0; index < text.length; index++) {
     this.$set(this.code, index, text[index])
   }
 }

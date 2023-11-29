@@ -1,8 +1,3 @@
-import { getAuth } from "firebase/auth"
-import { getCurrentInstance } from "vue"
-
-const app = getCurrentInstance()
-
 export const getters = {
   getError: (state) => state.error,
   getSessionPersistence: (state) => state.is_session_persistant,
@@ -12,9 +7,8 @@ export const getters = {
   getEmail: (state) => state?.current_user?.email || null,
   getPhotoURL: (state) => state?.current_user?.photoURL || null,
   getPhoneNumber: (state) => state?.current_user?.phoneNumber || null,
-  getMetadata: () => {
-    const user = getAuth(app.config.globalProperties.$authGuardFirebaseApp).currentUser
-    return user ? user.metadata : null
+  getMetadata: (state) => {
+    return state?.current_user ? state.current_user.metadata : null
   },
   isAuthenticated: (state) => !!state?.current_user,
   isAnonymous: (state) => state?.current_user?.isAnonymous || null,

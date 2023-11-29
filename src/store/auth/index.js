@@ -4,8 +4,10 @@ import { getters } from "./auth-getters"
 import { actions } from "./auth-actions"
 
 // Create a new store instance.
-export const useAuthStore = defineStore("auth", {
+const authStore = defineStore("auth", {
   state,
   getters,
   actions,
 })
+
+export default authStore

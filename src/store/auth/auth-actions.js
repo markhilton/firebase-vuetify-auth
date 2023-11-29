@@ -162,10 +162,12 @@ export const actions = {
 
       const verification = this.config.email
       const auth = getAuth(this.config.firebase)
-
       await createUserWithEmailAndPassword(auth, email, password)
       await signInWithEmailAndPassword(auth, email, password)
-      await updateProfile(auth.currentUser, displayName)
+
+      this.current_user.displayName = displayName
+
+      await updateProfile(auth.currentUser, { displayName })
 
       const domain = "XXX" // TODO: temp fix
 

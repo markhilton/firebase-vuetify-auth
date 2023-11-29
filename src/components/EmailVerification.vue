@@ -64,7 +64,7 @@
 
 <script setup>
 import { storeToRefs } from "pinia"
-import { useAuthStore } from "../store/auth"
+import useAuthStore from "../store/auth"
 
 const store = useAuthStore()
 const { error, is_loading, signOut, sendVerificationEmail, SET_EMAIL_VERIFICATION_SCREEN_SHOWN } = store

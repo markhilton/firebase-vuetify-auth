@@ -63,7 +63,7 @@ import { ref, onMounted } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
 import { storeToRefs } from "pinia"
-import { useAuthStore } from "@/store/auth"
+import useAuthStore from "@/store/auth"
 
 const store = useAuthStore()
 const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN } = store

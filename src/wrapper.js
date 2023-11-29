@@ -1,5 +1,5 @@
 import { createPinia } from "pinia"
-import { useAuthStore } from "../src/store/auth"
+import useAuthStore from "@/store/auth"
 import { VueMaskDirective } from "v-mask"
 import { getAuth, onAuthStateChanged } from "firebase/auth"
 

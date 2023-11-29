@@ -67,7 +67,7 @@ import LoginWithProvider from "./LoginWithProvider.vue"
 
 import { storeToRefs } from "pinia"
 import { useRoute } from "vue-router"
-import { useAuthStore } from "@/store/auth"
+import useAuthStore from "@/store/auth"
 
 const store = useAuthStore()
 const { initializeGuard } = store
