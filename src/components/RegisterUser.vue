@@ -87,6 +87,6 @@ const rules = computed(() => {
 })
 
 const register = () => {
-  if (form.value.validate()) registerUser(displayName.value, email.value, password.value)
+  if (form.value.validate() && registerUser) registerUser(displayName.value, email.value, password.value)
 }
 </script>

@@ -123,7 +123,7 @@ onMounted(() => {
 const onPaste = (event) => {
   const text = event.clipboardData.getData("text").substr(0, 6)
 
-  for (var index = 0; index < text.length; index++) {
+  for (let index = 0; index < text.length; index++) {
     this.$set(this.code, index, text[index])
   }
 }
