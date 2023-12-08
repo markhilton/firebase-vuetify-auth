@@ -34,7 +34,7 @@
     </v-main>
 
     <!-- auth guard -->
-    <AuthenticationGuard v-if="!isAuthenticated" />
+    <AuthenticationGuard v-if="!isAuthenticated || (isAuthenticated && !current_user.emailVerified)" />
   </v-app>
 </template>
 
@@ -44,5 +44,5 @@ import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
 const { signOut } = store
-const { isAuthenticated, getDisplayName } = storeToRefs(store)
+const { isAuthenticated, getDisplayName, current_user } = storeToRefs(store)
 </script>
