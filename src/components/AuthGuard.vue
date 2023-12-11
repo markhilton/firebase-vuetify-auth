@@ -11,7 +11,7 @@
         <v-card flat outlined>
           <v-progress-linear :indeterminate="is_loading" />
 
-          <div v-if="isAuthenticated && !current_user.emailVerified">
+          <div v-if="isEmailVerificationScrenShown">
             <EmailVerification />
           </div>
 
@@ -45,7 +45,7 @@
             </v-card-text>
           </div>
 
-          <v-card-actions v-if="!(isAuthenticated && !current_user.emailVerified)">
+          <v-card-actions v-if="!isEmailVerificationScrenShown">
             <LoginWithProvider />
           </v-card-actions>
         </v-card>
@@ -75,11 +75,10 @@ const {
   tab,
   config,
   is_loading,
-  current_user,
-  isAuthenticated,
   isLoginWithPhoneShown,
   isUserRegistrationAllowed,
   isResetPasswordScreenShown,
+  isEmailVerificationScrenShown,
 } = storeToRefs(store)
 
 const route = useRoute()

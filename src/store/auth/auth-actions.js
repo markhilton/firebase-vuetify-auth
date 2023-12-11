@@ -49,8 +49,6 @@ export const actions = {
       const currentUser = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
       this.current_user = { ...currentUser }
     } else this.current_user = null
-
-    this.is_email_verification_screen_shown = false
   },
 
   //
