@@ -77,8 +77,8 @@ const {
   is_loading,
   isLoginWithPhoneShown,
   isUserRegistrationAllowed,
-  isEmailVerificationScrenShown,
   isResetPasswordScreenShown,
+  isEmailVerificationScrenShown,
 } = storeToRefs(store)
 
 const route = useRoute()

@@ -70,10 +70,6 @@ export default () => {
       )
 
       allowRoute = true
-    } else {
-      debug("[ auth check ]: authguard config requires email verification")
-      store.error = null
-      store.is_email_verification_screen_shown = true
     }
 
     if (allowRoute) {
@@ -85,6 +81,13 @@ export default () => {
       if (fromPublicToAuth) {
         store.is_authguard_dialog_persistent = false
       } else store.is_authguard_dialog_persistent = true
+    }
+
+    if (!emailVerified && verification) {
+      debug("[ auth check ]: authguard config requires email verification")
+      store.error = null
+      store.is_email_verification_screen_shown = true
+      store.is_authguard_dialog_persistent = true
     }
   }
 
