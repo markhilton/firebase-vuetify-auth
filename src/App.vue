@@ -34,15 +34,15 @@
     </v-main>
 
     <!-- auth guard -->
-    <AuthenticationGuard v-if="!isAuthenticated" />
+    <AuthenticationGuard v-if="!isAuthenticated || isEmailVerificationScrenShown" />
   </v-app>
 </template>
 
 <script setup>
 import { storeToRefs } from "pinia"
-import { useAuthStore } from "../src/store/auth"
+import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
 const { signOut } = store
-const { isAuthenticated, getDisplayName } = storeToRefs(store)
+const { isAuthenticated, getDisplayName, isEmailVerificationScrenShown } = storeToRefs(store)
 </script>

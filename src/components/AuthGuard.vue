@@ -16,32 +16,29 @@
           </div>
 
           <div v-else>
-            <v-tabs :value="tab" grow @change="tab = $event">
-              <v-tab v-if="!isLoginWithPhoneShown" @click="tab = 0 && SET_PASSWORD_RESET_SCREEN_SHOWN(false)">
-                Sign In
-              </v-tab>
-              <v-tab v-if="isLoginWithPhoneShown"> Sign In </v-tab>
-              <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"> Register </v-tab>
-              <v-tab v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email">
+            <v-tabs v-model="tab" grow>
+              <v-tab value="0"> Sign In </v-tab>
+              <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" value="1"> Register </v-tab>
+              <v-tab v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email" value="1">
                 Reset Password
               </v-tab>
             </v-tabs>
 
             <v-card-text>
-              <v-window :value="tab" @change="tab = $event">
-                <v-window-item v-if="!isLoginWithPhoneShown" class="pt-5">
+              <v-window v-model="tab">
+                <v-window-item v-if="!isLoginWithPhoneShown" value="0" class="pt-5">
                   <LoginCard />
                 </v-window-item>
 
-                <v-window-item v-if="isLoginWithPhoneShown" class="pt-5">
+                <v-window-item v-else value="0" class="pt-5">
                   <LoginWithPhone />
                 </v-window-item>
 
-                <v-window-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" class="pt-5">
+                <v-window-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" value="1" class="pt-5">
                   <RegisterUser />
                 </v-window-item>
 
-                <v-window-item v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && !config.email">
+                <v-window-item v-else value="1">
                   <PasswordReset />
                 </v-window-item>
               </v-window>
@@ -70,18 +67,18 @@ import LoginWithProvider from "./LoginWithProvider.vue"
 
 import { storeToRefs } from "pinia"
 import { useRoute } from "vue-router"
-import { useAuthStore } from "../store/auth"
+import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
-const { initializeGuard, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
+const { initializeGuard } = store
 const {
   tab,
   config,
   is_loading,
   isLoginWithPhoneShown,
   isUserRegistrationAllowed,
-  isEmailVerificationScrenShown,
   isResetPasswordScreenShown,
+  isEmailVerificationScrenShown,
 } = storeToRefs(store)
 
 const route = useRoute()

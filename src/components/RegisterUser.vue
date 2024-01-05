@@ -62,32 +62,31 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
-import { useAuthStore } from "../store/auth"
+import { ref, computed } from "vue"
+import { useAuthStore } from "@/store/auth"
 import AuthBranding from "./AuthBranding.vue"
 
 const store = useAuthStore()
 const { error, registerUser } = store
 
-let email = ""
-let password = ""
-let confirm = ""
-let displayName = ""
-let valid = false
+let email = ref("")
+let password = ref("")
+let confirm = ref("")
+let displayName = ref("")
+let valid = ref(false)
+
+const form = ref()
 
 const rules = computed(() => {
-  const validation = {
-    email: this.email == "" ? "Email cannot be empty" : true,
-    password: this.password == "" ? "Password cannot be empty" : true,
-    displayName: this.displayName == "" ? "Name cannot be empty" : true,
-    confirm: this.password !== this.confirm ? "Passwords do not match" : true,
+  return {
+    email: !email.value ? "Email cannot be empty" : true,
+    password: !password.value ? "Password cannot be empty" : true,
+    displayName: !displayName.value ? "Name cannot be empty" : true,
+    confirm: password.value !== confirm.value ? "Passwords do not match" : true,
   }
-
-  return validation
 })
 
 const register = () => {
-  const { displayName, email, password } = this
-  if (this.$refs.form.validate()) registerUser({ displayName, email, password })
+  if (form.value.validate() && registerUser) registerUser(displayName.value, email.value, password.value)
 }
 </script>

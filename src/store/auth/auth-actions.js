@@ -49,8 +49,6 @@ export const actions = {
       const currentUser = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
       this.current_user = { ...currentUser }
     } else this.current_user = null
-
-    this.is_email_verification_screen_shown = false
   },
 
   //
@@ -156,15 +154,17 @@ export const actions = {
   },
 
   //
-  async registerUser({ displayName, email, password }) {
+  async registerUser(displayName, email, password) {
     try {
       this.is_loading = true
 
       const verification = this.config.email
       const auth = getAuth(this.config.firebase)
-
       await createUserWithEmailAndPassword(auth, email, password)
       await signInWithEmailAndPassword(auth, email, password)
+
+      this.current_user.displayName = displayName
+
       await updateProfile(auth.currentUser, { displayName })
 
       const domain = "XXX" // TODO: temp fix
