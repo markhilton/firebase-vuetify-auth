@@ -16,7 +16,9 @@ export default {
   install: (app, options = {}) => {
     // merge default settings with user settings
     const globalConfig = { ...defaultSettings, ...options }
-    const { firebase, debug } = globalConfig
+    const { firebase, debug, verification } = globalConfig
+
+    const auth = getAuth(firebase)
 
     // verify if required dependency instances are passed to this package config
     if (debug) {
@@ -38,9 +40,25 @@ export default {
     // commit npm package config to the store
     authStore.config = globalConfig
 
-    onAuthStateChanged(getAuth(firebase), (user) => {
+    onAuthStateChanged(auth, (user) => {
       authStore.init = true
       authStore.current_user = user
+
+      if (user) {
+        const currentUser = auth.currentUser
+
+        if (!currentUser.emailVerified && verification) {
+          const emailVerificationUpdate = setInterval(async () => {
+            await currentUser.reload()
+
+            if (currentUser.emailVerified) {
+              clearInterval(emailVerificationUpdate)
+              window.location.reload()
+            }
+          }, 3500)
+        }
+      }
+
       console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
     })
 
