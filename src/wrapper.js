@@ -16,7 +16,7 @@ export default {
   install: (app, options = {}) => {
     // merge default settings with user settings
     const globalConfig = { ...defaultSettings, ...options }
-    const { firebase, debug } = globalConfig
+    const { firebase, debug, verification } = globalConfig
 
     const auth = getAuth(firebase)
 
@@ -47,7 +47,7 @@ export default {
       if (user) {
         const currentUser = auth.currentUser
 
-        if (!currentUser.emailVerified) {
+        if (!currentUser.emailVerified && verification) {
           const emailVerificationUpdate = setInterval(async () => {
             await currentUser.reload()
 

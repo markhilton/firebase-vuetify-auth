@@ -9146,19 +9146,19 @@ const Yi = {
   return l && console.log("[ auth guard ]: is route ALLOWED: [", r, "]"), i && r || !i ? n() : n(!1);
 }, Hc = {
   install: (e, t = {}) => {
-    const n = { ...Go, ...t }, { firebase: a, debug: l } = n, i = _e(a);
+    const n = { ...Go, ...t }, { firebase: a, debug: l, verification: i } = n, o = _e(a);
     l && (console.log("[ auth guard ]: wrapper initialization..."), a === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!")), e.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), e.use(Qi()));
-    const o = Ee();
-    o.config = n, co(i, (r) => {
-      if (o.init = !0, o.current_user = r, r) {
-        const s = i.currentUser;
-        if (!s.emailVerified) {
-          const c = setInterval(async () => {
-            await s.reload(), s.emailVerified && (clearInterval(c), window.location.reload());
+    const r = Ee();
+    r.config = n, co(o, (s) => {
+      if (r.init = !0, r.current_user = s, s) {
+        const c = o.currentUser;
+        if (!c.emailVerified && i) {
+          const f = setInterval(async () => {
+            await c.reload(), c.emailVerified && (clearInterval(f), window.location.reload());
           }, 3500);
         }
       }
-      console.log("[ auth guard ]: auth state changed. User ID: [", (r == null ? void 0 : r.uid) || null, "]");
+      console.log("[ auth guard ]: auth state changed. User ID: [", (s == null ? void 0 : s.uid) || null, "]");
     }), e.directive("mask", Uo), e.component("AuthenticationGuard", Fc);
   }
 };
