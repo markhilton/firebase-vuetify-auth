@@ -5,7 +5,8 @@ import {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
-  signInWithRedirect,
+  signInWithPopup,
+  // signInWithRedirect,
   signInWithPhoneNumber,
   signInWithEmailAndPassword,
   sendEmailVerification,
@@ -92,7 +93,9 @@ export const actions = {
     const auth = getAuth(this.config.firebase)
 
     // useDeviceLanguage(auth)
-    signInWithRedirect(auth, provider)
+    // signInWithRedirect(auth, provider)
+
+    signInWithPopup(auth, provider)
   },
 
   //
@@ -101,7 +104,9 @@ export const actions = {
     const auth = getAuth(this.config.firebase)
 
     // useDeviceLanguage(auth)
-    signInWithRedirect(auth, provider)
+    // signInWithRedirect(auth, provider)
+
+    signInWithPopup(auth, provider)
   },
 
   //
@@ -113,7 +118,9 @@ export const actions = {
 
     // provider.addScope("profile")
 
-    signInWithRedirect(auth, provider)
+    // signInWithRedirect(auth, provider)
+
+    signInWithPopup(auth, provider)
   },
 
   //
