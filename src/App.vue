@@ -13,7 +13,7 @@
     </v-app-bar>
 
     <v-main>
-      <v-container v-if="isAuthenticated">
+      <v-container>
         <h1>Firebase Vuetify Auth</h1>
 
         <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
@@ -30,11 +30,11 @@
       </v-container>
 
       <!-- v-router view -->
-      <router-view v-if="isAuthenticated" />
+      <router-view />
     </v-main>
 
     <!-- auth guard -->
-    <AuthenticationGuard v-if="!isAuthenticated || isEmailVerificationScrenShown" />
+    <AuthenticationGuard/>
   </v-app>
 </template>
 
@@ -44,5 +44,5 @@ import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
 const { signOut } = store
-const { isAuthenticated, getDisplayName, isEmailVerificationScrenShown } = storeToRefs(store)
+const { isAuthenticated, getDisplayName } = storeToRefs(store)
 </script>
