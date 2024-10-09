@@ -3,9 +3,9 @@
     <v-card flat>
       <v-form ref="form" v-model="valid" @submit.prevent="register()">
         <!-- error alerts -->
-        <v-alert v-if="Boolean(error)" type="error" dismissible @click="error = null">
-          {{ error.message }}
-        </v-alert>
+        <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
+            {{ getError.message }}
+        </v-alert>    
 
         <!-- application branding -->
         <AuthBranding v-else class="text-center" />
@@ -76,6 +76,8 @@ let displayName = ref("")
 let valid = ref(false)
 
 const form = ref()
+
+const getError = computed(() => store.getError)
 
 const rules = computed(() => {
   return {
