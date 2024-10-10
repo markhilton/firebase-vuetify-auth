@@ -222,6 +222,7 @@ export const actions = {
     const auth = getAuth(this.config.firebase)
 
     if (debug) console.log("[ auth guard ]: signOut request")
+      window.location.reload()
 
     return signOut(auth)
   },
