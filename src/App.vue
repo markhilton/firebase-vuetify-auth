@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar v-if="isAuthenticated" app dark>
+    <v-app-bar app dark>
       <v-toolbar-title>
         User: <v-chip>{{ getDisplayName }}</v-chip>
       </v-toolbar-title>
