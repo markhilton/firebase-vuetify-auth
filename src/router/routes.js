@@ -13,7 +13,7 @@ export default [
   {
     name: "Protected",
     path: "/protected",
-    meta: { requiresAuth: true },
     component: () => import("@/views/ProtectedRoute.vue"),
+    meta: { requiresAuth: true },
   },
 ]

@@ -168,6 +168,17 @@ export const actions = {
       const verification = this.config.email
       const auth = getAuth(this.config.firebase)
       await createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log("User Account Created!")
+        })
+        .catch((error) => {
+          {
+            this.error = error
+            this.is_loading = false
+            console.error("[ registerUser ]: Error occured during creating user" + this.getError)
+          }
+        })
+
       await signInWithEmailAndPassword(auth, email, password)
 
       this.current_user.displayName = displayName

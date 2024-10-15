@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-dialog
-      v-model="dialog"
-      :persistent="store.is_authguard_dialog_persistent"
+      :model-value="dialog"
+      :persistent="getAuthGuardDialogPersistence"
       :retain-focus="false"
       overlay-opacity="0.95"
       content-class="elevation-0"
@@ -85,6 +85,7 @@ const route = useRoute()
 
 const debug = computed(() => config.debug)
 const currentRoute = computed(() => route.path)
+const getAuthGuardDialogPersistence = computed(()=> store.getAuthGuardDialogPersistence)
 
 const dialog = computed({
   get: () => store.init && store.is_authguard_dialog_shown,

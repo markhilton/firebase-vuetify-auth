@@ -17,9 +17,10 @@ export default () => {
 
   let allowRoute = false // default state
 
-  const auth = getAuth(store.config.firebase)
+  let auth = getAuth(store.config.firebase)
+
   const currentUser = auth.currentUser
-  const isAuthenticated = !!currentUser
+  const isAuthenticated = auth.currentUser ? true : false
   const verification = store.config.verification
   const isRoutePublic = store.is_route_public
   const fromPublicToAuth = store.is_from_public_to_auth
@@ -39,9 +40,10 @@ export default () => {
     allowRoute = true
     store.is_authguard_dialog_shown = false
     store.is_authguard_dialog_persistent = false
-  } else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
+  } 
+  else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
     store.is_authguard_dialog_shown = true
-    store.is_authguard_dialog_persistent = false
+    store.is_authguard_dialog_persistent = true
   }
 
   // authenticated currentUser
