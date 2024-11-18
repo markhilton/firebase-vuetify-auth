@@ -1,16 +1,22 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="register()">
-        <!-- error alerts -->
-        <v-alert v-if="Boolean(error)" type="error" dismissible @click="error = null">
+      <v-form ref="form" v-model="valid" @submit.prevent="register">
+        <!-- Error Alerts -->
+        <v-alert
+          v-if="Boolean(error)"
+          type="error"
+          dismissible
+          transition="fade-transition"
+          @click="clearError"
+        >
           {{ error.message }}
         </v-alert>
 
-        <!-- application branding -->
+        <!-- Application Branding -->
         <AuthBranding v-else class="text-center" />
 
-        <!-- registration form -->
+        <!-- Registration Form -->
         <v-card-text class="mb-0 pb-0">
           <v-text-field
             v-model="displayName"
@@ -54,7 +60,9 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn block large depressed color="primary" type="submit" :disabled="!valid"> Register </v-btn>
+          <v-btn block large depressed color="primary" type="submit" :disabled="!valid">
+            Register
+          </v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
@@ -62,31 +70,47 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue"
-import { useAuthStore } from "@/store/auth"
-import AuthBranding from "./AuthBranding.vue"
+import { ref, computed, watch } from "vue";
+import { useAuthStore } from "@/store/auth";
+import { storeToRefs } from "pinia";
 
-const store = useAuthStore()
-const { error, registerUser } = store
+import AuthBranding from "./AuthBranding.vue";
 
-let email = ref("")
-let password = ref("")
-let confirm = ref("")
-let displayName = ref("")
-let valid = ref(false)
+const store = useAuthStore();
+const { registerUser } = store;
+const { getError, error } =
+  storeToRefs(store);
 
-const form = ref()
+const email = ref("");
+const password = ref("");
+const confirm = ref("");
+const displayName = ref("");
+const valid = ref(false);
 
-const rules = computed(() => {
-  return {
-    email: !email.value ? "Email cannot be empty" : true,
-    password: !password.value ? "Password cannot be empty" : true,
-    displayName: !displayName.value ? "Name cannot be empty" : true,
-    confirm: password.value !== confirm.value ? "Passwords do not match" : true,
+const form = ref();
+
+const rules = computed(() => ({
+  email: !email.value ? "Email cannot be empty" : true,
+  password: !password.value ? "Password cannot be empty" : true,
+  displayName: !displayName.value ? "Name cannot be empty" : true,
+  confirm: password.value !== confirm.value ? "Passwords do not match" : true,
+}));
+
+const clearError = () => {
+  error.value = null;
+};
+
+// Clear errors after 5 seconds
+watch(getError, (newError) => {
+  if (newError) {
+    setTimeout(clearError, 5000);
   }
-})
+});
 
+// Handle registration
 const register = () => {
-  if (form.value.validate() && registerUser) registerUser(displayName.value, email.value, password.value)
-}
+  if (form.value.validate() && registerUser) {
+    registerUser(displayName.value, email.value, password.value);
+  }
+};
 </script>
