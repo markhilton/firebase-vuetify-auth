@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar v-if="isAuthenticated" app dark>
+    <v-app-bar app dark>
       <v-toolbar-title>
         User: <v-chip>{{ getDisplayName }}</v-chip>
       </v-toolbar-title>
@@ -8,12 +8,12 @@
       <v-spacer />
 
       <!-- sign in / sign out button -->
-      <v-btn v-if="isAuthenticated" outlined @click="signOut()"> Sign Out </v-btn>
-      <v-btn v-else outlined @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
+      <v-btn v-if="isAuthenticated" variant="outlined" @click="signOut()"> Sign Out </v-btn>
+      <v-btn v-else variant="outlined" @click="$router.push('/protected').catch(() => {})"> Sign In </v-btn>
     </v-app-bar>
 
     <v-main>
-      <v-container v-if="isAuthenticated">
+      <v-container>
         <h1>Firebase Vuetify Auth</h1>
 
         <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
@@ -30,11 +30,11 @@
       </v-container>
 
       <!-- v-router view -->
-      <router-view v-if="isAuthenticated" />
+      <router-view />
     </v-main>
 
     <!-- auth guard -->
-    <AuthenticationGuard v-if="!isAuthenticated || isEmailVerificationScrenShown" />
+    <AuthenticationGuard/>
   </v-app>
 </template>
 
@@ -44,5 +44,5 @@ import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
 const { signOut } = store
-const { isAuthenticated, getDisplayName, isEmailVerificationScrenShown } = storeToRefs(store)
+const { isAuthenticated, getDisplayName } = storeToRefs(store)
 </script>

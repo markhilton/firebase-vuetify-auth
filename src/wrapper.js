@@ -11,12 +11,13 @@ import AuthGuard from "./components/AuthGuard.vue"
 
 // Import router middleware
 import AuthMiddleware from "./components/authguard"
+import authcheck from "./components/authcheck"
 
 export default {
   install: (app, options = {}) => {
     // merge default settings with user settings
     const globalConfig = { ...defaultSettings, ...options }
-    const { firebase, debug, verification } = globalConfig
+    const { firebase, debug, verification, router } = globalConfig
 
     const auth = getAuth(firebase)
 
@@ -26,6 +27,10 @@ export default {
 
       if (firebase === null) {
         console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!")
+      }
+
+      if (router === null) {
+        console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")
       }
     }
 
@@ -44,7 +49,11 @@ export default {
       authStore.init = true
       authStore.current_user = user
 
+      authcheck() // TODO: verify once
+
       if (user) {
+        console.log("[ auth guard ]: auth state changed. User is Authenticated!")
+
         const currentUser = auth.currentUser
 
         if (!currentUser.emailVerified && verification) {
@@ -58,7 +67,6 @@ export default {
           }, 3500)
         }
       }
-
       console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
     })
 

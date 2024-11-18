@@ -24,6 +24,11 @@ export const actions = {
     if (status === false) this.error = null
   },
 
+  SET_REGISTER_SCREEN_SHOWN(status) {
+    this.tab = status ? 0 : 1
+    this.is_reset_password_screen_shown = status
+  },
+
   SET_PASSWORD_RESET_SCREEN_SHOWN(status) {
     this.tab = status ? 1 : 0
     this.is_reset_password_screen_shown = status
@@ -168,6 +173,17 @@ export const actions = {
       const verification = this.config.email
       const auth = getAuth(this.config.firebase)
       await createUserWithEmailAndPassword(auth, email, password)
+        .then(() => {
+          console.log("User Account Created!")
+        })
+        .catch((error) => {
+          {
+            this.error = error
+            this.is_loading = false
+            console.error("[ registerUser ]: Error occured during creating user" + this.getError)
+          }
+        })
+
       await signInWithEmailAndPassword(auth, email, password)
 
       this.current_user.displayName = displayName

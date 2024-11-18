@@ -1,8 +1,8 @@
 <template>
   <div>
     <v-dialog
-      v-model="dialog"
-      :persistent="store.is_authguard_dialog_persistent"
+      :model-value="dialog"
+      :persistent="getAuthGuardDialogPersistence"
       :retain-focus="false"
       overlay-opacity="0.95"
       content-class="elevation-0"
@@ -26,7 +26,7 @@
 
             <v-card-text>
               <v-window v-model="tab">
-                <v-window-item v-if="!isLoginWithPhoneShown" value="0" class="pt-5">
+                <v-window-item v-if="!isLoginWithPhoneShown" value="0" class="pt--1">
                   <LoginCard />
                 </v-window-item>
 
@@ -85,6 +85,7 @@ const route = useRoute()
 
 const debug = computed(() => config.debug)
 const currentRoute = computed(() => route.path)
+const getAuthGuardDialogPersistence = computed(()=> store.getAuthGuardDialogPersistence)
 
 const dialog = computed({
   get: () => store.init && store.is_authguard_dialog_shown,
