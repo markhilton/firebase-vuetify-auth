@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="emailPasswordResetLink(email)">
+      <v-form ref="form" v-model="valid" @submit.prevent="handlePasswordReset(email)">
         <!-- error alerts -->
         <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
           {{ getError.message }}
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue"
+import { ref, computed } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
 import { storeToRefs } from "pinia"
@@ -64,12 +64,25 @@ const store = useAuthStore()
 const { emailPasswordResetLink, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
 const { error, is_loading, getError, isEmailResetPasswordLinkSent } = storeToRefs(store)
 
-let email = ""
-let valid = false
+let email = ref("")
+let valid = ref(false)
 
 const rules = computed(() => {
   return  {
-    email: email === "" ? "Email cannot be empty" : true,
+    email: email.value === "" ? "Email cannot be empty" : true,
   }
 })
+
+const clearError = () => {
+  error.value = null;
+};
+
+const handlePasswordReset = () => {
+  if (email.value) {
+    emailPasswordResetLink(email.value);
+  } else {
+    error.value = { message: "Email cannot be empty" };
+    setTimeout(clearError, 5000); // Hide the error
+  }
+};
 </script>
