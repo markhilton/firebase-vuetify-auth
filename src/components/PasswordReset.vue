@@ -29,7 +29,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn block large depressed color="primary" type="submit" :disabled="is_loading">
+            <v-btn block depressed color="primary" type="submit" size="large" :disabled="is_loading">
               Email Password Reset Link
             </v-btn>
           </v-card-actions>
