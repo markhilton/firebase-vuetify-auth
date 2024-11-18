@@ -24,6 +24,11 @@ export const actions = {
     if (status === false) this.error = null
   },
 
+  SET_REGISTER_SCREEN_SHOWN(status) {
+    this.tab = status ? 0 : 1
+    this.is_reset_password_screen_shown = status
+  },
+
   SET_PASSWORD_RESET_SCREEN_SHOWN(status) {
     this.tab = status ? 1 : 0
     this.is_reset_password_screen_shown = status

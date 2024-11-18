@@ -4,6 +4,7 @@
       <!-- Error Alerts -->
       <v-alert
         v-if="Boolean(getError)"
+        class="my-3"
         type="error"
         dismissible
         transition="fade-transition"
@@ -50,6 +51,7 @@
 
       <div class="text-center pb-4">
         <v-btn
+          v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed"
           variant="text"
           size="x-small"
           color="primary"
@@ -57,7 +59,28 @@
         >
           Forgot Password?
         </v-btn>
+
+        <v-btn
+          v-else
+          variant="text"
+          size="x-small"
+          color="primary"
+          @click="SET_REGISTER_SCREEN_SHOWN(false)"
+        >
+          Register as new user
+        </v-btn>
       </div>
+
+      <!-- <div class="text-center pb-4">
+        <v-btn
+          variant="text"
+          size="x-small"
+          color="primary"
+          @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true)"
+        >
+          Forgot Password?
+        </v-btn>
+      </div> -->
 
       <v-card-actions>
         <v-btn
@@ -83,9 +106,11 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/store/auth";
 
 const store = useAuthStore();
-const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN } = store;
+const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN } = store;
 const { config, error, is_session_persistant, getSessionPersistence, getError } =
   storeToRefs(store);
+
+const { isUserRegistrationAllowed, isResetPasswordScreenShown } = storeToRefs(store)
 
 const email = ref("");
 const password = ref("");
