@@ -1,61 +1,75 @@
 <template>
   <v-container>
-    <!-- user with no email verification -->
+    <!-- User with no email verification -->
     <v-card flat class="text-center pa-5">
-      <!-- email error -->
-      <div v-if="error">
-        <div class="display-1 grey--text mb-3">Error!</div>
+      <!-- Email Error -->
+      <div v-if="getError">
+        <div class="text-h4 text-grey mb-3">Error!</div>
 
-        <!-- error alerts -->
-        <v-alert v-if="Boolean(error)" type="error" dismissible @click="error = null">
-          {{ error.message }}
+        <!-- Error Alerts -->
+        <v-alert
+          v-if="Boolean(getError)"
+          type="error"
+          dismissible
+          transition="fade-transition"
+          @click="clearError"
+        >
+          {{ getError?.message  }}
         </v-alert>
 
-        <v-btn color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)"> Back to Login </v-btn>
+        <v-btn class="mt-2" color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
+          Back to Login
+        </v-btn>
       </div>
 
-      <!-- email verification -->
+      <!-- Email Verification -->
       <div v-else>
-        <!-- email confirmation required message -->
+        <!-- Email Confirmation Required Message -->
         <div v-if="!isEmailVerificationLinkSent">
-          <div class="display-1 grey--text mb-3">Verification Required</div>
+          <div class="text-h4 text-grey mb-3">Verification Required</div>
           <v-icon size="100" color="grey" class="ma-4">mdi-account</v-icon>
         </div>
 
-        <!-- email sent confirmation -->
+        <!-- Email Sent Confirmation -->
         <div v-if="isEmailVerificationLinkSent">
-          <div class="display-1 grey--text mb-3">Email sent!</div>
+          <div class="text-h4 text-grey mb-3">Email Sent!</div>
           <v-icon size="100" color="grey" class="ma-4">mdi-email</v-icon>
         </div>
 
-        <div class="grey--text text--darken-2 mb-7 body-2">
+        <div class="text-grey-darken-2 mb-7 body-2">
           <p>
-            Please check your email to verify your address. Click at the link in the email we've sent you to confirm
+            Please check your email to verify your address. Click the link in the email we've sent you to confirm
             your account access.
           </p>
         </div>
 
-        <!-- send verification email button -->
+        <!-- Send Verification Email Button -->
         <div v-if="!isEmailResetPasswordLinkSent">
-          <p class="grey--text text--darken-2 mb-7 body-2">
-            If you have not received verification email<br />click at the button below.
+          <p class="text-grey-darken-2 mb-7 body-2">
+            If you have not received a verification email,<br />click the button below.
           </p>
 
-          <v-btn :disabled="is_loading" color="primary" @click="sendVerificationEmail()">
+          <v-btn :disabled="is_loading" color="primary" @click="handleSendVerificationEmail">
             Send Verification Email
           </v-btn>
         </div>
 
-        <!-- back to login page button -->
+        <!-- Back to Login Page Button -->
         <div v-if="isEmailResetPasswordLinkSent">
-          <v-btn color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)"> Back to Login </v-btn>
+          <v-btn color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
+            Back to Login
+          </v-btn>
         </div>
 
-        <!-- allow to log out in case user cannot confirm the email address -->
+        <!-- Allow to Log Out -->
         <v-container>
           <div class="caption mb-2">- or -</div>
-          <v-btn v-if="isAuthenticated" color="primary" outlined @click="signOut"> SignOut </v-btn>
-          <v-btn v-else color="primary" outlined @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)"> SignIn </v-btn>
+          <v-btn v-if="isAuthenticated" color="primary" variant="outlined" @click="signOut">
+            Sign Out
+          </v-btn>
+          <v-btn v-else color="primary" variant="outlined" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
+            Sign In
+          </v-btn>
         </v-container>
       </div>
     </v-card>
@@ -63,10 +77,37 @@
 </template>
 
 <script setup>
-import { storeToRefs } from "pinia"
-import { useAuthStore } from "../store/auth"
+import { watch } from "vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "../store/auth";
 
-const store = useAuthStore()
-const { error, is_loading, signOut, sendVerificationEmail, SET_EMAIL_VERIFICATION_SCREEN_SHOWN } = store
-const { isAuthenticated, isEmailResetPasswordLinkSent, isEmailVerificationLinkSent } = storeToRefs(store)
+const store = useAuthStore();
+const {
+  is_loading,
+  signOut,
+  sendVerificationEmail,
+  SET_EMAIL_VERIFICATION_SCREEN_SHOWN,
+} = store;
+const {
+  error,
+  getError,
+  isAuthenticated,
+  isEmailResetPasswordLinkSent,
+  isEmailVerificationLinkSent,
+} = storeToRefs(store);
+
+const clearError = () => {
+  error.value = null;
+};
+
+const handleSendVerificationEmail = () => {
+  sendVerificationEmail();
+};
+
+// Watch for errors and clear them after 5 seconds
+watch(getError, (newError) => {
+  if (newError) {
+    setTimeout(clearError, 5000); // Clear Error after 5 seconds
+  }
+});
 </script>

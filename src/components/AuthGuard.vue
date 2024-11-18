@@ -26,7 +26,7 @@
 
             <v-card-text>
               <v-window v-model="tab">
-                <v-window-item v-if="!isLoginWithPhoneShown" value="0" class="pt-5">
+                <v-window-item v-if="!isLoginWithPhoneShown" value="0" class="pt--1">
                   <LoginCard />
                 </v-window-item>
 
