@@ -43,7 +43,7 @@ export default () => {
   } 
   else if (!isRoutePublic && fromPublicToAuth && !isAuthenticated) {
     store.is_authguard_dialog_shown = true
-    store.is_authguard_dialog_persistent = true
+    store.is_authguard_dialog_persistent = false
   }
 
   // authenticated currentUser

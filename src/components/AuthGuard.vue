@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-dialog
-      :model-value="dialog"
+      v-model="dialog"
       :persistent="getAuthGuardDialogPersistence"
       :retain-focus="false"
       overlay-opacity="0.95"
