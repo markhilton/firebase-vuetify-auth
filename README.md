@@ -9,7 +9,8 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 - Email verification for new accounts (required to gain access to the app)
 - 3rd party authentication provider integration (Google, Facebook, Phone text message)
 
-![Login Registration Example](./src/assets/auth-example.png)
+![Login Registration Example](./src/assets/register-ex.png)
+![Login Registration Example](./src/assets/signin-ex.png)
 
 ## Requirements
 
@@ -25,14 +26,14 @@ example:
 import { initializeApp } from "firebase/app"
 
 const config = {
-  appId: process.env.VUE_APP_FIREBASE_APP_ID,
-  apiKey: process.env.VUE_APP_FIREBASE_APIKEY,
-  authDomain: process.env.VUE_APP_FIREBASE_AUTH,
-  databaseURL: process.env.VUE_APP_FIREBASE_DATABASE,
-  projectId: process.env.VUE_APP_FIREBASE_PROJECT,
-  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE,
-  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING,
-  measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID,
+  appId: process.env.VITE_APP_FIREBASE_APP_ID,
+  apiKey: process.env.VITE_APP_FIREBASE_APIKEY,
+  authDomain: process.env.VITE_APP_FIREBASE_AUTH,
+  databaseURL: process.env.VITE_APP_FIREBASE_DATABASE,
+  projectId: process.env.VITE_APP_FIREBASE_PROJECT,
+  storageBucket: process.env.VITE_APP_FIREBASE_STORAGE,
+  messagingSenderId: process.env.VITE_APP_FIREBASE_MESSAGING,
+  measurementId: process.env.VITE_APP_FIREBASE_MEASUREMENT_ID,
 }
 
 const app = initializeApp(config)
@@ -125,6 +126,7 @@ Example of `router.js` implementation.
 
 ```js
 import { createWebHistory, createRouter } from "vue-router"
+import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -149,7 +151,7 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(guard)
+router.beforeEach(AuthMiddleware)
 
 export default router
 ```
