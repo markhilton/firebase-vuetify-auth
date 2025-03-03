@@ -539,7 +539,7 @@ const rr = {
       i
     ), t = !0), t ? (e.is_authguard_dialog_shown = !1, e.is_authguard_dialog_persistent = !1) : (e.is_authguard_dialog_shown = !0, r ? e.is_authguard_dialog_persistent = !1 : e.is_authguard_dialog_persistent = !0), !s && i && (Fe("[ auth check ]: authguard config requires email verification"), e.error = null, e.is_email_verification_screen_shown = !0, e.is_authguard_dialog_persistent = !0);
   } else
-    Fe("[ auth check ]: currentUser is NOT authenticated"), e.is_authguard_dialog_shown = !0, e.is_authguard_dialog_persistent = !1;
+    Fe("[ auth check ]: currentUser is NOT authenticated"), e.is_authguard_dialog_shown = !0, e.is_authguard_dialog_persistent = !0;
   return Fe("[ auth check ]: is route ALLOWED: [", t, "]"), t;
 };
 const he = typeof window < "u", Jn = he && "IntersectionObserver" in window;
@@ -9904,8 +9904,9 @@ const Zc = I({
     ]));
   }
 }, sd = (e, t, n) => {
-  const a = $e(), l = a.config.debug, i = e.meta.requiresAuth, o = t.meta.requiresAuth;
-  i && !o ? a.is_from_public_to_auth = !0 : a.is_from_public_to_auth = !1, i ? a.is_route_public = !1 : a.is_route_public = !0;
+  var s;
+  const a = $e(), l = a.config.debug, i = e.meta.requiresAuth, o = (s = t.meta) != null && s.requiresAuth ? t.meta.requiresAuth : !1;
+  i && o != null && !o ? a.is_from_public_to_auth = !0 : a.is_from_public_to_auth = !1, i ? a.is_route_public = !1 : a.is_route_public = !0;
   const r = Qn();
   return l && console.log("[ auth guard ]: is route ALLOWED: [", r, "]"), i && r || !i ? n() : n(!1);
 }, ud = {
