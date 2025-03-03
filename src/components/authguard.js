@@ -25,10 +25,10 @@ export default (to, from, next) => {
   const store = useAuthStore()
   const debug = store.config.debug
   const isRequired = to.meta.requiresAuth // is current path required authentication
-  const fromRequiresAuth = from.meta.requiresAuth // from which page is request
+  const fromRequiresAuth = from.meta?.requiresAuth ? from.meta.requiresAuth : false // from which page is request
 
   // check if we are going from public page to auth required page
-  if (isRequired && !fromRequiresAuth) {
+  if (isRequired && fromRequiresAuth != undefined && !fromRequiresAuth) {
     store.is_from_public_to_auth = true
   } else store.is_from_public_to_auth = false
 

@@ -20,7 +20,7 @@ export default () => {
   let auth = getAuth(store.config.firebase)
 
   const currentUser = auth.currentUser
-  const isAuthenticated = auth.currentUser ? true : false
+  const isAuthenticated = !!auth.currentUser
   const verification = store.config.verification
   const isRoutePublic = store.is_route_public
   const fromPublicToAuth = store.is_from_public_to_auth
@@ -98,7 +98,7 @@ export default () => {
     debug("[ auth check ]: currentUser is NOT authenticated")
 
     store.is_authguard_dialog_shown = true
-    store.is_authguard_dialog_persistent = false
+    store.is_authguard_dialog_persistent = true
     // added v0.5.6 because on log out the dialog was not persistent
   }
 
