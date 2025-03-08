@@ -9,13 +9,10 @@ export default [
     ignores: ['node_modules/**', 'dist/**', '.eslintignore']
   },
   js.configs.recommended,
+  // Ignore Vue files in the flat config - we'll use .eslintrc-vue.js for them
   {
     files: ['**/*.vue'],
-    plugins: {
-      vue: pluginVue
-    },
-    processor: pluginVue.processors['.vue'],
-    ...pluginVue.configs['vue3-recommended']
+    ignores: ['**/*.vue']
   },
   {
     files: ['**/*.js', '**/*.vue'],

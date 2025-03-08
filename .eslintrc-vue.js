@@ -8,10 +8,10 @@ module.exports = {
     'plugin:vue/vue3-recommended',
     'eslint:recommended'
   ],
+  parser: 'vue-eslint-parser',
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: 'module',
-    parser: 'vue-eslint-parser'
+    sourceType: 'module'
   },
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
