@@ -1,12 +1,19 @@
-import eslint from '@eslint/js';
+import js from '@eslint/js';
 import pluginVue from 'eslint-plugin-vue';
 import prettier from 'eslint-config-prettier';
 
 export default [
-  eslint.configs.recommended,
-  pluginVue.configs['vue3-recommended'],
-  prettier,
+  js.configs.recommended,
   {
+    files: ['**/*.vue'],
+    ...pluginVue.configs['vue3-recommended']
+  },
+  {
+    files: ['**/*.js', '**/*.vue'],
+    ...prettier
+  },
+  {
+    files: ['**/*.js', '**/*.vue'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -19,7 +26,6 @@ export default [
         process: 'readonly'
       }
     },
-    files: ['**/*.js', '**/*.vue'],
     ignores: ['node_modules/**', 'dist/**'],
     rules: {
       'no-async-promise-executor': 0,
