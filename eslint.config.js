@@ -1,8 +1,13 @@
 import js from '@eslint/js';
 import pluginVue from 'eslint-plugin-vue';
 import prettier from 'eslint-config-prettier';
+import globals from 'globals';
 
 export default [
+  // Ignore patterns (migrated from .eslintignore)
+  {
+    ignores: ['node_modules/**', 'dist/**']
+  },
   js.configs.recommended,
   {
     files: ['**/*.vue'],
@@ -23,10 +28,11 @@ export default [
         }
       },
       globals: {
+        ...globals.browser,
+        ...globals.node,
         process: 'readonly'
       }
     },
-    ignores: ['node_modules/**', 'dist/**'],
     rules: {
       'no-async-promise-executor': 0,
       'vue/multi-word-component-names': 'off',
