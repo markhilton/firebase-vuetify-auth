@@ -6,11 +6,15 @@ import globals from 'globals';
 export default [
   // Ignore patterns (migrated from .eslintignore)
   {
-    ignores: ['node_modules/**', 'dist/**']
+    ignores: ['node_modules/**', 'dist/**', '.eslintignore']
   },
   js.configs.recommended,
   {
     files: ['**/*.vue'],
+    plugins: {
+      vue: pluginVue
+    },
+    processor: pluginVue.processors['.vue'],
     ...pluginVue.configs['vue3-recommended']
   },
   {

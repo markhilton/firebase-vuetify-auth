@@ -11,7 +11,10 @@ export default defineConfig({
   plugins: [
     vue(),
     vuetify({ autoImport: true }),
-    eslintPlugin(),
+    eslintPlugin({
+      lintOnStart: false,
+      include: ['src/**/*.js', 'src/**/*.vue']
+    }),
     cssInjectedByJsPlugin()
   ],
   define: { "process.env": {} },
