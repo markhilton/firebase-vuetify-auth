@@ -4,7 +4,7 @@ import prettier from 'eslint-config-prettier';
 
 export default [
   eslint.configs.recommended,
-  ...pluginVue.configs['vue3-recommended'],
+  pluginVue.configs['vue3-recommended'],
   prettier,
   {
     languageOptions: {
