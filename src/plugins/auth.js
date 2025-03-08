@@ -1,6 +1,5 @@
 import router from "@/router"
 import { app as firebase } from "@/middleware/firebase"
-import AuthGuard from "../wrapper"
 import { useAuthStore } from "@/store/auth"
 
 // Create a proper Vue plugin with install method
