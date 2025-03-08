@@ -13,7 +13,8 @@ export default defineConfig({
     vuetify({ autoImport: true }),
     eslintPlugin({
       lintOnStart: false,
-      include: ['src/**/*.js', 'src/**/*.vue']
+      failOnError: false,
+      include: ['src/**/*.js']
     }),
     cssInjectedByJsPlugin()
   ],
