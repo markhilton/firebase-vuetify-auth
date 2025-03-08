@@ -33,7 +33,6 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
     "volar-service-vetur": "^0.0.14",
-    "css-loader": "^6.11.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-vue": "^9.33.0",
