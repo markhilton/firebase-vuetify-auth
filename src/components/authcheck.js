@@ -3,11 +3,11 @@ import { getAuth } from "firebase/auth"
 
 const debug = (...text) => {
   const store = useAuthStore()
-  const debug = store.config.debug
+  const isDebug = store.config.debug
 
-  if (!debug) return
+  if (!isDebug) return
 
-  console.log.apply(console, text)
+  console.log(...text)
 }
 
 export default () => {

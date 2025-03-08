@@ -205,7 +205,7 @@ export const actions = {
       }
 
       const code = Array.isArray(confirmationCode) ? confirmationCode.join('') : confirmationCode
-      console.log("confirmationCode", code)
+      if (this.config.debug) console.log("confirmationCode", code)
 
       const result = await this.text_confirmation.confirm(code)
       
@@ -237,11 +237,11 @@ export const actions = {
       
       try {
         await createUserWithEmailAndPassword(auth, email, password)
-        console.log("User Account Created!")
+        if (this.config.debug) console.log("User Account Created!")
       } catch (error) {
         this.error = error
         this.is_loading = false
-        console.error("[ registerUser ]: Error occurred during creating user", error)
+        if (this.config.debug) console.error("[ registerUser ]: Error occurred during creating user", error)
         throw error
       }
 
