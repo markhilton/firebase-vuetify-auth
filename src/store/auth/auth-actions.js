@@ -44,88 +44,133 @@ export const actions = {
   },
 
   //
-  initializeGuard() {
+  async initializeGuard() {
     const debug = this.config.debug
-    const user = getAuth(this.config.firebase).currentUser
-
+    const auth = getAuth(this.config.firebase)
+    
     if (debug) console.log("[ auth guard ]: component initialization")
 
+    // Get the current user
+    const user = auth.currentUser
+    
     if (user) {
       const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
-      const currentUser = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
-      this.current_user = { ...currentUser }
-    } else this.current_user = null
-  },
-
-  //
-  loginWithEmail({ email, password }) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const auth = getAuth(this.config.firebase)
-        // const router = useRouter()
-
-        this.is_loading = true
-
-        await signOut(auth)
-
-        // set session persistence
-        if (this.config.session === "browser") {
-          await setPersistence(auth, browserSessionPersistence)
-        } else {
-          await setPersistence(auth, browserLocalPersistence)
-        }
-
-        await signInWithEmailAndPassword(auth, email, password)
-
-        // this is needed to reload route that was not loaded if user was not authenticated
-        // if (router.currentRoute.name === null) router.push(router.currentRoute.path).catch(() => {})
-
-        this.is_loading = false
-
-        return resolve()
-      } catch (error) {
-        this.error = error
-        this.is_loading = false
-
-        return reject()
+      this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+    } else {
+      this.current_user = null
+    }
+    
+    // Set up auth state change listener
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      } else {
+        this.current_user = null
       }
+      
+      if (debug) console.log("[ auth guard ]: auth state changed", user ? "user logged in" : "user logged out")
     })
+    
+    return Promise.resolve()
   },
 
   //
-  loginWithGoogle() {
-    const provider = new GoogleAuthProvider()
-    const auth = getAuth(this.config.firebase)
+  async loginWithEmail({ email, password }) {
+    try {
+      const auth = getAuth(this.config.firebase)
+      
+      this.is_loading = true
 
-    // useDeviceLanguage(auth)
-    // signInWithRedirect(auth, provider)
+      await signOut(auth)
 
-    signInWithPopup(auth, provider)
+      // set session persistence
+      if (this.config.session === "browser") {
+        await setPersistence(auth, browserSessionPersistence)
+      } else {
+        await setPersistence(auth, browserLocalPersistence)
+      }
+
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      
+      // Update current user information
+      if (userCredential.user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = userCredential.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      }
+
+      this.is_loading = false
+      return Promise.resolve()
+    } catch (error) {
+      this.error = error
+      this.is_loading = false
+      return Promise.reject(error)
+    }
   },
 
   //
-  loginWithFacebook() {
-    const provider = new FacebookAuthProvider()
-    const auth = getAuth(this.config.firebase)
+  async loginWithGoogle() {
+    try {
+      const provider = new GoogleAuthProvider()
+      const auth = getAuth(this.config.firebase)
 
-    // useDeviceLanguage(auth)
-    // signInWithRedirect(auth, provider)
+      const result = await signInWithPopup(auth, provider)
+      
+      // Update current user information
+      if (result.user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      }
+      
+      return Promise.resolve(result)
+    } catch (error) {
+      this.error = error
+      return Promise.reject(error)
+    }
+  },
 
-    signInWithPopup(auth, provider)
+  //
+  async loginWithFacebook() {
+    try {
+      const provider = new FacebookAuthProvider()
+      const auth = getAuth(this.config.firebase)
+
+      const result = await signInWithPopup(auth, provider)
+      
+      // Update current user information
+      if (result.user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      }
+      
+      return Promise.resolve(result)
+    } catch (error) {
+      this.error = error
+      return Promise.reject(error)
+    }
   },
 
   //
   loginWithPhone() {},
 
-  loginWithSaml() {
-    const provider = new SAMLAuthProvider(this.config.saml_provider_id)
-    const auth = getAuth(this.config.firebase)
+  async loginWithSaml() {
+    try {
+      const provider = new SAMLAuthProvider(this.config.saml_provider_id)
+      const auth = getAuth(this.config.firebase)
 
-    // provider.addScope("profile")
-
-    // signInWithRedirect(auth, provider)
-
-    signInWithPopup(auth, provider)
+      const result = await signInWithPopup(auth, provider)
+      
+      // Update current user information
+      if (result.user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      }
+      
+      return Promise.resolve(result)
+    } catch (error) {
+      this.error = error
+      return Promise.reject(error)
+    }
   },
 
   //
@@ -141,9 +186,12 @@ export const actions = {
       this.is_loading = false
       this.sign_by_phone_step = 2
       this.text_confirmation = confirmationResult
+      
+      return Promise.resolve(confirmationResult)
     } catch (error) {
       this.error = error
       this.is_loading = false
+      return Promise.reject(error)
     }
   },
 
@@ -152,16 +200,30 @@ export const actions = {
     try {
       this.is_loading = true
 
-      console.log("confirmationCode", confirmationCode.join())
+      if (!this.text_confirmation) {
+        throw new Error("No confirmation result available")
+      }
 
-      await this.text_confirmation.confirm(confirmationCode.join())
+      const code = Array.isArray(confirmationCode) ? confirmationCode.join('') : confirmationCode
+      console.log("confirmationCode", code)
+
+      const result = await this.text_confirmation.confirm(code)
+      
+      // Update current user information
+      if (result.user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+      }
 
       this.is_loading = false
       this.sign_by_phone_step = 1
+      
+      return Promise.resolve(result)
     } catch (error) {
       this.error = error
       this.is_loading = false
       this.sign_by_phone_step = 1
+      return Promise.reject(error)
     }
   },
 
@@ -172,25 +234,27 @@ export const actions = {
 
       const verification = this.config.email
       const auth = getAuth(this.config.firebase)
-      await createUserWithEmailAndPassword(auth, email, password)
-        .then(() => {
-          console.log("User Account Created!")
-        })
-        .catch((error) => {
-          {
-            this.error = error
-            this.is_loading = false
-            console.error("[ registerUser ]: Error occured during creating user" + this.getError)
-          }
-        })
+      
+      try {
+        await createUserWithEmailAndPassword(auth, email, password)
+        console.log("User Account Created!")
+      } catch (error) {
+        this.error = error
+        this.is_loading = false
+        console.error("[ registerUser ]: Error occurred during creating user", error)
+        throw error
+      }
 
       await signInWithEmailAndPassword(auth, email, password)
 
-      this.current_user.displayName = displayName
+      this.current_user = {
+        ...this.current_user,
+        displayName
+      }
 
       await updateProfile(auth.currentUser, { displayName })
 
-      const domain = "XXX" // TODO: temp fix
+      const domain = email.split('@')[1] || "XXX" // Extract domain from email
 
       // send email to verify user email address if config option is not set to false
       if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
@@ -212,45 +276,59 @@ export const actions = {
 
       await sendPasswordResetEmail(auth, email)
 
-      this.error = false
+      this.error = null
       this.is_loading = false
       this.is_email_reset_password_link_sent = true
+      
+      return Promise.resolve()
     } catch (error) {
       this.error = error
       this.is_loading = false
+      return Promise.reject(error)
     }
   },
 
   //
-  signOut() {
-    const debug = this.config.debug
-    const auth = getAuth(this.config.firebase)
+  async signOut() {
+    try {
+      const debug = this.config.debug
+      const auth = getAuth(this.config.firebase)
 
-    if (debug) console.log("[ auth guard ]: signOut request")
+      if (debug) console.log("[ auth guard ]: signOut request")
 
-    return signOut(auth)
+      await signOut(auth)
+      
+      // Clear user data
+      this.current_user = null
+      
+      return Promise.resolve()
+    } catch (error) {
+      this.error = error
+      return Promise.reject(error)
+    }
   },
 
   //
-  sendVerificationEmail() {
-    return new Promise(async (resolve, reject) => {
-      try {
-        this.is_loading = true
+  async sendVerificationEmail() {
+    try {
+      this.is_loading = true
 
-        const auth = getAuth(this.config.firebase)
-
-        await sendEmailVerification(auth.currentUser)
-
-        this.is_loading = false
-        this.is_email_verification_link_sent = true
-
-        return resolve()
-      } catch (error) {
-        this.error = error
-        this.is_loading = false
-
-        return reject()
+      const auth = getAuth(this.config.firebase)
+      
+      if (!auth.currentUser) {
+        throw new Error("No authenticated user")
       }
-    })
+
+      await sendEmailVerification(auth.currentUser)
+
+      this.is_loading = false
+      this.is_email_verification_link_sent = true
+
+      return Promise.resolve()
+    } catch (error) {
+      this.error = error
+      this.is_loading = false
+      return Promise.reject(error)
+    }
   },
 }
