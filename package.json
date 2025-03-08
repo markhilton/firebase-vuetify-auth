@@ -44,10 +44,10 @@
     "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^2.0.1",
-    "volar-service-vetur": "^0.0.14",
+    "volar-service-vetur": "^0.0.63",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "vue-eslint-parser": "^10.1.1",
-    "vue-template-compiler": "^2.7.16"
+    "vue-template-compiler": "^0.1.0"
   },
   "browserslist": [
     "> 1%",
