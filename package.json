@@ -33,10 +33,10 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "volar-service-vetur": "^0.0.14",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-vue": "^10.0.0",
+    "globals": "^16.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.2.5",
     "sass": "^1.85.1",
@@ -44,7 +44,9 @@
     "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^2.0.1",
+    "volar-service-vetur": "^0.0.14",
     "vue-cli-plugin-vuetify": "~2.5.8",
+    "vue-eslint-parser": "^10.1.1",
     "vue-template-compiler": "^2.7.16"
   },
   "browserslist": [
