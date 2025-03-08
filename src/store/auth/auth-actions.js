@@ -307,6 +307,19 @@ export const actions = {
       return Promise.reject(error)
     }
   },
+  
+  // Toggle auth dialog visibility
+  toggleAuthDialog(value) {
+    if (value !== undefined) {
+      this.is_authguard_dialog_shown = value;
+    } else {
+      this.is_authguard_dialog_shown = !this.is_authguard_dialog_shown;
+    }
+    
+    if (this.config?.debug) {
+      console.log("[ auth guard ]: dialog visibility set to", this.is_authguard_dialog_shown);
+    }
+  },
 
   //
   async sendVerificationEmail() {

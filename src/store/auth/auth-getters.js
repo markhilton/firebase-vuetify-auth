@@ -2,6 +2,7 @@ export const getters = {
   getError: (state) => state.error,
   getSessionPersistence: (state) => state.is_session_persistant,
   getAuthGuardDialogPersistence: (state) => state.is_authguard_dialog_persistent,
+  getAuthGuardDialogState: (state) => state.is_authguard_dialog_shown,
   getCurrentUser: (state) => state.current_user,
   getUid: (state) => state?.current_user?.uid || null,
   getDisplayName: (state) => state?.current_user?.displayName || null,
