@@ -14,7 +14,7 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-console': 'off', // Allow console statements since this is a library with debug mode
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'vue/multi-word-component-names': 'off'
   }

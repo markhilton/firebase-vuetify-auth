@@ -14,6 +14,7 @@ export default defineConfig({
     eslintPlugin({
       lintOnStart: false,
       failOnError: false,
+      failOnWarning: false,
       include: ['src/**/*.js']
     }),
     cssInjectedByJsPlugin()
