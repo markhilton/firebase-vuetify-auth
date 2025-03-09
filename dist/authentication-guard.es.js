@@ -9897,7 +9897,7 @@ const Jc = I({
 }, sd = {
   install: (e, t = {}) => {
     const n = { ...sr, ...t }, { firebase: a, debug: l, verification: i, router: o } = n, r = pe(a);
-    l && (console.log("[ auth guard ]: wrapper initialization..."), a === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), o === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), e.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), e.use(ho()));
+    l && (console.log("[ auth guard ]: wrapper initialization... 2"), a === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), o === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), console.log("[ auth guard ]: XXXXX", e.config.globalProperties.$pinia), e.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), e.use(ho()));
     const s = Be();
     s.config = n, Eo(r, (d) => {
       if (s.init = !0, s.current_user = d, Zn(), d) {

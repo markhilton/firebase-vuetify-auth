@@ -9,5 +9,8 @@ import { loadFonts } from "./plugins/webfontloader"
 
 loadFonts()
 
+const app = createApp(App)
+const pinia = createPinia()
+
 // initialize firebase and VUE
-createApp(App).use(createPinia()).use(router).use(vuetify).use(AuthGuard, authGuardSettings).mount("#app")
+app.use(pinia).use(router).use(vuetify).use(AuthGuard, authGuardSettings).mount("#app")
