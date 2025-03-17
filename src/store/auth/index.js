@@ -7,5 +7,5 @@ import { actions } from "./auth-actions"
 export const useAuthStore = defineStore("auth", {
   state,
   getters,
-  actions,
+  actions
 })

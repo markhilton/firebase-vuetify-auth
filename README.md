@@ -16,6 +16,8 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 
 Current master branch supports Vue 3 application. For Vue 2 please see vue2 branch.
 
+**Note:** This package is compatible only with Pinia versions 3 and above.
+
 This package assumes your VUE project is already integrated with Firebase & Vuetify. Example integration:
 
 The Firebase config file, example: `./src/middleware/firebase` is created to initiate Firebase Modular v9 SDK

@@ -18,6 +18,10 @@ import {
 } from "firebase/auth"
 
 export const actions = {
+  SET_TAB(index) {
+    this.tab = index
+  },
+
   SET_EMAIL_VERIFICATION_SCREEN_SHOWN(status) {
     this.is_email_verification_screen_shown = status
 
@@ -47,19 +51,19 @@ export const actions = {
   async initializeGuard() {
     const debug = this.config.debug
     const auth = getAuth(this.config.firebase)
-    
+
     if (debug) console.log("[ auth guard ]: component initialization")
 
     // Get the current user
     const user = auth.currentUser
-    
+
     if (user) {
       const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
       this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
     } else {
       this.current_user = null
     }
-    
+
     // Set up auth state change listener
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -68,10 +72,10 @@ export const actions = {
       } else {
         this.current_user = null
       }
-      
+
       if (debug) console.log("[ auth guard ]: auth state changed", user ? "user logged in" : "user logged out")
     })
-    
+
     return Promise.resolve()
   },
 
@@ -79,7 +83,7 @@ export const actions = {
   async loginWithEmail({ email, password }) {
     try {
       const auth = getAuth(this.config.firebase)
-      
+
       this.is_loading = true
 
       await signOut(auth)
@@ -92,7 +96,7 @@ export const actions = {
       }
 
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
-      
+
       // Update current user information
       if (userCredential.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = userCredential.user
@@ -115,13 +119,13 @@ export const actions = {
       const auth = getAuth(this.config.firebase)
 
       const result = await signInWithPopup(auth, provider)
-      
+
       // Update current user information
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
       }
-      
+
       return Promise.resolve(result)
     } catch (error) {
       this.error = error
@@ -136,13 +140,13 @@ export const actions = {
       const auth = getAuth(this.config.firebase)
 
       const result = await signInWithPopup(auth, provider)
-      
+
       // Update current user information
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
       }
-      
+
       return Promise.resolve(result)
     } catch (error) {
       this.error = error
@@ -159,13 +163,13 @@ export const actions = {
       const auth = getAuth(this.config.firebase)
 
       const result = await signInWithPopup(auth, provider)
-      
+
       // Update current user information
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
       }
-      
+
       return Promise.resolve(result)
     } catch (error) {
       this.error = error
@@ -186,7 +190,7 @@ export const actions = {
       this.is_loading = false
       this.sign_by_phone_step = 2
       this.text_confirmation = confirmationResult
-      
+
       return Promise.resolve(confirmationResult)
     } catch (error) {
       this.error = error
@@ -204,11 +208,11 @@ export const actions = {
         throw new Error("No confirmation result available")
       }
 
-      const code = Array.isArray(confirmationCode) ? confirmationCode.join('') : confirmationCode
+      const code = Array.isArray(confirmationCode) ? confirmationCode.join("") : confirmationCode
       if (this.config.debug) console.log("confirmationCode", code)
 
       const result = await this.text_confirmation.confirm(code)
-      
+
       // Update current user information
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
@@ -217,7 +221,7 @@ export const actions = {
 
       this.is_loading = false
       this.sign_by_phone_step = 1
-      
+
       return Promise.resolve(result)
     } catch (error) {
       this.error = error
@@ -234,7 +238,7 @@ export const actions = {
 
       const verification = this.config.email
       const auth = getAuth(this.config.firebase)
-      
+
       try {
         await createUserWithEmailAndPassword(auth, email, password)
         if (this.config.debug) console.log("User Account Created!")
@@ -249,12 +253,12 @@ export const actions = {
 
       this.current_user = {
         ...this.current_user,
-        displayName
+        displayName,
       }
 
       await updateProfile(auth.currentUser, { displayName })
 
-      const domain = email.split('@')[1] || "XXX" // Extract domain from email
+      const domain = email.split("@")[1] || "XXX" // Extract domain from email
 
       // send email to verify user email address if config option is not set to false
       if (verification === true || (Array.isArray(verification) && verification.includes(domain))) {
@@ -279,7 +283,7 @@ export const actions = {
       this.error = null
       this.is_loading = false
       this.is_email_reset_password_link_sent = true
-      
+
       return Promise.resolve()
     } catch (error) {
       this.error = error
@@ -297,27 +301,27 @@ export const actions = {
       if (debug) console.log("[ auth guard ]: signOut request")
 
       await signOut(auth)
-      
+
       // Clear user data
       this.current_user = null
-      
+
       return Promise.resolve()
     } catch (error) {
       this.error = error
       return Promise.reject(error)
     }
   },
-  
+
   // Toggle auth dialog visibility
   toggleAuthDialog(value) {
     if (value !== undefined) {
-      this.is_authguard_dialog_shown = value;
+      this.is_authguard_dialog_shown = value
     } else {
-      this.is_authguard_dialog_shown = !this.is_authguard_dialog_shown;
+      this.is_authguard_dialog_shown = !this.is_authguard_dialog_shown
     }
-    
+
     if (this.config?.debug) {
-      console.log("[ auth guard ]: dialog visibility set to", this.is_authguard_dialog_shown);
+      console.log("[ auth guard ]: dialog visibility set to", this.is_authguard_dialog_shown)
     }
   },
 
@@ -327,7 +331,7 @@ export const actions = {
       this.is_loading = true
 
       const auth = getAuth(this.config.firebase)
-      
+
       if (!auth.currentUser) {
         throw new Error("No authenticated user")
       }
