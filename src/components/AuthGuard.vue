@@ -17,31 +17,31 @@
 
           <div v-else>
             <v-tabs v-model="tab" grow>
-              <v-tab value="0"> Sign In </v-tab>
-              <v-tab v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" value="1"> Register </v-tab>
-              <v-tab v-if="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email" value="1">
+              <v-tab :value="0" :key="0"> Sign In </v-tab>
+              <v-tab v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :value="1" :key="1" > Register </v-tab>
+              <v-tab v-show="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email" :value="2" :key="2">
                 Reset Password
               </v-tab>
             </v-tabs>
 
             <v-card-text>
-              <v-window v-model="tab">
-                <v-window-item v-if="!isLoginWithPhoneShown" value="0" class="pt--1">
+              <v-tabs-window v-model="tab">
+                <v-tabs-window-item v-show="!isLoginWithPhoneShown" :value="0" class="pt--1" :key="0">
                   <LoginCard />
-                </v-window-item>
+                </v-tabs-window-item>
 
-                <v-window-item v-else value="0" class="pt-5">
+                <v-tabs-window-item v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :value="0" :key="0" class="pt-5">
                   <LoginWithPhone />
-                </v-window-item>
+                </v-tabs-window-item>
 
-                <v-window-item v-if="!isResetPasswordScreenShown && isUserRegistrationAllowed" value="1" class="pt-5">
+                <v-tabs-window-item :value="1" :key="1" class="pt-5">
                   <RegisterUser />
-                </v-window-item>
+                </v-tabs-window-item>
 
-                <v-window-item v-else value="1">
+                <v-tabs-window-item :value="2" :key="2">
                   <PasswordReset />
-                </v-window-item>
-              </v-window>
+                </v-tabs-window-item>
+              </v-tabs-window>
             </v-card-text>
           </div>
 
@@ -80,6 +80,7 @@ const {
   isResetPasswordScreenShown,
   isEmailVerificationScrenShown,
 } = storeToRefs(store)
+const { SET_TAB } = store;
 
 const route = useRoute()
 

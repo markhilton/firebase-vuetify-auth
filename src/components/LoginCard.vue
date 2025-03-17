@@ -55,7 +55,7 @@
           variant="text"
           size="x-small"
           color="primary"
-          @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true)"
+          @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true), SET_TAB(2)"
         >
           Forgot Password?
         </v-btn>
@@ -65,7 +65,7 @@
           variant="text"
           size="x-small"
           color="primary"
-          @click="SET_REGISTER_SCREEN_SHOWN(false)"
+          @click="SET_REGISTER_SCREEN_SHOWN(false) , SET_TAB(1)"
         >
           Register as new user
         </v-btn>
@@ -106,7 +106,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/store/auth";
 
 const store = useAuthStore();
-const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN } = store;
+const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN, SET_TAB } = store;
 const { config, error, is_session_persistant, getSessionPersistence, getError } =
   storeToRefs(store);
 
