@@ -52,7 +52,7 @@ export default {
       authcheck() // TODO: verify once
 
       if (user) {
-        console.log("[ auth guard ]: auth state changed. User is Authenticated!")
+        if (debug) console.log("[ auth guard ]: auth state changed. User is Authenticated!")
 
         const currentUser = auth.currentUser
 
@@ -67,7 +67,7 @@ export default {
           }, 3500)
         }
       }
-      console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
+      if (debug) console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
     })
 
     app.directive("mask", VueMaskDirective)
