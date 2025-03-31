@@ -11,7 +11,7 @@
         <v-card flat outlined>
           <v-progress-linear :indeterminate="is_loading" />
 
-          <div v-if="isEmailVerificationScrenShown">
+          <div v-if="isEmailVerificationScrenShown && current_user">
             <EmailVerification />
           </div>
 
@@ -74,6 +74,7 @@ const { initializeGuard } = store
 const {
   tab,
   config,
+  current_user,
   is_loading,
   isLoginWithPhoneShown,
   isUserRegistrationAllowed,
