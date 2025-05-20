@@ -88,11 +88,11 @@ export const actions = {
 
       await signOut(auth)
 
-      // set session persistence
-      if (this.config.session === "browser") {
-        await setPersistence(auth, browserSessionPersistence)
+      // set session persistence based on the "Remember me" checkbox state
+      if (this.is_session_persistant) {
+        await setPersistence(auth, browserLocalPersistence) // Remember me: use local persistence
       } else {
-        await setPersistence(auth, browserLocalPersistence)
+        await setPersistence(auth, browserSessionPersistence) // Don't remember me: use session persistence
       }
 
       const userCredential = await signInWithEmailAndPassword(auth, email, password)
