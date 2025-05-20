@@ -83,6 +83,8 @@ npm i @nerd305/firebase-vuetify-auth
 
 ## Setup
 
+Integrating `@nerd305/firebase-vuetify-auth` into your Vue 3 and Vuetify 3 project is straightforward. If you've met the prerequisites outlined in the "Requirements" section, you can get up and running with just three simple steps.
+
 #### STEP 1: Update your `main.js` app file
 
 This example assumes that you're using `vue-router` and `pinia` packages with your app, so we initialize VUE class by passing in `router`, `store` & `vuetify` objects.
