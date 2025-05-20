@@ -83,7 +83,11 @@ npm i @nerd305/firebase-vuetify-auth
 
 ## Setup
 
-Integrating `@nerd305/firebase-vuetify-auth` into your Vue 3 and Vuetify 3 project is straightforward. If you've met the prerequisites outlined in the "Requirements" section, you can get up and running with just three simple steps.
+Integrating `@nerd305/firebase-vuetify-auth` into your Vue 3 and Vuetify 3 project is straightforward. If you've met the prerequisites outlined in the "Requirements" section, you can get up and running by following these three simple steps:
+
+*   **STEP 1:** Update your `main.js` app file to initialize the AuthGuard plugin.
+*   **STEP 2:** Add the `<AuthenticationGuard />` component to your main `App.vue` template.
+*   **STEP 3:** Update your Vue Router configuration to use the `AuthMiddleware` for protecting routes.
 
 #### STEP 1: Update your `main.js` app file
 
