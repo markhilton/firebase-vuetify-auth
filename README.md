@@ -69,28 +69,27 @@ This example assumes that you're using `vue-router` and `pinia` packages with yo
 import { createApp } from "vue"
 import { createPinia } from "pinia"
 
-import App from "@/App"
-import router from "@/router"
-import vuetify from "@/plugins/vuetify"
+import App from "@/App" // Your root App component
+import router from "@/router" // Your Vue Router instance
+import vuetify from "@/plugins/vuetify" // Your Vuetify instance
 import AuthGuard from "@nerd305/firebase-vuetify-auth"
 
-import firebase from "@/middleware/firebase"
-// import { getAuth } from "firebase/auth" // Not strictly needed here if firebase app instance is passed
+import firebaseApp from "@/middleware/firebase" // Your initialized Firebase app instance
 
 const authGuardSettings = {
   debug: true, // enable debug messages in console log
-  session: "local", // Default session persistence: "local" or "browser" (session) or "none".
-                   // "local": Persists across browser sessions.
-                   // "browser" (or "session"): Clears on browser close.
-                   // "none": Clears on tab close (Firebase interprets as browserSessionPersistence).
-                   // This is the default for all auth methods.
-                   // The "Remember me" checkbox in the email/password form overrides this for that specific login.
+  session: "local", // Default session persistence for all auth methods.
+                   // Options:
+                   //   "local": Persists session across browser closures (user stays logged in).
+                   //   "browser" (or "session"): Session lasts only as long as the browser tab/window is open.
+                   //   "none": Session is in memory only, lost on page refresh/tab close (Firebase interprets this as browserSessionPersistence).
+                   // The "Remember me" checkbox in the email/password form overrides this setting specifically for email/password logins.
 
-  router, // routes
-  firebase, // pass on firebase middleware app init
+  router,          // Your Vue Router instance
+  firebase: firebaseApp, // Your initialized Firebase app instance
 
   saml: false, // allow authentication with SAML
-  saml_text: "Login with OKTA", // text for large login button
+  saml_text: "Login with OKTA", // text for large login button if SAML is the only 3rd party provider
   saml_provider_id: "saml.okta", // firebase provider ID for SAML
 
   email: true, // allow authentication with email
@@ -98,19 +97,23 @@ const authGuardSettings = {
   google: true, // allow authentication with gmail account
   facebook: false, // allow authentication with facebook account
 
-  verification: false, // require user email to be verified before granting access
+  verification: false, // require user email to be verified before granting access.
+                       // Can be true (for all) or an array of domains (e.g., ['example.com']).
   registration: true, // allow new user registrations
+  
+  // Optional UI Customizations
+  // title: "My App Authentication",
+  // subtitle: "Please sign in to continue",
+  // icon: "mdi-lock",
+  // iconColor: "blue"
 }
 
-// reload VUE app on Firebase auth state change
 const app = createApp(App)
-
-app.config.productionTip = false
 
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
-app.use(AuthGuard, authGuardSettings)
+app.use(AuthGuard, authGuardSettings) // Initialize AuthGuard plugin
 app.mount("#app")
 ```
 
@@ -121,10 +124,23 @@ Update your `App.vue` to include global `AuthGuard` component.
 This component will monitor Firebase user auth state and open a fullscreen modal dialog with login screen if user is not autthenticated.
 
 ```html
-    [ ... ]
-    <AuthenticationGuard />
+<!-- App.vue -->
+<template>
+  <v-app>
+    <v-main>
+      <router-view />
+    </v-main>
+    
+    <!-- Required for phone authentication if enabled -->
+    <!-- <div id="recaptcha-container"></div> -->
+
+    <AuthenticationGuard /> {/* Add this component */}
   </v-app>
 </template>
+
+<script setup>
+// No specific script needed for basic integration here
+</script>
 ```
 
 #### STEP 3: Update vue router to protect desired routes
@@ -133,58 +149,67 @@ Example of `router.js` implementation.
 
 ```js
 import { createWebHistory, createRouter } from "vue-router"
-import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth"
+import { AuthMiddleware } from "@nerd305/firebase-vuetify-auth" // Import the middleware
+
+const routes = [
+  {
+    name: "Home",
+    path: "/",
+    component: () => import("@/views/HomePage.vue"),
+    meta: { requiresAuth: true }, // Protected route
+  },
+  {
+    name: "Public",
+    path: "/public",
+    component: () => import("@/views/PublicRoute.vue"),
+    // No meta.requiresAuth - this route is public
+  },
+  {
+    name: "Protected",
+    path: "/protected",
+    component: () => import("@/views/ProtectedRoute.vue"),
+    meta: { requiresAuth: true }, // Protected route
+  },
+  // ... other routes
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [
-    {
-      name: "Home",
-      path: "/",
-      component: () => import("@/views/HomePage.vue"),
-      meta: { requiresAuth: true },
-    },
-    {
-      name: "Public",
-      path: "/public",
-      component: () => import("@/views/PublicRoute.vue"),
-    },
-    {
-      name: "Protected",
-      path: "/protected",
-      meta: { requiresAuth: true },
-      component: () => import("@/views/ProtectedRoute.vue"),
-    },
-  ],
-})
+  routes,
+});
 
-router.beforeEach(AuthMiddleware)
+// Apply the AuthMiddleware globally
+router.beforeEach(AuthMiddleware);
 
-export default router
+export default router;
 ```
 
 add `meta: { requiresAuth: true }` for any route that would require authentication.
 
 ### Phone Authentication (reCAPTCHA)
 
-If you enable phone authentication (`phone: true` in `authGuardSettings`), Firebase requires a reCAPTCHA verifier. You must include an empty `div` with the ID `recaptcha-container` in your main application template (e.g., `App.vue` or wherever the `AuthenticationGuard` component is rendered). This `div` is used by Firebase to render the reCAPTCHA element (it's usually invisible).
+If you enable phone authentication (`phone: true` in `authGuardSettings`), Firebase requires a reCAPTCHA verifier. You **must** include an empty `div` with the ID `recaptcha-container` in your main application template (e.g., `App.vue` or wherever the `AuthenticationGuard` component is rendered). This `div` is used by Firebase to render the reCAPTCHA element (it's usually invisible).
 
 Example in `App.vue`:
 ```html
 <template>
   <v-app>
     <!-- ... your app layout ... -->
-    <div id="recaptcha-container"></div> <!-- Required for phone auth -->
+
+    <!-- This div is used by Firebase for reCAPTCHA. It can be empty. -->
+    <div id="recaptcha-container"></div>
+
     <AuthenticationGuard />
   </v-app>
 </template>
 ```
+Ensure this `div` is present in the DOM when phone authentication is attempted.
 
 ### Security Note
 
 This package facilitates client-side authentication flows with Firebase. **It is crucial to understand that client-side code, including Firebase API keys and configuration, is publicly accessible.**
 
-**True security for your application's data and backend resources must be enforced through Firebase Security Rules** (for Firestore, Realtime Database, and Cloud Storage) and by correctly configuring your Firebase Authentication providers in the Firebase console. This package helps manage the user's authentication state on the client but does not, by itself, secure your backend.
+**True security for your application's data and backend resources must be enforced through Firebase Security Rules** (for Firestore, Realtime Database, and Cloud Storage) and by correctly configuring your Firebase Authentication providers in the Firebase console. This package helps manage the user's authentication state on the client but does not, by itself, secure your backend. Always ensure your Firebase Security Rules are robust and properly tested.
 
 ### That's it!
 
@@ -194,20 +219,22 @@ For more usage examples (how to log in/sign out and so on) please check the pack
 
 ## Available settings
 
-| Prop         | Type             | Default                                       | Description                                                                                                    |
-| ------------ | ---------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| router       | Object           | null                                          | VUE router                                                                                                     |
-| firebase     | Object           | null                                          | Firebase middleware - initialized app                                                                          |
-| session      | String           | "local"                                       | Default Firebase auth state session persistence. Options: "local", "browser" (or "session"), "none". See note in Setup section. |
-| verification | Boolean or array | true                                          | require email verification to sign in for all accounts or for specific domains in array                        |
-| registration | Boolean          | true                                          | allow new user registrations                                                                                   |
-| phone        | Boolean          | true                                          | allow users to singin using phone number                                                                       |
-| google       | Boolean          | true                                          | allow users to singin using gmail                                                                              |
-| facebook     | Boolean          | true                                          | allow users to singin using facebook                                                                           |
-| saml         | Boolean          | false                                         | allow authentication with SAML                                                                                 |
-| saml_text    | String           | "Login with SAML"                             | Text for the SAML login button if it's the only 3rd party provider.                                            |
-| saml_provider_id | String       | "saml.okta"                                   | Firebase Provider ID for your SAML configuration.                                                              |
-| title        | String           | "Authenticate"                                | authentication prompt title                                                                                    |
-| subtitle     | String           | "Firebase Vuetify Authentication NPM package" | authentication prompt subtitle                                                                                 |
-| icon         | String           | "mdi-brightness-7"                            | authentication prompt icon                                                                                     |
-| iconColor    | String           | "orange"                                      | authentication prompt icon                                                                                     |
+| Prop         | Type             | Default                                       | Description                                                                                                                               |
+| ------------ | ---------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `router`       | Vue Router Instance | `null`                                        | **Required.** Your Vue Router instance.                                                                                                     |
+| `firebase`     | Firebase App Instance | `null`                                        | **Required.** Your initialized Firebase app instance.                                                                                     |
+| `session`      | String           | `"local"`                                     | Default Firebase auth state session persistence for all auth methods. Options: `"local"`, `"browser"` (or `"session"`), `"none"`. The "Remember me" checkbox for email/password login overrides this for that specific login. See [Firebase Docs](https://firebase.google.com/docs/auth/web/auth-state-persistence). |
+| `verification` | Boolean or Array | `false`                                       | Requires email verification. `true` for all new accounts, or an array of specific email domains (e.g., `['yourdomain.com']`) to target. |
+| `registration` | Boolean          | `true`                                        | `true` to allow new user registrations through the UI, `false` to disable.                                                                |
+| `debug`        | Boolean          | `false`                                       | `true` to enable verbose console logging from the package, `false` to disable.                                                            |
+| `email`        | Boolean          | `true`                                        | `true` to enable email/password authentication method.                                                                                    |
+| `phone`        | Boolean          | `false`                                       | `true` to enable phone number authentication method. (Requires reCAPTCHA setup, see above).                                               |
+| `google`       | Boolean          | `true`                                        | `true` to enable Google Sign-In authentication method.                                                                                    |
+| `facebook`     | Boolean          | `false`                                       | `true` to enable Facebook Sign-In authentication method.                                                                                  |
+| `saml`         | Boolean          | `false`                                       | `true` to enable SAML-based authentication.                                                                                               |
+| `saml_text`    | String           | `"Login with OKTA"`                           | Custom text for the SAML login button (if `saml` is `true` and it's the only 3rd party provider).                                         |
+| `saml_provider_id` | String       | `"saml.okta"`                                 | Your Firebase SAML Provider ID (e.g., `"saml.myprovider"`) (if `saml` is `true`).                                                          |
+| `title`        | String           | `"Authenticate"`                                | Title displayed on the authentication dialog.                                                                                           |
+| `subtitle`     | String           | `"Firebase Vuetify Authentication NPM package"` | Subtitle displayed on the authentication dialog.                                                                                        |
+| `icon`         | String           | `"mdi-brightness-7"`                            | MDI icon class for the icon displayed on the authentication dialog.                                                                       |
+| `iconColor`    | String           | `"orange"`                                      | Color of the icon on the authentication dialog.                                                                                           |

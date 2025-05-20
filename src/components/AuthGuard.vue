@@ -56,7 +56,7 @@
 
 <script setup>
 import { computed, watch, onMounted } from "vue"
-import authcheck from "./authcheck"
+import authcheck from "./authcheck" // The core logic for showing/hiding dialog and checking auth status
 
 import LoginCard from "./LoginCard.vue"
 import RegisterUser from "./RegisterUser.vue"
@@ -70,37 +70,41 @@ import { useRoute } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 
 const store = useAuthStore()
-const { initializeGuard } = store
+const { initializeGuard } = store // Action to initialize auth state listener
 const {
-  tab,
-  config,
-  is_loading,
-  isLoginWithPhoneShown,
-  isUserRegistrationAllowed,
-  isResetPasswordScreenShown,
-  isEmailVerificationScrenShown,
+  tab, // Current active tab in the dialog (Sign In, Register, Reset Password)
+  config, // Package configuration
+  is_loading, // Loading state for async operations
+  isLoginWithPhoneShown, // Controls visibility of phone login UI
+  isUserRegistrationAllowed, // From config, allows/disallows registration
+  isResetPasswordScreenShown, // Controls visibility of password reset UI
+  isEmailVerificationScrenShown, // Controls visibility of email verification UI
 } = storeToRefs(store)
-const { SET_TAB } = store;
+const { SET_TAB } = store; // Action to set active tab
 
-const route = useRoute()
+const route = useRoute() // Vue Router's current route
 
 const debug = computed(() => config.debug)
-const currentRoute = computed(() => route.path)
-const getAuthGuardDialogPersistence = computed(()=> store.getAuthGuardDialogPersistence)
+const currentRoute = computed(() => route.path) // Reactive current route path
+const getAuthGuardDialogPersistence = computed(()=> store.getAuthGuardDialogPersistence) // Reactive dialog persistence state
 
+// Computed property for dialog visibility, directly linked to store state
 const dialog = computed({
-  get: () => store.init && store.is_authguard_dialog_shown,
+  get: () => store.init && store.is_authguard_dialog_shown, // Show dialog only after store is initialized
   set: (value) => (store.is_authguard_dialog_shown = value),
 })
 
+// Initialize the authentication guard when the component is mounted
 onMounted(() => {
   initializeGuard()
 })
 
+// Watch for changes in the current route path.
+// When the route changes, re-evaluate authentication status and dialog visibility.
 watch(currentRoute, (after, before) => {
-  if (typeof before === "undefined") return
+  if (typeof before === "undefined") return // Skip initial watch trigger if 'before' is undefined
   if (debug.value) console.log("[ auth guard ]: vue router current route change: [", before, "] -> [", after, "]")
 
-  authcheck()
+  authcheck() // Perform the authentication check
 })
 </script>

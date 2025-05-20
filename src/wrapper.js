@@ -1,7 +1,7 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import { VueMaskDirective } from "v-mask"
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth"
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence } from "firebase/auth"
 
 // default npm package init config
 import defaultSettings from "./store/defaultSettings"
@@ -21,19 +21,23 @@ export default {
 
     const auth = getAuth(firebase)
 
-    // Set default session persistence
-    let persistenceMode = browserLocalPersistence; // Default to local
+    // Set initial default session persistence based on config
+    let persistenceMode = browserLocalPersistence; // Default to 'local'
+
     if (session === "browser" || session === "session") {
       persistenceMode = browserSessionPersistence;
     } else if (session === "none") {
-      // Firebase doesn't have a "none" persistence that lasts after tab close without signing out.
-      // Session persistence is the closest for "don't remember me across browser closes".
-      // If "none" truly means sign out on tab close, that's more complex and typically handled by session cookies or manual sign-out logic.
-      // For Firebase, browserSessionPersistence is the best fit for not persisting across browser sessions.
+      // Firebase's 'inMemoryPersistence' means state is not persisted even in the current session (lost on refresh/tab close).
+      // Your current setup maps "none" to browserSessionPersistence, which means it lasts for the session (tab lifetime).
+      // Sticking to your current interpretation for "none".
       persistenceMode = browserSessionPersistence; 
       if (debug) console.log("[ auth guard ]: 'none' persistence is interpreted as browserSessionPersistence for Firebase.");
     }
-    
+    // If you wanted "none" to be truly in-memory (lost on refresh), you would use:
+    // else if (session === "none") {
+    //   persistenceMode = inMemoryPersistence;
+    // }
+
     setPersistence(auth, persistenceMode)
       .then(() => {
         if (debug) console.log(`[ auth guard ]: Firebase session persistence set to ${session}`);
@@ -70,20 +74,25 @@ export default {
       authStore.init = true
       authStore.current_user = user
 
-      authcheck() // TODO: verify once
+      authcheck() // Perform auth check whenever auth state changes
 
       if (user) {
         if (debug) console.log("[ auth guard ]: auth state changed. User is Authenticated!")
 
         const currentUser = auth.currentUser
 
-        if (!currentUser.emailVerified && verification) {
+        // If email verification is required and the user's email is not verified,
+        // periodically reload the user's profile to check for verification status.
+        if (verification && currentUser && !currentUser.emailVerified) {
           const emailVerificationUpdate = setInterval(async () => {
-            await currentUser.reload()
-
-            if (currentUser.emailVerified) {
+            if (!auth.currentUser) { // User signed out
+              clearInterval(emailVerificationUpdate);
+              return;
+            }
+            await auth.currentUser.reload()
+            if (auth.currentUser.emailVerified) {
               clearInterval(emailVerificationUpdate)
-              window.location.reload()
+              window.location.reload() // Reload the page to reflect verified state
             }
           }, 3500)
         }
