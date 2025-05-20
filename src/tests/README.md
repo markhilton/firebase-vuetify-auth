@@ -1,58 +1,82 @@
-# Testing scenarios
+# Firebase Vuetify Auth: Test Scenarios
 
-## while user is signed off
+This document outlines manual test scenarios to ensure the `firebase-vuetify-auth` package functions correctly under various conditions. It covers user authentication states, package configurations, and core features.
 
-| request                          | description                                                                   | expected result                                                                                        |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `/`                              | open browser with root route                                                  | persisten auth dialog                                                                                  |
-| `/protected`                     | open browser with protected route                                             | persisten auth dialog                                                                                  |
-| `/public`                        | open browser with public route                                                | page render with no auth dialog                                                                        |
-| `/public` -> `/` or `/protected` | open browser with public route and navigate to `/protected` or `/` root route | non persistent auth dialog pop up that can be closed, URL does not change - blocked for authentication |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+## 1. User is Signed Off
 
-## while user is signed in with not confirmed email address
+These tests verify the behavior of the authentication guard when no user is currently signed into the application.
 
-This scenario tests against required `verification=true` option.
+| Request                          | Description                                                                                                | Expected Result                                                                                                                               |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                              | Open browser and navigate to the root route (`/`), which is a protected route.                             | A persistent authentication dialog should appear, blocking access to the content.                                                             |
+| `/protected`                     | Open browser and navigate to a designated protected route (`/protected`).                                  | A persistent authentication dialog should appear, blocking access to the content.                                                             |
+| `/public`                        | Open browser and navigate to a public route (`/public`).                                                   | The page content should render successfully without any authentication dialog.                                                                |
+| `/public` -> `/` or `/protected` | Open browser, navigate to a public route (`/public`), and then attempt to navigate to a protected route. | A non-persistent authentication dialog should appear. This dialog should be closable. Navigation to the protected route is blocked. The URL should remain on the public route's path or not change to the protected route's path. |
 
-| request                          | description                                                                   | expected result                                                                                        |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `/` or `/protected`              | open browser with any protected route                                         | auth dialog with email validation message                                                              |
-| `/public`                        | open browser with public route                                                | page render with no auth dialog                                                                        |
-| `/public` -> `/` or `/protected` | open browser with public route and navigate to `/protected` or `/` root route | non persistent auth dialog with email validation message                                               |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+## 2. User is Signed In with an Unconfirmed Email Address
 
-## while user is signed in with not confirmed email address
+### 2.1. Email Verification Required for All Users (`verification: true`)
 
-This scenario tests against required `verification=["domain.com"]` option, which requires email validation for emails using `domain.com` domain only and no email validation for emails using other domains.
+This scenario tests the behavior when the `verification` option is set to `true`, requiring all new accounts to verify their email. The test user is signed in but has not yet verified their email address.
 
-| request                          | description                                                                   | expected result                                                                                        |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `/` or `/protected`              | open browser with any protected route                                         | auth dialog with email validation message                                                              |
-| `/public`                        | open browser with public route                                                | page render with no auth dialog                                                                        |
-| `/public` -> `/` or `/protected` | open browser with public route and navigate to `/protected` or `/` root route | non persistent auth dialog with email validation message                                               |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Request                          | Description                                                                                                | Expected Result                                                                                                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/` or `/protected`              | Open browser and navigate to any protected route.                                                          | The authentication dialog should appear, displaying a message prompting the user to verify their email address. Access to the content is blocked.                                |
+| `/public`                        | Open browser and navigate to a public route.                                                               | The page content should render successfully without any authentication dialog.                                                                                               |
+| `/public` -> `/` or `/protected` | Open browser, navigate to a public route, and then attempt to navigate to a protected route.               | A non-persistent authentication dialog should appear, displaying an email verification message. This dialog should be closable. Access to the protected route is blocked. |
 
-## while user is signed as anonymous
+### 2.2. Email Verification Required for Specific Domains (e.g., `verification: ["domain.com"]`)
 
-This scenario tests user authenticated as anonymous without email.
+This scenario tests when `verification` is an array of domains (e.g., `["domain.com"]`). Email verification is required only for users whose email address belongs to one of the specified domains. The test user is signed in with an unverified email from `user@domain.com`.
 
-| request                          | description                                                                   | expected result                                                                                        |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `/` or `/protected`              | open browser with any protected route                                         | auth dialog with email validation message                                                              |
-| `/public`                        | open browser with public route                                                | page render with no auth dialog                                                                        |
-| `/public` -> `/` or `/protected` | open browser with public route and navigate to `/protected` or `/` root route | non persistent auth dialog with email validation message                                               |
-| -------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Request                          | Description                                                                                                                                  | Expected Result                                                                                                                                                              |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/` or `/protected`              | User with email `user@domain.com` (unverified) opens browser and navigates to any protected route.                                           | The authentication dialog should appear, displaying a message prompting the user to verify their email address. Access to the content is blocked.                                |
+| `/public`                        | User with email `user@domain.com` (unverified) opens browser and navigates to a public route.                                                | The page content should render successfully without any authentication dialog.                                                                                               |
+| `/public` -> `/` or `/protected` | User with email `user@domain.com` (unverified) opens browser, navigates to a public route, and then attempts to navigate to a protected route. | A non-persistent authentication dialog should appear, displaying an email verification message. This dialog should be closable. Access to the protected route is blocked. |
+| `/` or `/protected`              | User with email `user@otherdomain.com` (unverified) opens browser and navigates to any protected route.                                      | The user should be granted access to the protected route without an email verification prompt (assuming no other blocking rules apply).                                        |
 
-## forgot password
+## 3. User is Signed In Anonymously
 
-Test forgot password link if sends out the email and user is able to reset password.
+This scenario tests the behavior for a user who is authenticated anonymously (e.g., via `signInAnonymously()` from Firebase SDK) and does not have an associated email.
 
-## registration
+| Request                          | Description                                                                                                | Expected Result                                                                                                                                                                 |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/` or `/protected`              | Open browser and navigate to any protected route.                                                          | The authentication dialog should appear, prompting the user for full authentication (Sign In/Register). Anonymous users cannot access routes marked with `requiresAuth: true`. |
+| `/public`                        | Open browser and navigate to a public route.                                                               | The page content should render successfully without any authentication dialog.                                                                                                  |
+| `/public` -> `/` or `/protected` | Open browser, navigate to a public route, and then attempt to navigate to a protected route.               | A non-persistent authentication dialog should appear, prompting for full authentication. This dialog should be closable. Access to the protected route is blocked.             |
 
-Test if user is able to register.
+## 4. Core Authentication Features
 
-## 3rd party authentication providers
+### 4.1. Test "Forgot Password" Functionality
 
-- Gmail
-- Facebook
-- Phone
+*   **Goal**: Verify that a user can successfully reset their password.
+*   **Steps**:
+    1.  Initiate the "Forgot Password" process from the authentication dialog.
+    2.  Enter a registered email address.
+    3.  Confirm that a password reset email is received.
+    4.  Use the link in the email to set a new password.
+    5.  Attempt to log in with the new password.
+*   **Expected Result**: The user should receive the reset email, be able to set a new password, and subsequently log in with the new credentials.
+
+### 4.2. Test New User Registration
+
+*   **Goal**: Verify that a new user can successfully register for an account.
+*   **Steps**:
+    1.  Initiate the registration process from the authentication dialog.
+    2.  Fill in the required registration details (e.g., email, password).
+    3.  Submit the registration form.
+    4.  (If email verification is enabled) Check for a verification email and complete the verification process.
+*   **Expected Result**: The user should be successfully registered. If email verification is active, the user should be prompted to verify their email and gain full access only after verification.
+
+### 4.3. Test 3rd Party Authentication Providers
+
+*   **Goal**: Verify successful authentication using configured third-party providers.
+*   For each enabled provider (e.g., Google, Facebook, Phone, SAML):
+    1.  Click the respective third-party login button on the authentication dialog.
+    2.  Complete the authentication flow with the third-party provider.
+*   **Expected Result**: The user should be successfully signed into the application using the selected third-party provider. Test the following:
+    *   [ ] Google Sign-In
+    *   [ ] Facebook Sign-In
+    *   [ ] Phone Number Sign-In
+    *   [ ] SAML Sign-In (if configured)
