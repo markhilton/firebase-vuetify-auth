@@ -7,7 +7,7 @@ Firebase Vuetify Auth is a package providing user authentication against Firebas
 - User authentication - app Sign In
 - User registration - app Register
 - Email verification for new accounts (required to gain access to the app)
-- 3rd party authentication provider integration (Google, Facebook, Phone text message)
+- 3rd party authentication provider integration (Google, Facebook, Phone text message, SAML)
 
 ![Login Registration Example](./src/assets/register-ex.png)
 ![Login Registration Example](./src/assets/signin-ex.png)
@@ -75,11 +75,16 @@ import vuetify from "@/plugins/vuetify"
 import AuthGuard from "@nerd305/firebase-vuetify-auth"
 
 import firebase from "@/middleware/firebase"
-import { getAuth } from "firebase/auth"
+// import { getAuth } from "firebase/auth" // Not strictly needed here if firebase app instance is passed
 
 const authGuardSettings = {
   debug: true, // enable debug messages in console log
-  session: "local", // session persistance
+  session: "local", // Default session persistence: "local" or "browser" (session) or "none".
+                   // "local": Persists across browser sessions.
+                   // "browser" (or "session"): Clears on browser close.
+                   // "none": Clears on tab close (Firebase interprets as browserSessionPersistence).
+                   // This is the default for all auth methods.
+                   // The "Remember me" checkbox in the email/password form overrides this for that specific login.
 
   router, // routes
   firebase, // pass on firebase middleware app init
@@ -160,6 +165,27 @@ export default router
 
 add `meta: { requiresAuth: true }` for any route that would require authentication.
 
+### Phone Authentication (reCAPTCHA)
+
+If you enable phone authentication (`phone: true` in `authGuardSettings`), Firebase requires a reCAPTCHA verifier. You must include an empty `div` with the ID `recaptcha-container` in your main application template (e.g., `App.vue` or wherever the `AuthenticationGuard` component is rendered). This `div` is used by Firebase to render the reCAPTCHA element (it's usually invisible).
+
+Example in `App.vue`:
+```html
+<template>
+  <v-app>
+    <!-- ... your app layout ... -->
+    <div id="recaptcha-container"></div> <!-- Required for phone auth -->
+    <AuthenticationGuard />
+  </v-app>
+</template>
+```
+
+### Security Note
+
+This package facilitates client-side authentication flows with Firebase. **It is crucial to understand that client-side code, including Firebase API keys and configuration, is publicly accessible.**
+
+**True security for your application's data and backend resources must be enforced through Firebase Security Rules** (for Firestore, Realtime Database, and Cloud Storage) and by correctly configuring your Firebase Authentication providers in the Firebase console. This package helps manage the user's authentication state on the client but does not, by itself, secure your backend.
+
 ### That's it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
@@ -172,12 +198,15 @@ For more usage examples (how to log in/sign out and so on) please check the pack
 | ------------ | ---------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | router       | Object           | null                                          | VUE router                                                                                                     |
 | firebase     | Object           | null                                          | Firebase middleware - initialized app                                                                          |
-| session      | String           | "local"                                       | Firebase auth state session persistence, see: https://firebase.google.com/docs/auth/web/auth-state-persistence |
+| session      | String           | "local"                                       | Default Firebase auth state session persistence. Options: "local", "browser" (or "session"), "none". See note in Setup section. |
 | verification | Boolean or array | true                                          | require email verification to sign in for all accounts or for specific domains in array                        |
 | registration | Boolean          | true                                          | allow new user registrations                                                                                   |
 | phone        | Boolean          | true                                          | allow users to singin using phone number                                                                       |
 | google       | Boolean          | true                                          | allow users to singin using gmail                                                                              |
 | facebook     | Boolean          | true                                          | allow users to singin using facebook                                                                           |
+| saml         | Boolean          | false                                         | allow authentication with SAML                                                                                 |
+| saml_text    | String           | "Login with SAML"                             | Text for the SAML login button if it's the only 3rd party provider.                                            |
+| saml_provider_id | String       | "saml.okta"                                   | Firebase Provider ID for your SAML configuration.                                                              |
 | title        | String           | "Authenticate"                                | authentication prompt title                                                                                    |
 | subtitle     | String           | "Firebase Vuetify Authentication NPM package" | authentication prompt subtitle                                                                                 |
 | icon         | String           | "mdi-brightness-7"                            | authentication prompt icon                                                                                     |

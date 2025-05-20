@@ -18,7 +18,7 @@
         <v-form
           ref="form"
           v-model="valid"
-          @submit.prevent="textPhoneVerificationCode({ phoneNumber, recaptchaVerifier })"
+          @submit.prevent="handleTextPhoneVerificationCode"
         >
           <v-card-text>
             <v-text-field
@@ -49,22 +49,19 @@
         <v-row class="centered-input">
           <v-col v-for="(element, index) in 6" :key="index" cols="2">
             <v-text-field
-              :ref="'code' + index"
+              :ref="el => codeFieldRefs[index] = el"
               :key="index"
               v-model="code[index]"
               v-mask="digitMask"
-              :value="code[index]"
-              :item-value="code[index]"
-              :item-text="code[index]"
               outlined
               maxlength="1"
-              @keyup="nextElementFocus(index, $event)"
+              @keyup="event => nextElementFocus(index, event)"
               @paste="onPaste"
             />
           </v-col>
         </v-row>
 
-        <v-btn color="primary" block large depressed :disabled="code.length < 6" @click="confirmCode(code)">
+        <v-btn color="primary" block large depressed :disabled="code.join('').length < 6" @click="handleConfirmCode">
           Confirm Code
         </v-btn>
       </v-container>
@@ -77,76 +74,96 @@
 </template>
 
 <script setup>
-import { getCurrentInstance } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier } from "firebase/auth"
-import { computed, onMounted } from "vue"
+import { computed, onMounted, ref, nextTick } from "vue"
 import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
 
-let valid = false
-let code = [] // text confirmation code
-let digitMask = "#"
-let phoneMask = "(###) ###-####"
-let phoneNumber = "" // phone number field to send code to
+const valid = ref(false)
+const code = ref(Array(6).fill('')) // OTP code array
+const digitMask = "#"
+const phoneMask = "(###) ###-####"
+const phoneNumber = ref("") // phone number field
 let recaptchaVerifier = null
-// let recaptchaWidgetId = null // TODO
 
 const store = useAuthStore()
-const { appContext } = getCurrentInstance()
 const { textPhoneVerificationCode, confirmCode, SET_SHOW_LOGIN_WITH_PHONE } = store
-const { error, sign_by_phone_step, getError } = storeToRefs(store)
+const { error, sign_by_phone_step, getError, config } = storeToRefs(store)
+
+const codeFieldRefs = ref([]) // Template refs for OTP input fields
 
 const rules = computed(() => {
   return  {
-    phoneNumber: phoneNumber.replace(/\D/g, "") < 1000000000 ? "Please enter a valid US phone number" : true,
+    phoneNumber: phoneNumber.value.replace(/\D/g, "").length < 10 ? "Please enter a valid US phone number" : true,
   }
 })
 
+const handleTextPhoneVerificationCode = () => {
+  textPhoneVerificationCode({ phoneNumber: phoneNumber.value, recaptchaVerifier })
+}
+
+const handleConfirmCode = () => {
+  confirmCode(code.value)
+}
+
+
 onMounted(() => {
-  recaptchaVerifier = new RecaptchaVerifier(
-    "recaptcha-container",
-    { size: "invisible" },
-    getAuth(appContext.config.globalProperties.$authGuardFirebaseApp)
-  )
-  // this.recaptchaVerifier.render().then((widgetId) => (recaptchaWidgetId = widgetId))
-
-  // window.grecaptcha.reset(this.recaptchaWidgetId)
-
-  // // Or, if you haven't stored the widget ID:
-  // this.recaptchaVerifier.render().then(function (widgetId) {
-  //   grecaptcha.reset(widgetId)
-  // })
+  if (config.value && config.value.firebase) {
+    recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha-container",
+      { size: "invisible" },
+      getAuth(config.value.firebase) // Get Firebase app from store config
+    )
+    // recaptchaVerifier.render().then((widgetId) => (recaptchaWidgetId = widgetId)) // Optional: if widget ID is needed
+  } else {
+    console.error("[LoginWithPhone]: Firebase app not available in config for reCAPTCHA.")
+  }
 })
 
-// paste handler to allow confirmation code paste
+// Paste handler for OTP code
 const onPaste = (event) => {
-  const text = event.clipboardData.getData("text").substr(0, 6)
-
-  for (let index = 0; index < text.length; index++) {
-    this.$set(this.code, index, text[index])
+  const pastedText = event.clipboardData.getData("text").substr(0, 6)
+  pastedText.split('').forEach((char, index) => {
+    if (index < code.value.length) {
+      code.value[index] = char
+    }
+  })
+  // Optionally, focus the next empty field or the last field
+  const firstEmpty = code.value.findIndex(c => !c);
+  if (firstEmpty !== -1 && codeFieldRefs.value[firstEmpty]) {
+    codeFieldRefs.value[firstEmpty].focus();
+  } else if (codeFieldRefs.value[code.value.length - 1]) {
+     codeFieldRefs.value[code.value.length - 1].focus();
   }
 }
 
-// form field focus handler to automatically move cursor to the next field
+// Auto-focus next OTP input field
 const nextElementFocus = (index, event) => {
-  let i = index
+  let nextIndex = index
 
-  if (["Backspace", "ArrowLeft"].includes(event.key)) {
-    i = index > 1 ? index - 1 : 0
+  if (event.key === "Backspace" || event.key === "ArrowLeft") {
+    nextIndex = index > 0 ? index - 1 : 0
+    if (event.key === "Backspace" && index > 0) { // Clear current field on backspace before moving
+        code.value[index] = '';
+    }
+  } else if (/^[0-9]$/.test(event.key) || event.key === "ArrowRight") {
+    // If a digit is entered and current field is not the last one
+    if (/^[0-9]$/.test(event.key) && index < code.value.length -1) {
+         nextTick(() => { // Ensure value is updated before moving focus
+            if (codeFieldRefs.value[index + 1]) {
+                codeFieldRefs.value[index + 1].focus();
+            }
+        });
+        return; // Return early to prevent default focus logic below for this case
+    }
+    nextIndex = index < code.value.length - 1 ? index + 1 : index
   }
 
-  // jeez to figure this out OMG :)
-  // https://stackoverflow.com/questions/42807888/vuejs-and-vue-set-update-array
-  if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "ArrowRight"].includes(event.key)) {
-    this.$set(this.code, index, event.key)
 
-    i = index > 4 ? index : index + 1
+  if (codeFieldRefs.value[nextIndex]) {
+    codeFieldRefs.value[nextIndex].focus()
   }
-
-  const el = "code" + i
-
-  this.$refs[el][0].focus()
 }
 </script>
 

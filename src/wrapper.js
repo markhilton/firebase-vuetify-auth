@@ -1,7 +1,7 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import { VueMaskDirective } from "v-mask"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth"
 
 // default npm package init config
 import defaultSettings from "./store/defaultSettings"
@@ -17,9 +17,30 @@ export default {
   install: (app, options = {}) => {
     // merge default settings with user settings
     const globalConfig = { ...defaultSettings, ...options }
-    const { firebase, debug, verification, router } = globalConfig
+    const { firebase, debug, verification, router, session } = globalConfig
 
     const auth = getAuth(firebase)
+
+    // Set default session persistence
+    let persistenceMode = browserLocalPersistence; // Default to local
+    if (session === "browser" || session === "session") {
+      persistenceMode = browserSessionPersistence;
+    } else if (session === "none") {
+      // Firebase doesn't have a "none" persistence that lasts after tab close without signing out.
+      // Session persistence is the closest for "don't remember me across browser closes".
+      // If "none" truly means sign out on tab close, that's more complex and typically handled by session cookies or manual sign-out logic.
+      // For Firebase, browserSessionPersistence is the best fit for not persisting across browser sessions.
+      persistenceMode = browserSessionPersistence; 
+      if (debug) console.log("[ auth guard ]: 'none' persistence is interpreted as browserSessionPersistence for Firebase.");
+    }
+    
+    setPersistence(auth, persistenceMode)
+      .then(() => {
+        if (debug) console.log(`[ auth guard ]: Firebase session persistence set to ${session}`);
+      })
+      .catch((error) => {
+        if (debug) console.error("[ auth guard ]: Error setting Firebase session persistence:", error);
+      });
 
     // verify if required dependency instances are passed to this package config
     if (debug) {
