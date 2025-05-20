@@ -186,7 +186,110 @@ export default router;
 
 add `meta: { requiresAuth: true }` for any route that would require authentication.
 
-### Phone Authentication (reCAPTCHA)
+## How It Works
+
+This section provides an overview of the internal mechanism of the `firebase-vuetify-auth` package.
+
+### 1. Plugin Initialization (`src/wrapper.js`)
+When you install the plugin using `app.use(AuthGuard, authGuardSettings)`:
+- The `authGuardSettings` are merged with default settings and stored in the Pinia store (`useAuthStore`).
+- Firebase Authentication is initialized (`getAuth`).
+- The **default session persistence** (e.g., "local", "browser") is set on the Firebase `auth` object based on the `session` property in `authGuardSettings`. This default applies to all sign-in methods unless overridden (e.g., by the "Remember me" checkbox for email/password).
+- An `onAuthStateChanged` listener is attached to Firebase. This listener is crucial for reacting to changes in the user's authentication state.
+
+### 2. Core UI Component: `<AuthenticationGuard />` (`src/components/AuthGuard.vue`)
+- This component should be added to your main `App.vue`.
+- It renders the main authentication dialog (`v-dialog`).
+- The visibility of this dialog (`is_authguard_dialog_shown` state in Pinia) is controlled by the authentication logic.
+- The dialog contains tabs for Sign In, Register, Reset Password, and also houses the Email Verification screen.
+- Its internal state (like active tab) and the display of different forms (login, register, phone, email verification) are managed by the Pinia store.
+
+### 3. State Management (Pinia - `useAuthStore`)
+A dedicated Pinia store (`useAuthStore`) is the central hub for authentication-related state:
+- **`config`**: Stores the `authGuardSettings` provided during initialization.
+- **`current_user`**: Holds the Firebase user object when a user is authenticated.
+- **`is_loading`**, **`error`**: Manage loading states for asynchronous operations (like login attempts) and store any errors that occur.
+- **UI States**:
+    - `is_authguard_dialog_shown`: Boolean, controls the visibility of the main authentication dialog.
+    - `is_authguard_dialog_persistent`: Boolean, determines if the dialog can be closed by clicking outside or pressing Escape.
+    - `is_email_verification_screen_shown`: Boolean, controls the visibility of the email verification prompt.
+    - `tab`: Number, manages the active tab within the authentication dialog (Sign In, Register, Reset Password).
+    - Other states related to phone login steps, password reset confirmation, etc.
+- **Actions**:
+    - Functions like `loginWithEmail`, `registerUser`, `signOut`, `loginWithGoogle`, etc.
+    - These actions typically call the corresponding Firebase SDK methods to perform authentication operations.
+    - They update `is_loading` and `error` states and, upon success, Firebase's `onAuthStateChanged` listener (see below) will update the `current_user`.
+
+### 4. Firebase `onAuthStateChanged` Listener
+- Set up in `src/wrapper.js`.
+- This listener fires whenever a user signs in or out of Firebase.
+- **Primary Action**: It updates the `authStore.current_user` with the new Firebase user object (or `null` if signed out).
+- **Triggers `authcheck()`**: After updating the user state, it calls the `authcheck()` function (see below) to re-evaluate route access permissions and dialog visibility based on the new authentication status.
+- **Email Verification Check**: If a user is authenticated but their email is not verified (and email verification is required by the configuration), this listener also sets up an interval to periodically reload the user's Firebase profile to check if their email has been verified. If verification occurs, the page is reloaded.
+
+### 5. Routing and Navigation Guard (`AuthMiddleware` from `src/components/authguard.js`)
+- This middleware is intended to be registered globally with Vue Router using `router.beforeEach(AuthMiddleware)`.
+- **On Each Navigation**:
+    - It inspects the target route (`to`) to see if it requires authentication (via `to.meta.requiresAuth: true`).
+    - It determines if the navigation is from a public route to a protected route.
+    - It updates two key states in the Pinia store:
+        - `is_route_public`: Set to `true` if the target route does not require authentication, `false` otherwise.
+        - `is_from_public_to_auth`: Set to `true` if navigating from a public page to a protected one, `false` otherwise. This influences dialog persistence.
+    - **Calls `authcheck()`**: After updating these store states, it calls the `authcheck()` function to make the final decision on allowing or blocking the navigation.
+
+### 6. Core Logic Decider (`authcheck.js` from `src/components/authcheck.js`)
+This function is the heart of the access control and dialog management logic. It is called in two main scenarios:
+1.  By the `AuthMiddleware` during every route navigation.
+2.  By the `onAuthStateChanged` listener whenever the Firebase authentication state changes.
+
+**`authcheck()` performs the following checks:**
+- **Is the route public?** (`store.is_route_public`): If yes, access is allowed, and the auth dialog is hidden.
+- **Is the user authenticated?** (checks `firebase.auth().currentUser`):
+    - If **not authenticated** and trying to access a protected route:
+        - The auth dialog (`is_authguard_dialog_shown`) is shown.
+        - If navigating from a public route (`store.is_from_public_to_auth` is true), the dialog is made non-persistent (`is_authguard_dialog_persistent = false`), allowing the user to close it and stay on the public page.
+        - Otherwise (e.g., initial load on a protected route), the dialog is persistent.
+        - Navigation is blocked.
+    - If **authenticated**:
+        - **Email Verification Check**:
+            - It checks `currentUser.emailVerified` against the `config.verification` rules (is verification required for all, or for specific domains?).
+            - If verification is required and the user's email is not verified:
+                - Access to the protected route is blocked.
+                - The auth dialog is shown and made persistent.
+                - The specific email verification screen is displayed (`is_email_verification_screen_shown = true`).
+            - If email is verified, or verification is not required for this user:
+                - Access to the protected route is allowed.
+                - The auth dialog is hidden.
+- **Anonymous Users**: If email verification is active, anonymous users are generally blocked from protected resources that would require a verified email, as they cannot verify an email.
+- **Returns**: `true` if navigation/access is allowed, `false` otherwise. The `AuthMiddleware` uses this return value to call `next()` or `next(false)`.
+
+### 7. Email Verification Flow
+- If `authGuardSettings.verification` is enabled (either `true` for all or an array of domains):
+    - When an authenticated but unverified user (matching the verification rules) attempts to access a protected route, `authcheck()` will:
+        - Block access.
+        - Show the auth dialog (`is_authguard_dialog_shown = true`).
+        - Make the dialog persistent (`is_authguard_dialog_persistent = true`).
+        - Display the email verification screen (`is_email_verification_screen_shown = true`) within the dialog. This screen prompts the user to check their email and provides an option to resend the verification email.
+    - The `onAuthStateChanged` listener in `src/wrapper.js` includes logic to periodically reload the user's Firebase profile. If `currentUser.emailVerified` becomes `true`, it reloads the entire page to reflect the verified state and grant access.
+
+### 8. Dialog Persistence
+The authentication dialog's persistence (whether it can be closed by clicking outside or pressing Escape) is dynamically managed:
+- **Persistent**:
+    - Typically when the user initially lands on a protected route and is not authenticated.
+    - When email verification is required and the user's email is not yet verified.
+- **Non-Persistent (Closable)**:
+    - When a user navigates from a public page to a protected page. This allows them to close the dialog and remain on the public page if they choose not to sign in.
+
+This mechanism ensures that users are appropriately prompted for authentication or verification while providing a user-friendly experience for different navigation scenarios.
+
+## Testing Scenarios
+
+For detailed examples of expected behavior under various conditions (user signed off, signed in with unconfirmed email, different verification settings, etc.), please refer to the manual test scenarios outlined in:
+[`src/tests/README.md`](./src/tests/README.md)
+
+This document provides a structured way to test the core functionalities and edge cases of the package.
+
+## Phone Authentication (reCAPTCHA)
 
 If you enable phone authentication (`phone: true` in `authGuardSettings`), Firebase requires a reCAPTCHA verifier. You **must** include an empty `div` with the ID `recaptcha-container` in your main application template (e.g., `App.vue` or wherever the `AuthenticationGuard` component is rendered). This `div` is used by Firebase to render the reCAPTCHA element (it's usually invisible).
 
@@ -205,7 +308,7 @@ Example in `App.vue`:
 ```
 Ensure this `div` is present in the DOM when phone authentication is attempted.
 
-### Security Note
+## Security Note
 
 This package facilitates client-side authentication flows with Firebase. **It is crucial to understand that client-side code, including Firebase API keys and configuration, is publicly accessible.**
 
