@@ -19,7 +19,7 @@ const Wo = () => ({
   is_loading: !1,
   is_session_persistant: !0,
   is_login_with_phone_shown: !1,
-  is_authguard_dialog_shown: !0,
+  is_authguard_dialog_shown: !1,
   // login dialog
   is_authguard_dialog_persistent: !0,
   // login dialog persistent option
@@ -31,8 +31,8 @@ const Wo = () => ({
   // show email verification screen,
   is_reset_password_screen_shown: !1,
   // show reset password screen,
-  is_route_public: !1,
-  // is current route public
+  is_route_public: !0,
+  // is current route public (default to true until router sets it)
   is_from_public_to_auth: !1
   // is route going from public page to protected
 }), Do = {
@@ -9889,8 +9889,8 @@ const ed = I({
                     }, {
                       default: O(() => [
                         (W(), J(en, {
-                          value: 0,
-                          key: 0
+                          key: 0,
+                          value: 0
                         }, {
                           default: O(() => _[3] || (_[3] = [
                             Y(" Sign In ")
@@ -9898,8 +9898,8 @@ const ed = I({
                           _: 1
                         })),
                         de((W(), J(en, {
-                          value: 1,
-                          key: 1
+                          key: 1,
+                          value: 1
                         }, {
                           default: O(() => _[4] || (_[4] = [
                             Y(" Register ")
@@ -9909,8 +9909,8 @@ const ed = I({
                           [Ne, !A(s) && A(r)]
                         ]),
                         de((W(), J(en, {
-                          value: 2,
-                          key: 2
+                          key: 2,
+                          value: 2
                         }, {
                           default: O(() => _[5] || (_[5] = [
                             Y(" Reset Password ")
@@ -9930,9 +9930,9 @@ const ed = I({
                         }, {
                           default: O(() => [
                             de((W(), J(Ot, {
+                              key: 0,
                               value: 0,
-                              class: "pt--1",
-                              key: 0
+                              class: "pt--1"
                             }, {
                               default: O(() => [
                                 u(Fu)
@@ -9942,8 +9942,8 @@ const ed = I({
                               [Ne, !A(o)]
                             ]),
                             de((W(), J(Ot, {
-                              value: 0,
                               key: 0,
+                              value: 0,
                               class: "pt-5"
                             }, {
                               default: O(() => [
@@ -9954,8 +9954,8 @@ const ed = I({
                               [Ne, !A(s) && A(r)]
                             ]),
                             (W(), J(Ot, {
-                              value: 1,
                               key: 1,
+                              value: 1,
                               class: "pt-5"
                             }, {
                               default: O(() => [
@@ -9964,8 +9964,8 @@ const ed = I({
                               _: 1
                             })),
                             (W(), J(Ot, {
-                              value: 2,
-                              key: 2
+                              key: 2,
+                              value: 2
                             }, {
                               default: O(() => [
                                 u(zu)
@@ -10013,7 +10013,9 @@ const ed = I({
     }), l && (console.log("[ auth guard ]: wrapper initialization..."), a === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), o === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), e.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), e.use(_o()));
     const f = Be();
     f.config = n, Ao(s, (v) => {
-      if (f.init = !0, f.current_user = v, ea(), v) {
+      if (f.init = !0, f.current_user = v, o.isReady().then(() => {
+        ea();
+      }), v) {
         l && console.log("[ auth guard ]: auth state changed. User is Authenticated!");
         const y = s.currentUser;
         if (i && y && !y.emailVerified) {

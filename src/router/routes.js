@@ -3,7 +3,6 @@ export default [
     name: "Home",
     path: "/",
     component: () => import("@/views/HomePage.vue"),
-    meta: { requiresAuth: true },
   },
   {
     name: "Public",

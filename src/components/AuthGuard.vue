@@ -17,28 +17,28 @@
 
           <div v-else>
             <v-tabs v-model="tab" grow>
-              <v-tab :value="0" :key="0"> Sign In </v-tab>
-              <v-tab v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :value="1" :key="1" > Register </v-tab>
-              <v-tab v-show="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email" :value="2" :key="2">
+              <v-tab :key="0" :value="0"> Sign In </v-tab>
+              <v-tab v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :key="1" :value="1" > Register </v-tab>
+              <v-tab v-show="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email" :key="2" :value="2">
                 Reset Password
               </v-tab>
             </v-tabs>
 
             <v-card-text>
               <v-tabs-window v-model="tab">
-                <v-tabs-window-item v-show="!isLoginWithPhoneShown" :value="0" class="pt--1" :key="0">
+                <v-tabs-window-item v-show="!isLoginWithPhoneShown" :key="0" :value="0" class="pt--1">
                   <LoginCard />
                 </v-tabs-window-item>
 
-                <v-tabs-window-item v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :value="0" :key="0" class="pt-5">
+                <v-tabs-window-item v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :key="0" :value="0" class="pt-5">
                   <LoginWithPhone />
                 </v-tabs-window-item>
 
-                <v-tabs-window-item :value="1" :key="1" class="pt-5">
+                <v-tabs-window-item :key="1" :value="1" class="pt-5">
                   <RegisterUser />
                 </v-tabs-window-item>
 
-                <v-tabs-window-item :value="2" :key="2">
+                <v-tabs-window-item :key="2" :value="2">
                   <PasswordReset />
                 </v-tabs-window-item>
               </v-tabs-window>

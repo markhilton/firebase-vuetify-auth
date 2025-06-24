@@ -4,30 +4,18 @@ import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
 export default [
-  // Ignore patterns (migrated from .eslintignore)
+  // Ignore patterns
   {
-    ignores: ['node_modules/**', 'dist/**', '.eslintignore']
+    ignores: ['node_modules/**', 'dist/**']
   },
-  js.configs.recommended,
-  // Ignore Vue files in the flat config - we'll use .eslintrc-vue.js for them
+  
+  // JavaScript files
   {
-    files: ['**/*.vue'],
-    ignores: ['**/*.vue']
-  },
-  {
-    files: ['**/*.js', '**/*.vue'],
-    ...prettier
-  },
-  {
-    files: ['**/*.js', '**/*.vue'],
+    files: ['**/*.js'],
+    ...js.configs.recommended,
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true
-        }
-      },
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -36,12 +24,26 @@ export default [
     },
     rules: {
       'no-async-promise-executor': 0,
-      'vue/multi-word-component-names': 'off',
-      'no-console': 'off', // Allow console statements since this is a library with debug mode
+      'no-console': 'off',
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
-    },
-    linterOptions: {
-      reportUnusedDisableDirectives: true
     }
+  },
+  
+  // Vue files - spread the flat config
+  ...pluginVue.configs['flat/recommended'],
+  {
+    files: ['**/*.vue'],
+    rules: {
+      'no-async-promise-executor': 0,
+      'vue/multi-word-component-names': 'off',
+      'no-console': 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    }
+  },
+  
+  // Prettier config for all files
+  {
+    files: ['**/*.js', '**/*.vue'],
+    ...prettier
   }
 ];

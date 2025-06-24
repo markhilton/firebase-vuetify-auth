@@ -83,13 +83,42 @@ npm i @nerd305/firebase-vuetify-auth
 
 ## Setup
 
-Integrating `@nerd305/firebase-vuetify-auth` into your Vue 3 and Vuetify 3 project is straightforward. If you've met the prerequisites outlined in the "Requirements" section, you can get up and running by following these three simple steps:
+Integrating `@nerd305/firebase-vuetify-auth` into your Vue 3 and Vuetify 3 project requires four essential steps. Follow these steps carefully to ensure proper integration:
 
-*   **STEP 1:** Update your `main.js` app file to initialize the AuthGuard plugin.
-*   **STEP 2:** Add the `<AuthenticationGuard />` component to your main `App.vue` template.
-*   **STEP 3:** Update your Vue Router configuration to use the `AuthMiddleware` for protecting routes.
+*   **STEP 1:** Set up Firebase configuration file
+*   **STEP 2:** Update your `main.js` app file to initialize the AuthGuard plugin
+*   **STEP 3:** Add the `<AuthenticationGuard />` component to your main `App.vue` template
+*   **STEP 4:** Update your Vue Router configuration to use the `AuthMiddleware` for protecting routes
+*   **STEP 5:** Access authentication state in your components (optional but common)
 
-#### STEP 1: Update your `main.js` app file
+#### STEP 1: Set up Firebase configuration file
+
+First, create a Firebase configuration file. This is **required** and must be done before using the package.
+
+Create a file at `src/middleware/firebase.js` (or your preferred location):
+
+```javascript
+import { initializeApp } from "firebase/app"
+
+const config = {
+  appId: process.env.VITE_APP_FIREBASE_APP_ID,
+  apiKey: process.env.VITE_APP_FIREBASE_APIKEY,
+  authDomain: process.env.VITE_APP_FIREBASE_AUTH,
+  databaseURL: process.env.VITE_APP_FIREBASE_DATABASE,
+  projectId: process.env.VITE_APP_FIREBASE_PROJECT,
+  storageBucket: process.env.VITE_APP_FIREBASE_STORAGE,
+  messagingSenderId: process.env.VITE_APP_FIREBASE_MESSAGING,
+  measurementId: process.env.VITE_APP_FIREBASE_MEASUREMENT_ID,
+}
+
+const app = initializeApp(config)
+
+export default app
+```
+
+**Important:** Make sure to set up your environment variables in your `.env` file with your actual Firebase project configuration.
+
+#### STEP 2: Update your `main.js` app file
 
 This example assumes that you're using `vue-router` and `pinia` packages with your app, so we initialize VUE class by passing in `router`, `store` & `vuetify` objects.
 
@@ -145,11 +174,11 @@ app.use(AuthGuard, authGuardSettings) // Initialize AuthGuard plugin
 app.mount("#app")
 ```
 
-#### STEP 2: Add AuthenticationGuard to your App.vue template
+#### STEP 3: Add AuthenticationGuard to your App.vue template
 
-Update your `App.vue` to include global `AuthGuard` component.
+**CRITICAL:** This step is essential for the package to work. The `<AuthenticationGuard />` component must be placed correctly in your `App.vue`.
 
-This component will monitor Firebase user auth state and open a fullscreen modal dialog with login screen if user is not autthenticated.
+Update your `App.vue` to include the global `AuthGuard` component. This component will monitor Firebase user auth state and display a fullscreen modal dialog with login screen when authentication is required.
 
 ```html
 <!-- App.vue -->
@@ -162,18 +191,20 @@ This component will monitor Firebase user auth state and open a fullscreen modal
     <!-- Required for phone authentication if enabled -->
     <!-- <div id="recaptcha-container"></div> -->
 
-    <AuthenticationGuard /> {/* Add this component */}
+    <!-- CRITICAL: Add this component at the same level as router-view -->
+    <AuthenticationGuard />
   </v-app>
 </template>
 
 <script setup>
 // No specific script needed for basic integration here
+// The AuthenticationGuard component is automatically available after plugin initialization
 </script>
 ```
 
-#### STEP 3: Update vue router to protect desired routes
+#### STEP 4: Update Vue Router to protect desired routes
 
-Example of `router.js` implementation.
+Configure your Vue Router to use the AuthMiddleware and define which routes require authentication.
 
 ```js
 import { createWebHistory, createRouter } from "vue-router"
@@ -212,7 +243,78 @@ router.beforeEach(AuthMiddleware);
 export default router;
 ```
 
-add `meta: { requiresAuth: true }` for any route that would require authentication.
+**Important:** Add `meta: { requiresAuth: true }` only to routes that require authentication. Routes without this meta property are considered public and will never show the authentication dialog.
+
+#### STEP 5: Access authentication state in your components (Optional)
+
+Once the package is set up, you can access the authentication state in any component using the Pinia store:
+
+```vue
+<template>
+  <div>
+    <div v-if="isAuthenticated">
+      <h2>Welcome, {{ currentUser.displayName || currentUser.email }}!</h2>
+      <button @click="handleSignOut">Sign Out</button>
+    </div>
+    <div v-else>
+      <p>You are not authenticated</p>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from 'vue'
+import { useAuthStore } from '@nerd305/firebase-vuetify-auth'
+
+const authStore = useAuthStore()
+
+// Reactive authentication state
+const isAuthenticated = computed(() => !!authStore.current_user)
+const currentUser = computed(() => authStore.current_user)
+
+// Sign out function
+const handleSignOut = async () => {
+  try {
+    await authStore.signOut()
+  } catch (error) {
+    console.error('Sign out error:', error)
+  }
+}
+</script>
+```
+
+### Available Store Properties and Methods
+
+**State Properties:**
+- `authStore.current_user` - Current Firebase user object (null if not authenticated)
+- `authStore.is_loading` - Boolean indicating if an authentication operation is in progress
+- `authStore.error` - Last error from authentication operations
+- `authStore.config` - Current package configuration
+
+**Methods:**
+- `authStore.signOut()` - Sign out the current user
+- `authStore.loginWithEmail(email, password, rememberMe)` - Sign in with email/password
+- `authStore.registerUser(userData)` - Register a new user
+- `authStore.loginWithGoogle()` - Sign in with Google
+- `authStore.loginWithFacebook()` - Sign in with Facebook
+- `authStore.sendPasswordResetEmail(email)` - Send password reset email
+
+### Integration Checklist
+
+Before proceeding, ensure you have completed all required steps:
+
+- [ ] **Firebase config file created** (`src/middleware/firebase.js`)
+- [ ] **Environment variables set** (`.env` file with Firebase config)
+- [ ] **Package initialized in main.js** with proper settings including `router` and `firebase` properties
+- [ ] **`<AuthenticationGuard />` component added to App.vue** inside the `<v-app>` component
+- [ ] **AuthMiddleware applied to router** using `router.beforeEach(AuthMiddleware)`
+- [ ] **Route protection configured** with `meta: { requiresAuth: true }` on protected routes only
+
+**Common Integration Issues:**
+1. **Missing `<AuthenticationGuard />` in App.vue** - The auth dialog won't appear
+2. **Incorrect router configuration** - Routes may not be properly protected
+3. **Missing Firebase config** - Authentication will fail to initialize
+4. **Wrong component placement** - Place `<AuthenticationGuard />` at the same level as `<router-view />`
 
 ## How It Works
 
