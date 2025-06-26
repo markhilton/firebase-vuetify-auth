@@ -69,48 +69,50 @@
   </v-container>
 </template>
 
-<script setup>
-import { ref, computed, watch } from "vue";
-import { useAuthStore } from "@/store/auth";
-import { storeToRefs } from "pinia";
+<script setup lang="ts">
+import { ref, computed, watch, type Ref, type ComputedRef } from "vue"
+import { useAuthStore } from "@/store/auth"
+import { storeToRefs } from "pinia"
 
-import AuthBranding from "./AuthBranding.vue";
+import AuthBranding from "./AuthBranding.vue"
+import type { RegisterForm, AuthError } from "@/types"
 
-const store = useAuthStore();
-const { registerUser } = store;
-const { getError, error } =
-  storeToRefs(store);
+const store = useAuthStore()
+const { registerUser } = store
+const { getError, error } = storeToRefs(store)
 
-const email = ref("");
-const password = ref("");
-const confirm = ref("");
-const displayName = ref("");
-const valid = ref(false);
+const email: Ref<string> = ref("")
+const password: Ref<string> = ref("")
+const confirm: Ref<string> = ref("")
+const displayName: Ref<string> = ref("")
+const valid: Ref<boolean> = ref(false)
 
-const form = ref();
+// Form ref with validation methods
+const form: Ref<{ validate: () => boolean } | null> = ref(null)
 
-const rules = computed(() => ({
+// Validation rules with proper typing
+const rules: ComputedRef<Record<keyof RegisterForm, string | boolean>> = computed(() => ({
   email: !email.value ? "Email cannot be empty" : true,
   password: !password.value ? "Password cannot be empty" : true,
   displayName: !displayName.value ? "Name cannot be empty" : true,
   confirm: password.value !== confirm.value ? "Passwords do not match" : true,
-}));
+}))
 
-const clearError = () => {
-  error.value = null;
-};
+const clearError = (): void => {
+  error.value = null
+}
 
 // Clear errors after 5 seconds
-watch(getError, (newError) => {
+watch(getError, (newError: AuthError | null): void => {
   if (newError) {
-    setTimeout(clearError, 5000);
+    setTimeout(clearError, 5000)
   }
-});
+})
 
 // Handle registration
-const register = () => {
-  if (form.value.validate() && registerUser) {
-    registerUser(displayName.value, email.value, password.value);
+const register = (): void => {
+  if (form.value?.validate() && registerUser) {
+    registerUser(displayName.value, email.value, password.value)
   }
-};
+}
 </script>

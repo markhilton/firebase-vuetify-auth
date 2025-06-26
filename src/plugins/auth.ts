@@ -1,8 +1,9 @@
 import router from "@/router"
 import { app as firebase } from "@/middleware/firebase"
 import AuthGuard from "../wrapper"
+import type { AuthGuardSettings } from '../types'
 
-const authGuardSettings = {
+const authGuardSettings: AuthGuardSettings = {
   debug: true,
   session: "local", // or "browser" see: https://firebase.google.com/docs/auth/web/auth-state-persistence
   router,

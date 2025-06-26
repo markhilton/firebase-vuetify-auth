@@ -20,34 +20,39 @@
 
     <!-- Login Form -->
     <v-card v-if="config.email" flat>
-      <v-card-text class="mb-0 pb-0">
-        <v-text-field
-          v-model="email"
-          required
-          class="mr-2"
-          label="Email"
-          prepend-icon="mdi-account"
-        />
+      <form @submit.prevent="handleLogin">
+        <v-card-text class="mb-0 pb-0">
+          <v-text-field
+            v-model="email"
+            required
+            class="mr-2"
+            label="Email"
+            type="email"
+            name="email"
+            autocomplete="email"
+            prepend-icon="mdi-account"
+          />
 
-        <v-text-field
-          v-model="password"
-          autocomplete="off"
-          class="mr-2"
-          name="password"
-          type="password"
-          label="Password"
-          prepend-icon="mdi-lock"
-        />
+          <v-text-field
+            v-model="password"
+            required
+            class="mr-2"
+            name="password"
+            type="password"
+            label="Password"
+            autocomplete="current-password"
+            prepend-icon="mdi-lock"
+          />
 
-        <v-checkbox
-          v-model="remember"
-          dense
-          class="ml-8"
-          name="remember"
-          label="Remember Me"
-          @change="updateSessionPersistence"
-        />
-      </v-card-text>
+          <v-checkbox
+            v-model="remember"
+            dense
+            class="ml-8"
+            name="remember"
+            label="Remember Me"
+            @change="updateSessionPersistence"
+          />
+        </v-card-text>
 
       <div class="text-center pb-4">
         <v-btn
@@ -82,68 +87,77 @@
         </v-btn>
       </div> -->
 
-      <v-card-actions>
-        <v-btn
-          block
-          size="large"
-          variant="outlined"
-          color="primary"
-          type="submit"
-          @click="handleLogin"
-        >
-          Login
-        </v-btn>
-      </v-card-actions>
+        <v-card-actions>
+          <v-btn
+            block
+            size="large"
+            variant="outlined"
+            color="primary"
+            type="submit"
+          >
+            Login
+          </v-btn>
+        </v-card-actions>
+      </form>
     </v-card>
   </v-container>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from "vue";
-import AuthBranding from "./AuthBranding.vue";
+<script setup lang="ts">
+import { ref, onMounted, watch, type Ref } from "vue"
+import AuthBranding from "./AuthBranding.vue"
 
-import { storeToRefs } from "pinia";
-import { useAuthStore } from "@/store/auth";
+import { storeToRefs } from "pinia"
+import { useAuthStore } from "@/store/auth"
+import type { LoginForm, AuthError } from "@/types"
 
-const store = useAuthStore();
-const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN, SET_TAB } = store;
-const { config, error, is_session_persistant, getSessionPersistence, getError } =
-  storeToRefs(store);
+const store = useAuthStore()
+const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN, SET_TAB } = store
+const { config, error, is_session_persistant, sessionPersistence, getError } =
+  storeToRefs(store)
 
 const { isUserRegistrationAllowed, isResetPasswordScreenShown } = storeToRefs(store)
 
-const email = ref("");
-const password = ref("");
-const remember = ref(true);
+const email: Ref<string> = ref("")
+const password: Ref<string> = ref("")
+const remember: Ref<boolean> = ref(true)
 
-const clearError = () => {
-  error.value = null;
-};
+const clearError = (): void => {
+  error.value = null
+}
 
-const handleLogin = () => {
+const handleLogin = (): void => {
   if (email.value && password.value) {
-    loginWithEmail({ email: email.value, password: password.value });
+    const loginData: Pick<LoginForm, 'email' | 'password'> = { 
+      email: email.value, 
+      password: password.value 
+    }
+    loginWithEmail(loginData)
     // Reset inputs after login attempt
-    password.value = "";
+    password.value = ""
   } else {
-    error.value = { message: "Email and password are required." };
-    setTimeout(clearError, 5000); // Hide the error
+    const validationError: AuthError = { 
+      code: "validation-error",
+      message: "Email and password are required." 
+    }
+    error.value = validationError
+    setTimeout(clearError, 5000) // Hide the error
   }
-};
+}
 
-const updateSessionPersistence = () => {
-  is_session_persistant.value = remember.value;
-};
+const updateSessionPersistence = (): void => {
+  is_session_persistant.value = remember.value
+}
 
-onMounted(() => {
+onMounted((): void => {
   // Initialize the "remember me" checkbox
-  remember.value = getSessionPersistence.value;
-});
+  remember.value = sessionPersistence.value === 'LOCAL'
+})
 
 // Clear error automatically when it's set
-watch(getError, (newError) => {
+watch(getError, (newError: AuthError | null): void => {
   if (newError) {
-    setTimeout(clearError, 5000); // Hide error after 5 seconds
+    setTimeout(clearError, 5000) // Hide error after 5 seconds
   }
-});
+})
 </script>

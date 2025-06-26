@@ -1,7 +1,10 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import { VueMaskDirective } from "v-mask"
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, inMemoryPersistence } from "firebase/auth"
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth"
+import type { Auth, Persistence } from "firebase/auth"
+import type { App } from 'vue'
+import type { AuthGuardSettings } from './types'
 
 // default npm package init config
 import defaultSettings from "./store/defaultSettings"
@@ -14,24 +17,24 @@ import AuthMiddleware from "./components/authguard"
 import authcheck from "./components/authcheck"
 
 export default {
-  install: (app, options = {}) => {
+  install: (app: App, options: Partial<AuthGuardSettings> = {}) => {
     // merge default settings with user settings
-    const globalConfig = { ...defaultSettings, ...options }
+    const globalConfig: AuthGuardSettings = { ...defaultSettings, ...options } as AuthGuardSettings
     const { firebase, debug, verification, router, session } = globalConfig
 
-    const auth = getAuth(firebase)
+    const auth: Auth = getAuth(firebase)
 
     // Set initial default session persistence based on config
-    let persistenceMode = browserLocalPersistence; // Default to 'local'
+    let persistenceMode: Persistence = browserLocalPersistence // Default to 'local'
 
     if (session === "browser" || session === "session") {
-      persistenceMode = browserSessionPersistence;
+      persistenceMode = browserSessionPersistence
     } else if (session === "none") {
       // Firebase's 'inMemoryPersistence' means state is not persisted even in the current session (lost on refresh/tab close).
       // Your current setup maps "none" to browserSessionPersistence, which means it lasts for the session (tab lifetime).
       // Sticking to your current interpretation for "none".
-      persistenceMode = browserSessionPersistence; 
-      if (debug) console.log("[ auth guard ]: 'none' persistence is interpreted as browserSessionPersistence for Firebase.");
+      persistenceMode = browserSessionPersistence
+      if (debug) console.log("[ auth guard ]: 'none' persistence is interpreted as browserSessionPersistence for Firebase.")
     }
     // If you wanted "none" to be truly in-memory (lost on refresh), you would use:
     // else if (session === "none") {
@@ -40,11 +43,11 @@ export default {
 
     setPersistence(auth, persistenceMode)
       .then(() => {
-        if (debug) console.log(`[ auth guard ]: Firebase session persistence set to ${session}`);
+        if (debug) console.log(`[ auth guard ]: Firebase session persistence set to ${session}`)
       })
       .catch((error) => {
-        if (debug) console.error("[ auth guard ]: Error setting Firebase session persistence:", error);
-      });
+        if (debug) console.error("[ auth guard ]: Error setting Firebase session persistence:", error)
+      })
 
     // verify if required dependency instances are passed to this package config
     if (debug) {
@@ -86,8 +89,8 @@ export default {
         if (verification && currentUser && !currentUser.emailVerified) {
           const emailVerificationUpdate = setInterval(async () => {
             if (!auth.currentUser) { // User signed out
-              clearInterval(emailVerificationUpdate);
-              return;
+              clearInterval(emailVerificationUpdate)
+              return
             }
             await auth.currentUser.reload()
             if (auth.currentUser.emailVerified) {

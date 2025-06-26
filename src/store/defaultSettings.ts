@@ -1,4 +1,6 @@
-export default {
+import type { AuthGuardSettings } from '../types'
+
+const defaultSettings: Partial<AuthGuardSettings> = {
   debug: false,
   store: null, // vuex store
   router: null, // routes
@@ -23,3 +25,5 @@ export default {
   verification: false, // require user email to be verified before granting access
   registration: true, // allow new user registrations
 }
+
+export default defaultSettings

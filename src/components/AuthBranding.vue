@@ -9,7 +9,7 @@
   </v-list>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { storeToRefs } from "pinia"
 import { useAuthStore } from "../store/auth"
 

@@ -53,35 +53,40 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
 import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
+import type { AuthError, ValidationRule } from "../types"
 
 const store = useAuthStore()
 const { emailPasswordResetLink, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
 const { error, is_loading, getError, isEmailResetPasswordLinkSent } = storeToRefs(store)
 
-let email = ref("")
-let valid = ref(false)
+const email = ref<string>("")
+const valid = ref<boolean>(false)
 
-const rules = computed(() => {
-  return  {
+interface ValidationRules {
+  email: ValidationRule
+}
+
+const rules = computed<ValidationRules>(() => {
+  return {
     email: email.value === "" ? "Email cannot be empty" : true,
   }
 })
 
-const clearError = () => {
+const clearError = (): void => {
   error.value = null;
 };
 
-const handlePasswordReset = () => {
+const handlePasswordReset = (): void => {
   if (email.value) {
     emailPasswordResetLink(email.value);
   } else {
-    error.value = { message: "Email cannot be empty" };
+    error.value = { message: "Email cannot be empty" } as AuthError;
     setTimeout(clearError, 5000); // Hide the error
   }
 };

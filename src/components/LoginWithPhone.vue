@@ -73,47 +73,56 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import AuthBranding from "./AuthBranding.vue"
-import { getAuth, RecaptchaVerifier } from "firebase/auth"
-import { computed, onMounted, ref, nextTick } from "vue"
+import { getAuth, RecaptchaVerifier, type Auth } from "firebase/auth"
+import { computed, onMounted, ref, nextTick, type Ref, type ComputedRef } from "vue"
 import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
+import type { PhoneAuthData } from "@/types"
 
-const valid = ref(false)
-const code = ref(Array(6).fill('')) // OTP code array
-const digitMask = "#"
-const phoneMask = "(###) ###-####"
-const phoneNumber = ref("") // phone number field
-let recaptchaVerifier = null
+const valid: Ref<boolean> = ref(false)
+const code: Ref<string[]> = ref(Array(6).fill('')) // OTP code array
+const digitMask: string = "#"
+const phoneMask: string = "(###) ###-####"
+const phoneNumber: Ref<string> = ref("") // phone number field
+let recaptchaVerifier: RecaptchaVerifier | null = null
 
 const store = useAuthStore()
 const { textPhoneVerificationCode, confirmCode, SET_SHOW_LOGIN_WITH_PHONE } = store
 const { error, sign_by_phone_step, getError, config } = storeToRefs(store)
 
-const codeFieldRefs = ref([]) // Template refs for OTP input fields
+// Template refs for OTP input fields
+const codeFieldRefs: Ref<Array<{ focus: () => void } | null>> = ref([])
 
-const rules = computed(() => {
-  return  {
+// Validation rules with proper typing
+const rules: ComputedRef<{ phoneNumber: string | boolean }> = computed(() => {
+  return {
     phoneNumber: phoneNumber.value.replace(/\D/g, "").length < 10 ? "Please enter a valid US phone number" : true,
   }
 })
 
-const handleTextPhoneVerificationCode = () => {
-  textPhoneVerificationCode({ phoneNumber: phoneNumber.value, recaptchaVerifier })
+const handleTextPhoneVerificationCode = (): void => {
+  if (recaptchaVerifier) {
+    const phoneAuthData: PhoneAuthData = {
+      phoneNumber: phoneNumber.value,
+      recaptchaVerifier
+    }
+    textPhoneVerificationCode(phoneAuthData)
+  }
 }
 
-const handleConfirmCode = () => {
+const handleConfirmCode = (): void => {
   confirmCode(code.value)
 }
 
-
-onMounted(() => {
+onMounted((): void => {
   if (config.value && config.value.firebase) {
+    const auth: Auth = getAuth(config.value.firebase)
     recaptchaVerifier = new RecaptchaVerifier(
       "recaptcha-container",
       { size: "invisible" },
-      getAuth(config.value.firebase) // Get Firebase app from store config
+      auth // Get Firebase app from store config
     )
     // recaptchaVerifier.render().then((widgetId) => (recaptchaWidgetId = widgetId)) // Optional: if widget ID is needed
   } else {
@@ -122,47 +131,46 @@ onMounted(() => {
 })
 
 // Paste handler for OTP code
-const onPaste = (event) => {
-  const pastedText = event.clipboardData.getData("text").substr(0, 6)
-  pastedText.split('').forEach((char, index) => {
+const onPaste = (event: ClipboardEvent): void => {
+  const pastedText: string = event.clipboardData?.getData("text").substr(0, 6) ?? ""
+  pastedText.split('').forEach((char: string, index: number) => {
     if (index < code.value.length) {
       code.value[index] = char
     }
   })
   // Optionally, focus the next empty field or the last field
-  const firstEmpty = code.value.findIndex(c => !c);
+  const firstEmpty: number = code.value.findIndex(c => !c)
   if (firstEmpty !== -1 && codeFieldRefs.value[firstEmpty]) {
-    codeFieldRefs.value[firstEmpty].focus();
+    codeFieldRefs.value[firstEmpty]?.focus()
   } else if (codeFieldRefs.value[code.value.length - 1]) {
-     codeFieldRefs.value[code.value.length - 1].focus();
+    codeFieldRefs.value[code.value.length - 1]?.focus()
   }
 }
 
 // Auto-focus next OTP input field
-const nextElementFocus = (index, event) => {
-  let nextIndex = index
+const nextElementFocus = (index: number, event: KeyboardEvent): void => {
+  let nextIndex: number = index
 
   if (event.key === "Backspace" || event.key === "ArrowLeft") {
     nextIndex = index > 0 ? index - 1 : 0
     if (event.key === "Backspace" && index > 0) { // Clear current field on backspace before moving
-        code.value[index] = '';
+      code.value[index] = ''
     }
   } else if (/^[0-9]$/.test(event.key) || event.key === "ArrowRight") {
     // If a digit is entered and current field is not the last one
-    if (/^[0-9]$/.test(event.key) && index < code.value.length -1) {
-         nextTick(() => { // Ensure value is updated before moving focus
-            if (codeFieldRefs.value[index + 1]) {
-                codeFieldRefs.value[index + 1].focus();
-            }
-        });
-        return; // Return early to prevent default focus logic below for this case
+    if (/^[0-9]$/.test(event.key) && index < code.value.length - 1) {
+      nextTick(() => { // Ensure value is updated before moving focus
+        if (codeFieldRefs.value[index + 1]) {
+          codeFieldRefs.value[index + 1]?.focus()
+        }
+      })
+      return // Return early to prevent default focus logic below for this case
     }
     nextIndex = index < code.value.length - 1 ? index + 1 : index
   }
 
-
   if (codeFieldRefs.value[nextIndex]) {
-    codeFieldRefs.value[nextIndex].focus()
+    codeFieldRefs.value[nextIndex]?.focus()
   }
 }
 </script>

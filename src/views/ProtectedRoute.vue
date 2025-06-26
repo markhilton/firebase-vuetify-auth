@@ -53,50 +53,65 @@
   </v-container>
 </template>
 
-<script setup>
-import { onMounted, computed } from "vue"
+<script setup lang="ts">
+import { onMounted, computed, ref, reactive } from "vue"
 import { useAuthStore } from "../store/auth"
+import type { AuthError, ValidationRule } from "../types"
 
 const store = useAuthStore()
 
-const form = {
+interface UserForm {
+  name: string
+  password: string
+  confirm: string
+  agree: boolean
+}
+
+const form = reactive<UserForm>({
   name: "",
   password: "",
   confirm: "",
   agree: true,
-}
+})
 
-let alert = true
-let valid = false
-let error = null
-let progress = false
+const alert = ref<boolean>(true)
+const valid = ref<boolean>(false)
+const error = ref<AuthError | null>(null)
+const progress = ref<boolean>(false)
 
 onMounted(() => {
   const currentUser = store.current_user
 
-  form.name = (currentUser && currentUser.displayName) || null
+  form.name = (currentUser && currentUser.displayName) || ""
 })
 
-const rules = computed(() => {
-  const validation = {
-    password: form.password == "" ? "Password cannot be empty" : true,
-    name: form.name == "" ? "Name cannot be empty" : true,
+interface ValidationRules {
+  password: ValidationRule
+  name: ValidationRule
+  confirm: ValidationRule
+  email?: ValidationRule
+}
+
+const rules = computed<ValidationRules>(() => {
+  const validation: ValidationRules = {
+    password: form.password === "" ? "Password cannot be empty" : true,
+    name: form.name === "" ? "Name cannot be empty" : true,
     confirm: form.password !== form.confirm ? "Passwords do not match" : true,
   }
 
-  if (error) {
-    if (error.code == "auth/invalid-email") {
-      validation.email = error.message
+  if (error.value) {
+    if (error.value.code === "auth/invalid-email") {
+      validation.email = error.value.message
     }
-    if (error.code == "auth/weak-password") {
-      validation.password = error.message
+    if (error.value.code === "auth/weak-password") {
+      validation.password = error.value.message
     }
   }
 
   return validation
 })
 
-const updateUser = () => {
+const updateUser = (): void => {
   alert("this is just a test!")
 }
 </script>

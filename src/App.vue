@@ -38,11 +38,14 @@
   </v-app>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
+import { useRouter } from "vue-router"
+import type { Router } from "vue-router"
 
 const store = useAuthStore()
+const router: Router = useRouter()
 const { signOut } = store
 const { isAuthenticated, getDisplayName } = storeToRefs(store)
 </script>

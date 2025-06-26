@@ -1,9 +1,11 @@
-export default [
+import type { RouteRecordRaw } from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
   {
     name: "Home",
     path: "/",
     component: () => import("@/views/HomePage.vue"),
-    meta: { requiresAuth: true },
+    // meta: { requiresAuth: true },
   },
   {
     name: "Public",
@@ -17,3 +19,5 @@ export default [
     meta: { requiresAuth: true },
   },
 ]
+
+export default routes

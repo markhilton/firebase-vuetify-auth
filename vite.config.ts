@@ -1,10 +1,9 @@
 import { defineConfig } from "vite"
-
 import vue from "@vitejs/plugin-vue"
 import vuetify from "vite-plugin-vuetify"
 import eslintPlugin from "vite-plugin-eslint"
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
-import { fileURLToPath, URL } from "node:url";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js"
+import { fileURLToPath, URL } from "node:url"
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -15,7 +14,7 @@ export default defineConfig({
       lintOnStart: false,
       failOnError: false,
       failOnWarning: false,
-      include: ['src/**/*.js']
+      include: ['src/**/*.js', 'src/**/*.ts', 'src/**/*.vue']
     }),
     cssInjectedByJsPlugin()
   ],
@@ -28,7 +27,7 @@ export default defineConfig({
   build: {
     assetsDir: "",
     lib: {
-      entry: './src/wrapper.js',
+      entry: './src/wrapper.ts',
       name: 'AuthGuard',
       formats: ["es", "cjs"],
       fileName: (format) => `authentication-guard.${format}.js`,

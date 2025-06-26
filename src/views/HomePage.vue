@@ -5,4 +5,6 @@
   </v-container>
 </template>
 
-<script setup></script>
+<script setup lang="ts">
+// This is a static component with no reactive state or logic
+</script>

@@ -76,10 +76,11 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../store/auth";
+import type { AuthError } from "../types";
 
 const store = useAuthStore();
 const {
@@ -96,16 +97,16 @@ const {
   isEmailVerificationLinkSent,
 } = storeToRefs(store);
 
-const clearError = () => {
+const clearError = (): void => {
   error.value = null;
 };
 
-const handleSendVerificationEmail = () => {
+const handleSendVerificationEmail = (): void => {
   sendVerificationEmail();
 };
 
 // Watch for errors and clear them after 5 seconds
-watch(getError, (newError) => {
+watch(getError, (newError: AuthError | null) => {
   if (newError) {
     setTimeout(clearError, 5000); // Clear Error after 5 seconds
   }

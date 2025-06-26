@@ -16,10 +16,11 @@
   },
   "scripts": {
     "serve": "vite preview",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+    "lint": "eslint --fix src",
     "dev": "vite",
-    "build": "vite build",
-    "build:script": "vue-cli-service build --mode production --dest dist --inline-vue --name insights"
+    "build": "vue-tsc --noEmit && vite build",
+    "build:script": "vue-cli-service build --mode production --dest dist --inline-vue --name insights",
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
@@ -32,7 +33,12 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@types/node": "^24.0.4",
+    "@types/webfontloader": "^1.6.38",
+    "@typescript-eslint/eslint-plugin": "^8.35.0",
+    "@typescript-eslint/parser": "^8.35.0",
     "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/tsconfig": "^0.7.0",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-vue": "^10.0.0",
@@ -40,6 +46,7 @@
     "postcss": "^8.5.3",
     "prettier": "^3.2.5",
     "sass": "^1.85.1",
+    "typescript": "^5.8.3",
     "vite": "^6.2.1",
     "vite-plugin-css-injected-by-js": "^3.5.2",
     "vite-plugin-eslint": "^1.8.1",
@@ -47,7 +54,8 @@
     "volar-service-vetur": "^0.0.63",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "vue-eslint-parser": "^10.1.1",
-    "vue-template-compiler": "^0.1.0"
+    "vue-template-compiler": "^0.1.0",
+    "vue-tsc": "^2.2.10"
   },
   "browserslist": [
     "> 1%",
