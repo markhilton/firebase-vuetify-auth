@@ -77,8 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
-import { storeToRefs } from "pinia";
+import { watch, computed } from "vue";
 import { useAuthStore } from "../store/auth";
 import type { AuthError } from "../types";
 
@@ -89,13 +88,16 @@ const {
   sendVerificationEmail,
   SET_EMAIL_VERIFICATION_SCREEN_SHOWN,
 } = store;
-const {
-  error,
-  getError,
-  isAuthenticated,
-  isEmailResetPasswordLinkSent,
-  isEmailVerificationLinkSent,
-} = storeToRefs(store);
+
+// Replace storeToRefs with computed properties to safely access store properties
+const error = computed({
+  get: () => store.error,
+  set: (value) => { store.error = value }
+});
+const getError = computed(() => store.getError);
+const isAuthenticated = computed(() => store.isAuthenticated);
+const isEmailResetPasswordLinkSent = computed(() => store.isEmailResetPasswordLinkSent);
+const isEmailVerificationLinkSent = computed(() => store.isEmailVerificationLinkSent);
 
 const clearError = (): void => {
   error.value = null;

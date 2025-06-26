@@ -144,12 +144,27 @@ export const getters = {
   isLoginWithPhoneShown: (state: AuthStoreState): boolean => 
     state.is_login_with_phone_shown,
   
-  isEmailVerificationScrenShown: (state: AuthStoreState): boolean => 
+  isEmailVerificationScreenShown: (state: AuthStoreState): boolean => 
     state.is_email_verification_screen_shown,
   
   isEmailVerificationLinkSent: (state: AuthStoreState): boolean => 
     state.is_email_verification_link_sent,
   
   isEmailResetPasswordLinkSent: (state: AuthStoreState): boolean => 
-    state.is_email_reset_password_link_sent
+    state.is_email_reset_password_link_sent,
+  
+  getAuthGuardDialogPersistence: (state: AuthStoreState): boolean => 
+    state.is_authguard_dialog_persistent,
+  
+  isLoginWithProvidersActive: (state: AuthStoreState): boolean => {
+    const config = state.config
+    if (!config) return false
+    
+    return Boolean(
+      config.googleButton || 
+      config.facebookButton || 
+      config.samlButton || 
+      config.phoneButton
+    )
+  }
 }

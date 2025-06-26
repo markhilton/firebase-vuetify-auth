@@ -1,6 +1,6 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "@/store/auth"
-import { VueMaskDirective } from "v-mask"
+import { vMaska } from "maska/vue"
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth"
 import type { Auth, Persistence } from "firebase/auth"
 import type { App } from 'vue'
@@ -107,7 +107,7 @@ export default {
       if (debug) console.log("[ auth guard ]: auth state changed. User ID: [", user?.uid || null, "]")
     })
 
-    app.directive("mask", VueMaskDirective)
+    app.directive("maska", vMaska)
     app.component("AuthenticationGuard", AuthGuard)
   },
 }

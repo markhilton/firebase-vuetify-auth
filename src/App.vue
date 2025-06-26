@@ -17,14 +17,26 @@
         <h1>Firebase Vuetify Auth</h1>
 
         <div>This is a demo implementation of Firebase Vuetify Auth component.</div>
+
         <div class="my-4">
-          <b>Try:</b>
-          <router-link to="/"> Home </router-link>
-          |
-          <router-link to="/public"> Public Route </router-link>
-          |
-          <router-link to="/protected"> Protected Route </router-link>
+          <b class="mr-2">Open at:</b>
+          <a href="/">Home ({{ homeRouteStatus }})</a>
+          <span class="mx-2">|</span>
+          <a href="/public">Public Route</a>
+          <span class="mx-2">|</span>
+          <a href="/protected">Protected Route</a>
         </div>
+
+        <div class="my-4">
+          <b class="mr-2">Route to:</b>
+          <router-link to="/">Home ({{ homeRouteStatus }})</router-link>
+          <span class="mx-2">|</span>
+          <router-link to="/public">Public Route</router-link>
+          <span class="mx-2">|</span>
+          <router-link to="/protected">Protected Route</router-link>
+        </div>
+
+        <v-btn variant="tonal" color="primary" class="mb-4" @click="toggleHomeRouteProtection">{{ buttonText }}</v-btn>
 
         <hr />
       </v-container>
@@ -39,13 +51,31 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia"
+import { computed, ref, onMounted } from "vue"
 import { useAuthStore } from "@/store/auth"
-import { useRouter } from "vue-router"
-import type { Router } from "vue-router"
-
 const store = useAuthStore()
-const router: Router = useRouter()
 const { signOut } = store
-const { isAuthenticated, getDisplayName } = storeToRefs(store)
+
+// Home route protection state
+const isHomeRouteProtected = ref<boolean>(true)
+
+// Initialize from localStorage on mount
+onMounted(() => {
+  const stored = localStorage.getItem("isHomeRouteProtected")
+  if (stored !== null) {
+    isHomeRouteProtected.value = stored === "true"
+  }
+})
+
+// Toggle home route protection
+const toggleHomeRouteProtection = (): void => {
+  isHomeRouteProtected.value = !isHomeRouteProtected.value
+  localStorage.setItem("isHomeRouteProtected", String(isHomeRouteProtected.value))
+}
+
+// Computed properties
+const isAuthenticated = computed(() => store.isAuthenticated)
+const getDisplayName = computed(() => store.getDisplayName)
+const homeRouteStatus = computed(() => isHomeRouteProtected.value ? "protected" : "public")
+const buttonText = computed(() => isHomeRouteProtected.value ? "Set Home to PUBLIC" : "Set Home to PROTECTED")
 </script>

@@ -1,17 +1,16 @@
 <template>
-  <div>
-    <v-dialog
-      v-model="dialog"
-      :persistent="getAuthGuardDialogPersistence"
-      :retain-focus="false"
-      overlay-opacity="0.95"
-      content-class="elevation-0"
-    >
+  <v-dialog
+    v-model="dialog"
+    :persistent="persistent"
+    :retain-focus="false"
+    overlay-opacity="0.95"
+    content-class="elevation-0"
+  >
       <v-container style="max-width: 500px" class="mb-5">
         <v-card flat outlined>
           <v-progress-linear :indeterminate="is_loading" />
 
-          <div v-if="isEmailVerificationScrenShown">
+          <div v-if="isEmailVerificationScreenShown">
             <EmailVerification />
           </div>
 
@@ -45,13 +44,12 @@
             </v-card-text>
           </div>
 
-          <v-card-actions v-if="!isEmailVerificationScrenShown">
+          <v-card-actions v-if="!isEmailVerificationScreenShown">
             <LoginWithProvider />
           </v-card-actions>
         </v-card>
       </v-container>
-    </v-dialog>
-  </div>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -65,34 +63,47 @@ import LoginWithPhone from "./LoginWithPhone.vue"
 import EmailVerification from "./EmailVerification.vue"
 import LoginWithProvider from "./LoginWithProvider.vue"
 
-import { storeToRefs } from "pinia"
 import { useRoute, type RouteLocationNormalized } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 const store = useAuthStore()
 const { initializeGuard } = store // Action to initialize auth state listener
-const {
-  tab, // Current active tab in the dialog (Sign In, Register, Reset Password)
-  config, // Package configuration
-  is_loading, // Loading state for async operations
-  isLoginWithPhoneShown, // Controls visibility of phone login UI
-  isUserRegistrationAllowed, // From config, allows/disallows registration
-  isResetPasswordScreenShown, // Controls visibility of password reset UI
-  isEmailVerificationScrenShown, // Controls visibility of email verification UI
-} = storeToRefs(store)
+
+// Use computed to safely access store properties
+const tab = computed(() => store.tab)
+const config = computed(() => store.config)
+const is_loading = computed(() => store.is_loading)
+const isLoginWithPhoneShown = computed(() => store.isLoginWithPhoneShown)
+const isUserRegistrationAllowed = computed(() => store.isUserRegistrationAllowed)
+const isResetPasswordScreenShown = computed(() => store.isResetPasswordScreenShown)
+const isEmailVerificationScreenShown = computed(() => store.isEmailVerificationScreenShown)
+const persistent = computed(() => store.is_authguard_dialog_persistent)
 
 const route: RouteLocationNormalized = useRoute() // Vue Router's current route
 
 const debug: ComputedRef<boolean> = computed(() => config.value?.debug ?? false)
 const currentRoute: ComputedRef<string> = computed(() => route.path) // Reactive current route path
-const getAuthGuardDialogPersistence: ComputedRef<boolean> = computed(() => store.getAuthGuardDialogPersistence) // Reactive dialog persistence state
 
 // Computed property for dialog visibility, directly linked to store state
 const dialog = computed({
   get: (): boolean => store.init && store.is_authguard_dialog_shown, // Show dialog only after store is initialized
   set: (value: boolean): void => {
     store.is_authguard_dialog_shown = value
+    // If dialog is being closed, clean up state
+    if (!value && store.loginState) {
+      handleDialogClose()
+    }
   },
 })
+
+// Handle dialog close - clean up state only
+const handleDialogClose = (): void => {
+  if (debug.value) console.log("[ auth guard ]: Dialog closed by user")
+
+  // Reset the login state to clean up
+  store.loginState = null
+
+  // Note: We don't force navigation here - let the app/router handle it naturally
+}
 
 // Initialize the authentication guard when the component is mounted
 onMounted((): void => {

@@ -4,7 +4,7 @@ This document outlines manual test scenarios to ensure the `firebase-vuetify-aut
 
 ## 1. User is Signed Off
 
-These tests verify the behavior of the authentication guard when no user is currently signed into the application.
+These tests verify the behavior of the authentication guard when user is not signed in.
 
 | Request                          | Description                                                                                                | Expected Result                                                                                                                               |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |

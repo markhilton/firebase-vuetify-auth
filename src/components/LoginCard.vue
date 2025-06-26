@@ -104,19 +104,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, type Ref } from "vue"
+import { ref, computed, onMounted, watch, type Ref } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
-import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import type { LoginForm, AuthError } from "@/types"
 
 const store = useAuthStore()
 const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN, SET_TAB } = store
-const { config, error, is_session_persistant, sessionPersistence, getError } =
-  storeToRefs(store)
 
-const { isUserRegistrationAllowed, isResetPasswordScreenShown } = storeToRefs(store)
+// Use computed to safely access store properties
+const config = computed(() => store.config)
+const error = computed(() => store.error)
+const is_session_persistant = computed(() => store.is_session_persistant)
+const sessionPersistence = computed(() => store.sessionPersistence)
+const getError = computed(() => store.getError)
+const isUserRegistrationAllowed = computed(() => store.isUserRegistrationAllowed)
+const isResetPasswordScreenShown = computed(() => store.isResetPasswordScreenShown)
 
 const email: Ref<string> = ref("")
 const password: Ref<string> = ref("")

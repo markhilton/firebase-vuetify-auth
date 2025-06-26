@@ -23,7 +23,7 @@
           <v-card-text>
             <v-text-field
               v-model="phoneNumber"
-              v-mask="phoneMask"
+              v-maska="phoneMask"
               class="mx-15 px-5 large-font"
               autocomplete="off"
               label="Phone Number"
@@ -52,7 +52,7 @@
               :ref="el => codeFieldRefs[index] = el"
               :key="index"
               v-model="code[index]"
-              v-mask="digitMask"
+              v-maska="digitMask"
               outlined
               maxlength="1"
               @keyup="event => nextElementFocus(index, event)"
@@ -77,7 +77,6 @@
 import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier, type Auth } from "firebase/auth"
 import { computed, onMounted, ref, nextTick, type Ref, type ComputedRef } from "vue"
-import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import type { PhoneAuthData } from "@/types"
 
@@ -90,7 +89,15 @@ let recaptchaVerifier: RecaptchaVerifier | null = null
 
 const store = useAuthStore()
 const { textPhoneVerificationCode, confirmCode, SET_SHOW_LOGIN_WITH_PHONE } = store
-const { error, sign_by_phone_step, getError, config } = storeToRefs(store)
+
+// Replace storeToRefs with computed properties to safely access store properties
+const error = computed({
+  get: () => store.error,
+  set: (value) => { store.error = value }
+})
+const sign_by_phone_step = computed(() => store.sign_by_phone_step)
+const getError = computed(() => store.getError)
+const config = computed(() => store.config)
 
 // Template refs for OTP input fields
 const codeFieldRefs: Ref<Array<{ focus: () => void } | null>> = ref([])

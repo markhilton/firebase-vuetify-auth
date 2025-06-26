@@ -72,14 +72,19 @@
 <script setup lang="ts">
 import { ref, computed, watch, type Ref, type ComputedRef } from "vue"
 import { useAuthStore } from "@/store/auth"
-import { storeToRefs } from "pinia"
 
 import AuthBranding from "./AuthBranding.vue"
 import type { RegisterForm, AuthError } from "@/types"
 
 const store = useAuthStore()
 const { registerUser } = store
-const { getError, error } = storeToRefs(store)
+
+// Replace storeToRefs with computed properties to safely access store properties
+const getError = computed(() => store.getError)
+const error = computed({
+  get: () => store.error,
+  set: (value) => { store.error = value }
+})
 
 const email: Ref<string> = ref("")
 const password: Ref<string> = ref("")

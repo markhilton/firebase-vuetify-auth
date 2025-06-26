@@ -56,10 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia"
+import { computed } from "vue"
 import { useAuthStore } from "../store/auth"
 
 const store = useAuthStore()
 const { loginWithGoogle, loginWithFacebook, loginWithSaml, SET_SHOW_LOGIN_WITH_PHONE } = store
-const { config, isLoginWithProvidersActive, isOnlySingleProvider } = storeToRefs(store)
+
+// Replace storeToRefs with computed properties to safely access store properties
+const config = computed(() => store.config)
+const isLoginWithProvidersActive = computed(() => store.isLoginWithProvidersActive)
+const isOnlySingleProvider = computed(() => store.isOnlySingleProvider)
 </script>

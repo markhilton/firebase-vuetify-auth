@@ -15,7 +15,9 @@
       "Bash(touch:*)",
       "Bash(npm run dev:*)",
       "Bash(rg:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "WebFetch(domain:vuetifyjs.com)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

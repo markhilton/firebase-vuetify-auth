@@ -57,13 +57,20 @@
 import { ref, computed } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
-import { storeToRefs } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import type { AuthError, ValidationRule } from "../types"
 
 const store = useAuthStore()
 const { emailPasswordResetLink, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
-const { error, is_loading, getError, isEmailResetPasswordLinkSent } = storeToRefs(store)
+
+// Replace storeToRefs with computed properties to safely access store properties
+const error = computed({
+  get: () => store.error,
+  set: (value) => { store.error = value }
+})
+const is_loading = computed(() => store.is_loading)
+const getError = computed(() => store.getError)
+const isEmailResetPasswordLinkSent = computed(() => store.isEmailResetPasswordLinkSent)
 
 const email = ref<string>("")
 const valid = ref<boolean>(false)

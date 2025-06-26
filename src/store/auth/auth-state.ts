@@ -81,7 +81,7 @@ export const state = (): AuthState & {
   is_session_persistant: true,
   is_login_with_phone_shown: false,
   is_authguard_dialog_shown: false,
-  is_authguard_dialog_persistent: true,
+  is_authguard_dialog_persistent: false,
   is_email_verification_link_sent: false,
   is_email_reset_password_link_sent: false,
   is_email_verification_screen_shown: false,

@@ -10,9 +10,9 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia"
+import { computed } from "vue"
 import { useAuthStore } from "../store/auth"
 
 const store = useAuthStore()
-const { config } = storeToRefs(store)
+const config = computed(() => store.config)
 </script>
