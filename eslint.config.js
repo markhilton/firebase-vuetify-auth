@@ -11,6 +11,7 @@ export default [
     ignores: ['node_modules/**', 'dist/**']
   },
   
+<<<<<<< HEAD
   // Base JavaScript config
   js.configs.recommended,
   
@@ -63,6 +64,15 @@ export default [
       parserOptions: {
         parser: tsParser
       },
+=======
+  // JavaScript files
+  {
+    files: ['**/*.js'],
+    ...js.configs.recommended,
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
       globals: {
         ...globals.browser,
         ...globals.node,
@@ -75,6 +85,7 @@ export default [
         KeyboardEvent: 'readonly'
       }
     },
+<<<<<<< HEAD
     plugins: {
       vue: pluginVue,
       '@typescript-eslint': tseslint
@@ -93,3 +104,30 @@ export default [
   // Prettier (should be last)
   prettier
 ];
+=======
+    rules: {
+      'no-async-promise-executor': 0,
+      'no-console': 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    }
+  },
+  
+  // Vue files - spread the flat config
+  ...pluginVue.configs['flat/recommended'],
+  {
+    files: ['**/*.vue'],
+    rules: {
+      'no-async-promise-executor': 0,
+      'vue/multi-word-component-names': 'off',
+      'no-console': 'off',
+      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+    }
+  },
+  
+  // Prettier config for all files
+  {
+    files: ['**/*.js', '**/*.vue'],
+    ...prettier
+  }
+];
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b

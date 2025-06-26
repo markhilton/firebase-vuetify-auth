@@ -5,7 +5,10 @@ const routes: RouteRecordRaw[] = [
     name: "Home",
     path: "/",
     component: () => import("@/views/HomePage.vue"),
+<<<<<<< HEAD:src/router/routes.ts
     // meta: { requiresAuth: true },
+=======
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b:src/router/routes.js
   },
   {
     name: "Public",

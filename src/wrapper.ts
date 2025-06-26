@@ -77,7 +77,11 @@ export default {
       authStore.init = true
       authStore.current_user = user
 
-      authcheck() // Perform auth check whenever auth state changes
+      // Wait for router to be ready before performing auth check
+      // This ensures route meta information is available
+      router.isReady().then(() => {
+        authcheck() // Perform auth check whenever auth state changes
+      })
 
       if (user) {
         if (debug) console.log("[ auth guard ]: auth state changed. User is Authenticated!")

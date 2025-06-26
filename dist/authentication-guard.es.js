@@ -38,11 +38,16 @@ const Mo = () => ({
   is_session_persistant: !0,
   is_login_with_phone_shown: !1,
   is_authguard_dialog_shown: !1,
+<<<<<<< HEAD
+=======
+  // login dialog
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
   is_authguard_dialog_persistent: !0,
   is_email_verification_link_sent: !1,
   is_email_reset_password_link_sent: !1,
   is_email_verification_screen_shown: !1,
   is_reset_password_screen_shown: !1,
+<<<<<<< HEAD
   is_route_public: !1,
   is_from_public_to_auth: !1,
   // Phone auth states
@@ -50,6 +55,14 @@ const Mo = () => ({
   sign_by_phone_step: 1,
   tab: 0
 }), Wo = {
+=======
+  // show reset password screen,
+  is_route_public: !0,
+  // is current route public (default to true until router sets it)
+  is_from_public_to_auth: !1
+  // is route going from public page to protected
+}), Do = {
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
   getError: (e) => e.error,
   sessionPersistence: (e) => {
     var t;
@@ -9897,8 +9910,13 @@ const Zc = A({
                       "onUpdate:modelValue": b[0] || (b[0] = (w) => tt(a) ? a.value = w : null),
                       grow: ""
                     }, {
+<<<<<<< HEAD
                       default: I(() => [
                         (D(), J(en, {
+=======
+                      default: O(() => [
+                        (W(), J(en, {
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
                           key: 0,
                           value: 0
                         }, {
@@ -9907,7 +9925,11 @@ const Zc = A({
                           ])),
                           _: 1
                         })),
+<<<<<<< HEAD
                         de((D(), J(en, {
+=======
+                        de((W(), J(en, {
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
                           key: 1,
                           value: 1
                         }, {
@@ -9918,7 +9940,11 @@ const Zc = A({
                         })), [
                           [$e, !O(s) && O(r)]
                         ]),
+<<<<<<< HEAD
                         de((D(), J(en, {
+=======
+                        de((W(), J(en, {
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
                           key: 2,
                           value: 2
                         }, {
@@ -9938,11 +9964,31 @@ const Zc = A({
                           modelValue: O(a),
                           "onUpdate:modelValue": b[1] || (b[1] = (w) => tt(a) ? a.value = w : null)
                         }, {
+<<<<<<< HEAD
                           default: I(() => [
                             de((D(), J(Ot, {
                               key: 0,
                               value: 0,
                               class: "pt--1"
+=======
+                          default: O(() => [
+                            de((W(), J(Ot, {
+                              key: 0,
+                              value: 0,
+                              class: "pt--1"
+                            }, {
+                              default: O(() => [
+                                u(Fu)
+                              ]),
+                              _: 1
+                            })), [
+                              [Ne, !A(o)]
+                            ]),
+                            de((W(), J(Ot, {
+                              key: 0,
+                              value: 0,
+                              class: "pt-5"
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
                             }, {
                               default: I(() => [
                                 c(Nu)
@@ -9951,9 +9997,15 @@ const Zc = A({
                             })), [
                               [$e, !O(o)]
                             ]),
+<<<<<<< HEAD
                             de((D(), J(Ot, {
                               key: 0,
                               value: 0,
+=======
+                            (W(), J(Ot, {
+                              key: 1,
+                              value: 1,
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
                               class: "pt-5"
                             }, {
                               default: I(() => [
@@ -9973,7 +10025,11 @@ const Zc = A({
                               ]),
                               _: 1
                             })),
+<<<<<<< HEAD
                             (D(), J(Ot, {
+=======
+                            (W(), J(Ot, {
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
                               key: 2,
                               value: 2
                             }, {
@@ -10017,10 +10073,19 @@ const Zc = A({
       l && console.log(`[ auth guard ]: Firebase session persistence set to ${r}`);
     }).catch((v) => {
       l && console.error("[ auth guard ]: Error setting Firebase session persistence:", v);
+<<<<<<< HEAD
     }), l && (console.log("[ auth guard ]: wrapper initialization..."), a === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), o === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), e.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), e.use(Co()));
     const d = Re();
     d.config = n, Ao(s, (v) => {
       if (d.init = !0, d.current_user = v, $l(), v) {
+=======
+    }), l && (console.log("[ auth guard ]: wrapper initialization..."), a === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), o === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), e.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), e.use(_o()));
+    const f = Be();
+    f.config = n, Ao(s, (v) => {
+      if (f.init = !0, f.current_user = v, o.isReady().then(() => {
+        ea();
+      }), v) {
+>>>>>>> e8d24ac54c52ad6937b4434006ba08c67caf605b
         l && console.log("[ auth guard ]: auth state changed. User is Authenticated!");
         const y = s.currentUser;
         if (i && y && !y.emailVerified) {
