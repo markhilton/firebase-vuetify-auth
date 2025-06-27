@@ -17,7 +17,10 @@
       "Bash(rg:*)",
       "Bash(grep:*)",
       "WebFetch(domain:vuetifyjs.com)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npm test:*)"
     ],
     "deny": []
   }

@@ -104,6 +104,7 @@ export default {
 
     onAuthStateChanged(auth, (user) => {
       const wasAuthenticated = authStore.loggedIn // Store previous auth state
+      const wasInitialized = authStore.init // Check if this is first auth state change
       
       authStore.init = true
       authStore.current_user = user
@@ -115,22 +116,30 @@ export default {
       } else {
         authStore.data = null
         
-        // If user just signed out and is on a protected route, show auth dialog
-        if (wasAuthenticated && router.currentRoute.value.matched.some((record) => record.meta.requiresAuth)) {
-          if (debug) console.log("[ auth guard ]: User signed out on protected route, showing auth dialog")
-          
-          // Store the current route to potentially navigate back after login
-          authStore.loginState = router.currentRoute.value.fullPath
-          
-          // Reset password/email verification screens
-          authStore.SET_PASSWORD_RESET_SCREEN_SHOWN(false)
-          authStore.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)
-          
-          // Show the auth dialog
-          authStore.toggleAuthDialog(true)
-          
-          // Set dialog as persistent since user is on a protected route
-          authStore.is_authguard_dialog_persistent = true
+        // If user just signed out (not initial load) and is on a protected route, show auth dialog
+        if (wasInitialized && wasAuthenticated) {
+          // Use router.isReady() to ensure route information is available
+          router.isReady().then(() => {
+            const currentRoute = router.currentRoute.value
+            const requiresAuth = currentRoute.matched.some((record) => record.meta.requiresAuth)
+            
+            if (requiresAuth) {
+              if (debug) console.log("[ auth guard ]: User signed out on protected route, showing auth dialog")
+              
+              // Store the current route to potentially navigate back after login
+              authStore.loginState = currentRoute.fullPath
+              
+              // Reset password/email verification screens
+              authStore.SET_PASSWORD_RESET_SCREEN_SHOWN(false)
+              authStore.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)
+              
+              // Show the auth dialog
+              authStore.toggleAuthDialog(true)
+              
+              // Set dialog as persistent since user is on a protected route
+              authStore.is_authguard_dialog_persistent = true
+            }
+          })
         }
       }
 

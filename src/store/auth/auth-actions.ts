@@ -79,10 +79,24 @@ export const actions = {
           this.data = user
           if (debug) console.log("[ auth guard ]: initialization - user authenticated")
         } else {
+          const wasAuthenticated = this.loggedIn
           this.current_user = null
           this.loggedIn = false
           this.data = null
           if (debug) console.log("[ auth guard ]: initialization - no user")
+          
+          // If user was authenticated and signed out, show auth dialog on protected routes
+          if (this.init && wasAuthenticated && this.router?.currentRoute.value) {
+            const currentRoute = this.router.currentRoute.value
+            const requiresAuth = currentRoute.matched.some((record) => record.meta.requiresAuth)
+            
+            if (requiresAuth) {
+              this.loginState = currentRoute.fullPath
+              this.toggleAuthDialog(true)
+              this.is_authguard_dialog_persistent = true
+              if (debug) console.log("[ auth guard ]: showing auth dialog after sign out on protected route")
+            }
+          }
         }
 
         // Resolve the promise on first auth state change (initialization complete)
@@ -123,6 +137,7 @@ export const actions = {
 
   async loginWithGoogle(this: AuthActionContext): Promise<UserCredential> {
     try {
+      this.is_loading = true
       const provider = new GoogleAuthProvider()
       
       // Add custom parameters to avoid COOP issues
@@ -144,20 +159,24 @@ export const actions = {
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
         this.loggedIn = true
         this.data = result.user
+        this.is_authguard_dialog_shown = false
       }
       
+      this.is_loading = false
       return Promise.resolve(result)
     } catch (error: any) {
       if (this.config.debug) {
         console.error("[ auth guard ]: Google popup auth failed:", error)
       }
       this.error = error
+      this.is_loading = false
       return Promise.reject(error)
     }
   },
 
   async loginWithFacebook(this: AuthActionContext): Promise<UserCredential> {
     try {
+      this.is_loading = true
       const provider = new FacebookAuthProvider()
       const auth: Auth = getAuth(this.config.firebase)
       const result: UserCredential = await signInWithPopup(auth, provider)
@@ -165,11 +184,16 @@ export const actions = {
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = result.user
+        this.is_authguard_dialog_shown = false
       }
 
+      this.is_loading = false
       return Promise.resolve(result)
     } catch (error: any) {
       this.error = error
+      this.is_loading = false
       return Promise.reject(error)
     }
   },
@@ -180,6 +204,7 @@ export const actions = {
 
   async loginWithSaml(this: AuthActionContext): Promise<UserCredential> {
     try {
+      this.is_loading = true
       const provider = new SAMLAuthProvider(this.config.saml_provider_id)
       const auth: Auth = getAuth(this.config.firebase)
       const result: UserCredential = await signInWithPopup(auth, provider)
@@ -187,11 +212,16 @@ export const actions = {
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = result.user
+        this.is_authguard_dialog_shown = false
       }
 
+      this.is_loading = false
       return Promise.resolve(result)
     } catch (error: any) {
       this.error = error
+      this.is_loading = false
       return Promise.reject(error)
     }
   },

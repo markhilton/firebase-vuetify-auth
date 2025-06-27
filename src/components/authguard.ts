@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/store/auth"
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
-export default async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): Promise<void> => {
+export const authGuard = async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): Promise<void> => {
   const authStore = useAuthStore()
   const debug = authStore.config?.debug ?? false
 
@@ -45,9 +45,20 @@ export default async (to: RouteLocationNormalized, from: RouteLocationNormalized
       }
 
       authStore.toggleAuthDialog(true)
-      next(false)
+      
+      // If navigating to the same route (e.g., after sign out), don't block
+      if (to.fullPath === from.fullPath) {
+        next()
+      } else if (isDirectAccess) {
+        // On direct access (page reload), allow navigation to proceed
+        next()
+      } else {
+        next(false)
+      }
     }
   } else {
     next()
   }
 }
+
+export default authGuard
