@@ -1,7 +1,7 @@
 import { createPinia } from "pinia"
 import { useAuthStore } from "@/store/auth"
 import { vMaska } from "maska/vue"
-import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth"
+import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, getRedirectResult } from "firebase/auth"
 import type { Auth, Persistence } from "firebase/auth"
 import type { App } from 'vue'
 import type { AuthGuardSettings } from './types'
@@ -73,9 +73,40 @@ export default {
     // commit npm package config to the store
     authStore.config = globalConfig
 
+    // Handle redirect result from social auth (Google, Facebook, etc.)
+    getRedirectResult(auth).then((result) => {
+      if (debug) console.log("[ auth guard ]: Checking redirect result:", result)
+      
+      if (result && result.user) {
+        if (debug) console.log("[ auth guard ]: Redirect auth successful")
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        authStore.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL }
+        authStore.loggedIn = true
+        authStore.data = result.user
+        
+        // Close auth dialog if it's open
+        if (authStore.is_authguard_dialog_shown) {
+          authStore.toggleAuthDialog(false)
+        }
+      } else {
+        if (debug) console.log("[ auth guard ]: No redirect result or user")
+      }
+    }).catch((error) => {
+      if (debug) console.error("[ auth guard ]: Redirect auth error:", error)
+      authStore.error = error
+    })
+
     onAuthStateChanged(auth, (user) => {
       authStore.init = true
       authStore.current_user = user
+      
+      // Update loggedIn state based on user presence
+      authStore.loggedIn = !!user
+      if (user) {
+        authStore.data = user
+      } else {
+        authStore.data = null
+      }
 
       // Wait for router to be ready before performing auth check
       // This ensures route meta information is available
@@ -85,6 +116,12 @@ export default {
 
       if (user) {
         if (debug) console.log("[ auth guard ]: auth state changed. User is Authenticated!")
+
+        // Close auth dialog if it's open and user is now authenticated
+        if (authStore.is_authguard_dialog_shown) {
+          if (debug) console.log("[ auth guard ]: dialog visibility set to false")
+          authStore.toggleAuthDialog(false)
+        }
 
         const currentUser = auth.currentUser
 

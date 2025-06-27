@@ -69,26 +69,27 @@ export const actions = {
 
     if (debug) console.log("[ auth guard ]: component initialization")
 
-    const user = auth.currentUser
-    if (user) {
-      const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
-      this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
-    } else {
-      this.current_user = null
-    }
+    // Wait for Firebase Auth to initialize and restore auth state
+    return new Promise((resolve) => {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
+          this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+          this.loggedIn = true
+          this.data = user
+          if (debug) console.log("[ auth guard ]: initialization - user authenticated")
+        } else {
+          this.current_user = null
+          this.loggedIn = false
+          this.data = null
+          if (debug) console.log("[ auth guard ]: initialization - no user")
+        }
 
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = user
-        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
-      } else {
-        this.current_user = null
-      }
-
-      if (debug) console.log("[ auth guard ]: auth state changed", user ? "user logged in" : "user logged out")
+        // Resolve the promise on first auth state change (initialization complete)
+        unsubscribe()
+        resolve()
+      })
     })
-
-    return Promise.resolve()
   },
 
   async loginWithEmail(this: AuthActionContext, { email, password }: { email: string; password: string }): Promise<void> {
@@ -123,16 +124,33 @@ export const actions = {
   async loginWithGoogle(this: AuthActionContext): Promise<UserCredential> {
     try {
       const provider = new GoogleAuthProvider()
+      
+      // Add custom parameters to avoid COOP issues
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      })
+      
       const auth: Auth = getAuth(this.config.firebase)
+      
+      // Try popup method first to test if CSP is the issue
+      if (this.config.debug) {
+        console.log("[ auth guard ]: Trying popup method for Google authentication")
+      }
+      
       const result: UserCredential = await signInWithPopup(auth, provider)
-
+      
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = result.user
       }
-
+      
       return Promise.resolve(result)
     } catch (error: any) {
+      if (this.config.debug) {
+        console.error("[ auth guard ]: Google popup auth failed:", error)
+      }
       this.error = error
       return Promise.reject(error)
     }
