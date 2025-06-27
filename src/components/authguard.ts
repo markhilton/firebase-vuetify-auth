@@ -4,7 +4,7 @@ import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
 export default async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): Promise<void> => {
   const authStore = useAuthStore()
-  const { debug } = authStore.config
+  const debug = authStore.config?.debug ?? false
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (debug) console.log("[ auth guard ]: Route requires authentication. Evaluating...")

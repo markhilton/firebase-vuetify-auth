@@ -3,6 +3,12 @@ import { useAuthStore } from "@/store/auth"
 
 export default (): void => {
   const authStore = useAuthStore()
+  
+  // Early return if config is not yet initialized
+  if (!authStore.config) {
+    return
+  }
+  
   const { firebase, debug } = authStore.config
   const auth: Auth = getAuth(firebase)
 

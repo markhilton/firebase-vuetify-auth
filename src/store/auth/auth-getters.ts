@@ -124,11 +124,11 @@ export const getters = {
     if (!config) return false
     
     const providers = [
-      config.googleButton,
-      config.facebookButton,
-      config.emailPasswordButton,
-      config.phoneButton,
-      config.samlButton
+      config.google,
+      config.facebook,
+      config.email,
+      config.phone,
+      config.saml
     ].filter(Boolean)
     
     return providers.length === 1
@@ -161,10 +161,10 @@ export const getters = {
     if (!config) return false
     
     return Boolean(
-      config.googleButton || 
-      config.facebookButton || 
-      config.samlButton || 
-      config.phoneButton
+      config.google || 
+      config.facebook || 
+      config.saml || 
+      config.phone
     )
   }
 }

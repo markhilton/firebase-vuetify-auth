@@ -1,20 +1,20 @@
 (function(){"use strict";try{if(typeof document<"u"){var e=document.createElement("style");e.appendChild(document.createTextNode(".large-font>input[data-v-6de7752f]{font-size:1.5rem}.centered-input>input[data-v-6de7752f]{text-align:center;font-weight:700;font-size:1.5rem}")),document.head.appendChild(e)}}catch(t){console.error("vite-plugin-css-injected-by-js",t)}})();
 import { defineStore as be, createPinia as we } from "pinia";
 import { getAuth as L, sendEmailVerification as me, signOut as fe, sendPasswordResetEmail as Ee, createUserWithEmailAndPassword as Se, signInWithEmailAndPassword as pe, updateProfile as Ae, signInWithPhoneNumber as Ve, SAMLAuthProvider as Pe, signInWithPopup as ie, FacebookAuthProvider as Re, GoogleAuthProvider as Ne, setPersistence as ae, browserLocalPersistence as ve, browserSessionPersistence as le, RecaptchaVerifier as Ce, onAuthStateChanged as Ie } from "firebase/auth";
-import { defineComponent as B, computed as k, createBlock as w, openBlock as h, withCtx as a, createVNode as u, createTextVNode as b, toDisplayString as q, ref as C, onMounted as ue, watch as ee, createCommentVNode as P, createElementVNode as N, withModifiers as te, unref as I, createElementBlock as U, resolveDirective as xe, withDirectives as z, Fragment as Le, renderList as Ue, nextTick as Te, vShow as K } from "vue";
-import { VIcon as F } from "vuetify/components/VIcon";
+import { defineComponent as F, computed as k, createBlock as w, openBlock as h, withCtx as a, createVNode as u, createTextVNode as b, toDisplayString as q, ref as C, onMounted as ue, watch as ee, createCommentVNode as P, createElementVNode as N, withModifiers as te, unref as I, createElementBlock as U, resolveDirective as xe, withDirectives as z, Fragment as Le, renderList as Ue, nextTick as Te, vShow as K } from "vue";
+import { VIcon as H } from "vuetify/components/VIcon";
 import { VList as We, VListItem as Oe } from "vuetify/components/VList";
 import { VAlert as J } from "vuetify/components/VAlert";
 import { VBtn as R } from "vuetify/components/VBtn";
-import { VCard as G, VCardText as H, VCardActions as j } from "vuetify/components/VCard";
+import { VCard as G, VCardText as B, VCardActions as j } from "vuetify/components/VCard";
 import { VCheckbox as Me } from "vuetify/components/VCheckbox";
 import { VContainer as O, VRow as $e, VCol as De } from "vuetify/components/VGrid";
 import { VTextField as $ } from "vuetify/components/VTextField";
 import { VForm as de } from "vuetify/components/VForm";
 import { VTooltip as Z } from "vuetify/components/VTooltip";
-import { useRoute as Be } from "vue-router";
-import { VDialog as Fe } from "vuetify/components/VDialog";
-import { VProgressLinear as He } from "vuetify/components/VProgressLinear";
+import { useRoute as Fe } from "vue-router";
+import { VDialog as He } from "vuetify/components/VDialog";
+import { VProgressLinear as Be } from "vuetify/components/VProgressLinear";
 import { VTabs as qe, VTab as oe, VTabsWindow as Ge, VTabsWindowItem as Y } from "vuetify/components/VTabs";
 const ze = () => ({
   config: null,
@@ -141,11 +141,11 @@ const ze = () => ({
   isOnlySingleProvider: (t) => {
     const e = t.config;
     return e ? [
-      e.googleButton,
-      e.facebookButton,
-      e.emailPasswordButton,
-      e.phoneButton,
-      e.samlButton
+      e.google,
+      e.facebook,
+      e.email,
+      e.phone,
+      e.saml
     ].filter(Boolean).length === 1 : !1;
   },
   // Additional getters for component compatibility
@@ -161,7 +161,7 @@ const ze = () => ({
   getAuthGuardDialogPersistence: (t) => t.is_authguard_dialog_persistent,
   isLoginWithProvidersActive: (t) => {
     const e = t.config;
-    return e ? !!(e.googleButton || e.facebookButton || e.samlButton || e.phoneButton) : !1;
+    return e ? !!(e.google || e.facebook || e.saml || e.phone) : !1;
   }
 }, Xe = {
   SET_TAB(t) {
@@ -561,7 +561,10 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
   registration: !0
   // allow new user registrations
 }, ye = () => {
-  const t = M(), { firebase: e, debug: s } = t.config, r = L(e), i = (d, m) => {
+  const t = M();
+  if (!t.config)
+    return;
+  const { firebase: e, debug: s } = t.config, r = L(e), i = (d, m) => {
     s && console.log(`[ auth guard ]: ${m}`, d ? "authenticated" : "not authenticated");
   }, o = r.currentUser, l = !!o, c = t.isAuthenticated;
   l !== c && (t.loggedIn = l, t.data = o, s && console.log("[ auth guard ]: Auth state mismatch detected. Updated store:", {
@@ -569,7 +572,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
     store: c,
     updated: t.loggedIn
   })), i(t.loggedIn, "Current auth state:");
-}, se = /* @__PURE__ */ B({
+}, se = /* @__PURE__ */ F({
   __name: "AuthBranding",
   setup(t) {
     const e = M(), s = k(() => e.config);
@@ -583,7 +586,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
           subtitle: s.value.subtitle
         }, {
           title: a(() => [
-            u(F, {
+            u(H, {
               color: s.value.iconColor
             }, {
               default: a(() => [
@@ -599,7 +602,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
       _: 1
     }));
   }
-}), nt = { class: "text-center pb-4" }, at = /* @__PURE__ */ B({
+}), nt = { class: "text-center pb-4" }, at = /* @__PURE__ */ F({
   __name: "LoginCard",
   setup(t) {
     const e = M(), { loginWithEmail: s, SET_PASSWORD_RESET_SCREEN_SHOWN: r, SET_REGISTER_SCREEN_SHOWN: i, SET_TAB: o } = e, l = k(() => e.config), c = k(() => e.error), d = k(() => e.is_session_persistant), m = k(() => e.sessionPersistence), g = k(() => e.getError), y = k(() => e.isUserRegistrationAllowed), A = k(() => e.isResetPasswordScreenShown), v = C(""), n = C(""), _ = C(!0), p = () => {
@@ -657,7 +660,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
             N("form", {
               onSubmit: te(S, ["prevent"])
             }, [
-              u(H, { class: "mb-0 pb-0" }, {
+              u(B, { class: "mb-0 pb-0" }, {
                 default: a(() => [
                   u($, {
                     modelValue: v.value,
@@ -746,7 +749,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
       _: 1
     }));
   }
-}), lt = /* @__PURE__ */ B({
+}), lt = /* @__PURE__ */ F({
   __name: "RegisterUser",
   setup(t) {
     const e = M(), { registerUser: s } = e, r = k(() => e.getError), i = k({
@@ -796,7 +799,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
                   key: 1,
                   class: "text-center"
                 })),
-                u(H, { class: "mb-0 pb-0" }, {
+                u(B, { class: "mb-0 pb-0" }, {
                   default: a(() => [
                     u($, {
                       modelValue: d.value,
@@ -870,7 +873,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
       _: 1
     }));
   }
-}), ut = { key: 2 }, dt = /* @__PURE__ */ B({
+}), ut = { key: 2 }, dt = /* @__PURE__ */ F({
   __name: "PasswordReset",
   setup(t) {
     const e = M(), { emailPasswordResetLink: s, SET_PASSWORD_RESET_SCREEN_SHOWN: r } = e, i = k({
@@ -911,7 +914,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
                   class: "text-center"
                 })),
                 c.value ? P("", !0) : (h(), U("div", ut, [
-                  u(H, { class: "mb-0 pb-0" }, {
+                  u(B, { class: "mb-0 pb-0" }, {
                     default: a(() => [
                       n[5] || (n[5] = N("div", { class: "mb-5" }, " Enter registered user email address and we will send you a link to reset your password. ", -1)),
                       u($, {
@@ -953,14 +956,14 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
                   class: "pa-4 text-center"
                 }, {
                   default: a(() => [
-                    u(H, { class: "text-h5" }, {
+                    u(B, { class: "text-h5" }, {
                       default: a(() => n[7] || (n[7] = [
                         b(" Email has been sent! ")
                       ])),
                       _: 1,
                       __: [7]
                     }),
-                    u(H, null, {
+                    u(B, null, {
                       default: a(() => n[8] || (n[8] = [
                         b("Please check your inbox and follow the instructions in the email to reset your account password")
                       ])),
@@ -998,7 +1001,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
       _: 1
     }));
   }
-}), ct = { key: 2 }, mt = "#", ft = "(###) ###-####", pt = /* @__PURE__ */ B({
+}), ct = { key: 2 }, mt = "#", ft = "(###) ###-####", pt = /* @__PURE__ */ F({
   __name: "LoginWithPhone",
   setup(t) {
     const e = C(!1), s = C(Array(6).fill("")), r = C("");
@@ -1086,7 +1089,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
                   onSubmit: te(_, ["prevent"])
                 }, {
                   default: a(() => [
-                    u(H, null, {
+                    u(B, null, {
                       default: a(() => [
                         z(u($, {
                           modelValue: r.value,
@@ -1208,7 +1211,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
   for (const [r, i] of e)
     s[r] = i;
   return s;
-}, ht = /* @__PURE__ */ gt(pt, [["__scopeId", "data-v-6de7752f"]]), _t = { key: 0 }, vt = { key: 1 }, kt = { key: 0 }, yt = { key: 1 }, bt = { key: 2 }, wt = { key: 3 }, Et = /* @__PURE__ */ B({
+}, ht = /* @__PURE__ */ gt(pt, [["__scopeId", "data-v-6de7752f"]]), _t = { key: 0 }, vt = { key: 1 }, kt = { key: 0 }, yt = { key: 1 }, bt = { key: 2 }, wt = { key: 3 }, Et = /* @__PURE__ */ F({
   __name: "EmailVerification",
   setup(t) {
     const e = M(), {
@@ -1266,7 +1269,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
             ])) : (h(), U("div", vt, [
               g.value ? P("", !0) : (h(), U("div", kt, [
                 n[6] || (n[6] = N("div", { class: "text-h4 text-grey mb-3" }, "Verification Required", -1)),
-                u(F, {
+                u(H, {
                   size: "100",
                   color: "grey",
                   class: "ma-4"
@@ -1280,7 +1283,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
               ])),
               g.value ? (h(), U("div", yt, [
                 n[8] || (n[8] = N("div", { class: "text-h4 text-grey mb-3" }, "Email Sent!", -1)),
-                u(F, {
+                u(H, {
                   size: "100",
                   color: "grey",
                   class: "ma-4"
@@ -1366,7 +1369,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
 }), St = { class: "caption" }, At = { key: 0 }, Vt = {
   key: 0,
   class: "ml-2"
-}, Pt = /* @__PURE__ */ B({
+}, Pt = /* @__PURE__ */ F({
   __name: "LoginWithProvider",
   setup(t) {
     const e = M(), { loginWithGoogle: s, loginWithFacebook: r, loginWithSaml: i, SET_SHOW_LOGIN_WITH_PHONE: o } = e, l = k(() => e.config), c = k(() => e.isLoginWithProvidersActive), d = k(() => e.isOnlySingleProvider);
@@ -1391,7 +1394,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
               onClick: g[0] || (g[0] = (y) => I(s)())
             }, {
               default: a(() => [
-                u(F, null, {
+                u(H, null, {
                   default: a(() => g[5] || (g[5] = [
                     b("mdi-google")
                   ])),
@@ -1415,7 +1418,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
               onClick: g[1] || (g[1] = (y) => I(r)())
             }, {
               default: a(() => [
-                u(F, null, {
+                u(H, null, {
                   default: a(() => g[6] || (g[6] = [
                     b("mdi-facebook")
                   ])),
@@ -1439,7 +1442,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
               onClick: g[2] || (g[2] = (y) => I(o)(!0))
             }, {
               default: a(() => [
-                u(F, null, {
+                u(H, null, {
                   default: a(() => g[7] || (g[7] = [
                     b("mdi-cellphone")
                   ])),
@@ -1462,7 +1465,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
               onClick: g[3] || (g[3] = (y) => I(i)())
             }, {
               default: a(() => [
-                u(F, null, {
+                u(H, null, {
                   default: a(() => g[8] || (g[8] = [
                     b("mdi-onepassword")
                   ])),
@@ -1485,10 +1488,10 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
       _: 1
     })) : P("", !0);
   }
-}), Rt = { key: 0 }, Nt = { key: 1 }, Ct = /* @__PURE__ */ B({
+}), Rt = { key: 0 }, Nt = { key: 1 }, Ct = /* @__PURE__ */ F({
   __name: "AuthGuard",
   setup(t) {
-    const e = M(), { initializeGuard: s } = e, r = k(() => e.tab), i = k(() => e.config), o = k(() => e.is_loading), l = k(() => e.isLoginWithPhoneShown), c = k(() => e.isUserRegistrationAllowed), d = k(() => e.isResetPasswordScreenShown), m = k(() => e.isEmailVerificationScreenShown), g = k(() => e.is_authguard_dialog_persistent), y = Be(), A = k(() => {
+    const e = M(), { initializeGuard: s } = e, r = k(() => e.tab), i = k(() => e.config), o = k(() => e.is_loading), l = k(() => e.isLoginWithPhoneShown), c = k(() => e.isUserRegistrationAllowed), d = k(() => e.isResetPasswordScreenShown), m = k(() => e.isEmailVerificationScreenShown), g = k(() => e.is_authguard_dialog_persistent), y = Fe(), A = k(() => {
       var p;
       return ((p = i.value) == null ? void 0 : p.debug) ?? !1;
     }), v = k(() => y.path), n = k({
@@ -1504,7 +1507,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
       s();
     }), ee(v, (p, S) => {
       typeof S > "u" || (A.value && console.log("[ auth guard ]: vue router current route change: [", S, "] -> [", p, "]"), ye());
-    }), (p, S) => (h(), w(Fe, {
+    }), (p, S) => (h(), w(He, {
       modelValue: n.value,
       "onUpdate:modelValue": S[2] || (S[2] = (x) => n.value = x),
       persistent: g.value,
@@ -1523,7 +1526,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
               outlined: ""
             }, {
               default: a(() => [
-                u(He, { indeterminate: o.value }, null, 8, ["indeterminate"]),
+                u(Be, { indeterminate: o.value }, null, 8, ["indeterminate"]),
                 m.value ? (h(), U("div", Rt, [
                   u(Et)
                 ])) : (h(), U("div", Nt, [
@@ -1570,7 +1573,7 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
                     ]),
                     _: 1
                   }, 8, ["modelValue"]),
-                  u(H, null, {
+                  u(B, null, {
                     default: a(() => [
                       u(Ge, {
                         modelValue: r.value,
@@ -1644,16 +1647,17 @@ const ne = /* @__PURE__ */ new WeakMap(), rt = (t, e) => {
     }, 8, ["modelValue", "persistent"]));
   }
 }), Xt = async (t, e, s) => {
-  const r = M(), { debug: i } = r.config;
-  if (t.matched.some((o) => o.meta.requiresAuth))
+  var o;
+  const r = M(), i = ((o = r.config) == null ? void 0 : o.debug) ?? !1;
+  if (t.matched.some((l) => l.meta.requiresAuth))
     if (i && console.log("[ auth guard ]: Route requires authentication. Evaluating..."), r.routesInitialized === !1 && (await r.initializeGuard(), r.routesInitialized = !0), r.isAuthenticated)
       i && console.log("[ auth guard ]: User is authenticated."), s();
     else {
       i && console.log("[ auth guard ]: User not authenticated."), r.loginState = t.fullPath, r.SET_PASSWORD_RESET_SCREEN_SHOWN(!1), r.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(!1);
-      const o = !e.name, l = e.name && !e.matched.some((c) => c.meta.requiresAuth);
-      r.is_authguard_dialog_persistent = o || !l, i && console.log("[ auth guard ]: Navigation context:", {
-        isDirectAccess: o,
-        hasPublicRoute: l,
+      const l = !e.name, c = e.name && !e.matched.some((d) => d.meta.requiresAuth);
+      r.is_authguard_dialog_persistent = l || !c, i && console.log("[ auth guard ]: Navigation context:", {
+        isDirectAccess: l,
+        hasPublicRoute: c,
         fromRoute: e.name,
         toRoute: t.name,
         dialogPersistent: r.is_authguard_dialog_persistent
