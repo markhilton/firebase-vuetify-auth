@@ -88,6 +88,12 @@ export default {
         if (authStore.is_authguard_dialog_shown) {
           authStore.toggleAuthDialog(false)
         }
+        
+        // Clear loginState since user is now authenticated
+        if (authStore.loginState) {
+          if (debug) console.log("[ auth guard ]: Clearing loginState after redirect:", authStore.loginState)
+          authStore.loginState = null
+        }
       } else {
         if (debug) console.log("[ auth guard ]: No redirect result or user")
       }
@@ -97,6 +103,8 @@ export default {
     })
 
     onAuthStateChanged(auth, (user) => {
+      const wasAuthenticated = authStore.loggedIn // Store previous auth state
+      
       authStore.init = true
       authStore.current_user = user
       
@@ -106,6 +114,24 @@ export default {
         authStore.data = user
       } else {
         authStore.data = null
+        
+        // If user just signed out and is on a protected route, show auth dialog
+        if (wasAuthenticated && router.currentRoute.value.matched.some((record) => record.meta.requiresAuth)) {
+          if (debug) console.log("[ auth guard ]: User signed out on protected route, showing auth dialog")
+          
+          // Store the current route to potentially navigate back after login
+          authStore.loginState = router.currentRoute.value.fullPath
+          
+          // Reset password/email verification screens
+          authStore.SET_PASSWORD_RESET_SCREEN_SHOWN(false)
+          authStore.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)
+          
+          // Show the auth dialog
+          authStore.toggleAuthDialog(true)
+          
+          // Set dialog as persistent since user is on a protected route
+          authStore.is_authguard_dialog_persistent = true
+        }
       }
 
       // Wait for router to be ready before performing auth check
@@ -121,6 +147,13 @@ export default {
         if (authStore.is_authguard_dialog_shown) {
           if (debug) console.log("[ auth guard ]: dialog visibility set to false")
           authStore.toggleAuthDialog(false)
+        }
+
+        // Clear loginState since user is now authenticated
+        // No need to navigate as the route should already be loaded
+        if (authStore.loginState) {
+          if (debug) console.log("[ auth guard ]: Clearing loginState:", authStore.loginState)
+          authStore.loginState = null
         }
 
         const currentUser = auth.currentUser
