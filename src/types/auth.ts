@@ -78,6 +78,18 @@ export interface AuthGuardSettings {
   rememberMeEnabled?: boolean
   forceRegister?: boolean
   
+  /**
+   * Authentication flow method for OAuth providers
+   * @default 'auto' - Automatically selects based on device type
+   */
+  authMethod?: 'popup' | 'redirect' | 'auto'
+  
+  /**
+   * Fallback method when primary method fails
+   * @default 'redirect' if authMethod is 'popup', otherwise 'popup'
+   */
+  authMethodFallback?: 'popup' | 'redirect' | null
+  
   // Legacy support
   store?: any // vuex store (optional, legacy support)
   

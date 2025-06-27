@@ -158,6 +158,21 @@ const authGuardSettings = {
                        // Can be true (for all) or an array of domains (e.g., ['example.com']).
   registration: true, // allow new user registrations
   
+  // Authentication Flow Configuration
+  authMethod: "auto", // Authentication flow method for OAuth providers
+                     // Options:
+                     //   "auto": Automatically selects based on device type (popup for desktop, redirect for mobile)
+                     //   "popup": Always use popup method (may be blocked on some browsers/devices)
+                     //   "redirect": Always use redirect method (requires additional setup for modern browsers)
+                     // Default: "auto"
+  
+  authMethodFallback: null, // Fallback method when primary method fails
+                           // Options:
+                           //   "popup": Use popup as fallback
+                           //   "redirect": Use redirect as fallback
+                           //   null: No fallback, show error
+                           // Default: opposite of authMethod (redirect if authMethod is popup, popup if authMethod is redirect)
+  
   // Optional UI Customizations
   // title: "My App Authentication",
   // subtitle: "Please sign in to continue",
@@ -315,6 +330,27 @@ Before proceeding, ensure you have completed all required steps:
 2. **Incorrect router configuration** - Routes may not be properly protected
 3. **Missing Firebase config** - Authentication will fail to initialize
 4. **Wrong component placement** - Place `<AuthenticationGuard />` at the same level as `<router-view />`
+
+### Authentication Methods (Popup vs Redirect)
+
+The package supports both popup and redirect authentication flows for OAuth providers (Google, Facebook, SAML):
+
+**Popup Method:**
+- Opens authentication in a popup window
+- Better for desktop browsers
+- May be blocked by popup blockers
+- Provides immediate feedback
+
+**Redirect Method:**
+- Redirects the entire page to the auth provider
+- Better for mobile devices
+- Requires additional setup for modern browsers (Chrome 115+, Firefox 109+, Safari 16.1+)
+- See [Firebase's redirect best practices](https://firebase.google.com/docs/auth/web/redirect-best-practices) for setup
+
+**Auto Mode (Default):**
+- Automatically selects popup for desktop and redirect for mobile
+- Provides the best user experience across devices
+- Falls back to the opposite method if the primary fails (configurable)
 
 ## How It Works
 

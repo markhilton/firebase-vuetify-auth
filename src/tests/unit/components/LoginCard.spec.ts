@@ -148,9 +148,10 @@ describe('LoginCard Component', () => {
     })
 
     it('should handle login errors', async () => {
-      store.loginWithEmail = vi.fn().mockRejectedValueOnce(new Error('Invalid credentials'))
-      // Set up error state
-      const mockError = { code: 'auth/invalid-credential', message: 'Invalid credentials' }
+      // Mock the loginWithEmail to simulate it setting an error in the store
+      store.loginWithEmail = vi.fn().mockImplementation(() => {
+        store.error = { code: 'auth/invalid-credential', message: 'Invalid credentials' }
+      })
       
       const wrapper = mount(LoginCard, {
         global: {
@@ -189,8 +190,14 @@ describe('LoginCard Component', () => {
         }
       })
       
-      const forgotButton = wrapper.find('button.v-btn').find(btn => btn.text().includes('Forgot Password?'))
-      await forgotButton.trigger('click')
+      // Find the forgot password button
+      const buttons = wrapper.findAll('button')
+      const forgotButton = buttons.find(btn => btn.text().includes('Forgot Password?'))
+      
+      expect(forgotButton).toBeTruthy()
+      if (forgotButton) {
+        await forgotButton.trigger('click')
+      }
       
       expect(store.SET_PASSWORD_RESET_SCREEN_SHOWN).toHaveBeenCalledWith(true)
       expect(store.SET_TAB).toHaveBeenCalledWith(2)

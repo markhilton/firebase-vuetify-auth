@@ -34,6 +34,7 @@ vi.mock('firebase/auth', () => ({
 describe('OAuth Provider Flow', () => {
   let store: any
   let consoleErrorSpy: any
+  let consoleLogSpy: any
 
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -45,13 +46,15 @@ describe('OAuth Provider Flow', () => {
       facebook: true
     }
     
-    // Spy on console.error to check error handling
+    // Spy on console methods to check debug output
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
     vi.clearAllMocks()
   })
 
   afterEach(() => {
     consoleErrorSpy.mockRestore()
+    consoleLogSpy.mockRestore()
   })
 
   describe('Google OAuth Popup Flow', () => {
@@ -95,13 +98,20 @@ describe('OAuth Provider Flow', () => {
       const popupBlockedError = new Error('Popup blocked')
       popupBlockedError.code = 'auth/popup-blocked'
       
+      // Mock popup to fail with popup-blocked error
       vi.mocked(signInWithPopup).mockRejectedValue(popupBlockedError)
+      // Mock redirect fallback to succeed (it will be used as default fallback)
+      vi.mocked(signInWithRedirect).mockResolvedValue(undefined)
       
-      await expect(store.loginWithGoogle()).rejects.toThrow(popupBlockedError)
+      // With default fallback, it should use redirect and not throw
+      await store.loginWithGoogle()
       
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         '[ auth guard ]: Google popup auth failed:',
         popupBlockedError
+      )
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        '[ auth guard ]: Trying fallback redirect method for Google'
       )
       expect(store.is_loading).toBe(false)
     })

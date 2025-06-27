@@ -6,6 +6,8 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithPhoneNumber,
   signInWithEmailAndPassword,
   sendEmailVerification,
@@ -69,6 +71,24 @@ export const actions = {
 
     if (debug) console.log("[ auth guard ]: component initialization")
 
+    // Check for redirect result first
+    try {
+      const result = await getRedirectResult(auth)
+      if (result && result.user) {
+        if (debug) console.log("[ auth guard ]: redirect result found, processing...")
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = result.user
+        this.is_authguard_dialog_shown = false
+        this.is_loading = false
+      }
+    } catch (error: any) {
+      if (debug) console.error("[ auth guard ]: redirect result error:", error)
+      this.error = error
+      this.is_loading = false
+    }
+
     // Wait for Firebase Auth to initialize and restore auth state
     return new Promise((resolve) => {
       const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -104,6 +124,92 @@ export const actions = {
         resolve()
       })
     })
+  },
+
+  // Helper function to detect if device is mobile
+  _isMobileDevice(): boolean {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined') return false
+    
+    // Check for mobile user agents
+    const userAgent = window.navigator.userAgent.toLowerCase()
+    const mobileKeywords = ['android', 'webos', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone']
+    const isMobileAgent = mobileKeywords.some(keyword => userAgent.includes(keyword))
+    
+    // Also check for touch support and screen size
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    const isSmallScreen = window.innerWidth <= 768
+    
+    return isMobileAgent || (hasTouch && isSmallScreen)
+  },
+
+  // Helper function to determine which auth method to use
+  _getAuthMethod(this: AuthActionContext): 'popup' | 'redirect' {
+    const configMethod = this.config.authMethod || 'auto'
+    
+    if (configMethod === 'auto') {
+      // Auto-detect based on device type
+      return this._isMobileDevice() ? 'redirect' : 'popup'
+    }
+    
+    return configMethod
+  },
+
+  // Helper function to sign in with provider using the configured method
+  async _signInWithProvider(
+    this: AuthActionContext, 
+    provider: GoogleAuthProvider | FacebookAuthProvider | SAMLAuthProvider,
+    providerName: string
+  ): Promise<UserCredential> {
+    const auth: Auth = getAuth(this.config.firebase)
+    const method = this._getAuthMethod()
+    const fallbackMethod = this.config.authMethodFallback || (method === 'popup' ? 'redirect' : 'popup')
+    
+    if (this.config.debug) {
+      console.log(`[ auth guard ]: Trying ${method} method for ${providerName} authentication`)
+    }
+    
+    try {
+      let result: UserCredential | null = null
+      
+      if (method === 'popup') {
+        result = await signInWithPopup(auth, provider)
+      } else {
+        // For redirect method, initiate the redirect
+        await signInWithRedirect(auth, provider)
+        // The actual result will be handled in initializeGuard when the page reloads
+        return Promise.resolve({} as UserCredential)
+      }
+      
+      return result
+    } catch (error: any) {
+      if (this.config.debug) {
+        console.error(`[ auth guard ]: ${providerName} ${method} auth failed:`, error)
+      }
+      
+      // Try fallback method if configured and not null
+      if (fallbackMethod && error.code === 'auth/popup-blocked') {
+        if (this.config.debug) {
+          console.log(`[ auth guard ]: Trying fallback ${fallbackMethod} method for ${providerName}`)
+        }
+        
+        try {
+          if (fallbackMethod === 'popup') {
+            return await signInWithPopup(auth, provider)
+          } else {
+            await signInWithRedirect(auth, provider)
+            return Promise.resolve({} as UserCredential)
+          }
+        } catch (fallbackError: any) {
+          if (this.config.debug) {
+            console.error(`[ auth guard ]: ${providerName} fallback ${fallbackMethod} auth also failed:`, fallbackError)
+          }
+          throw fallbackError
+        }
+      }
+      
+      throw error
+    }
   },
 
   async loginWithEmail(this: AuthActionContext, { email, password }: { email: string; password: string }): Promise<void> {
@@ -145,14 +251,7 @@ export const actions = {
         prompt: 'select_account'
       })
       
-      const auth: Auth = getAuth(this.config.firebase)
-      
-      // Try popup method first to test if CSP is the issue
-      if (this.config.debug) {
-        console.log("[ auth guard ]: Trying popup method for Google authentication")
-      }
-      
-      const result: UserCredential = await signInWithPopup(auth, provider)
+      const result = await this._signInWithProvider(provider, 'Google')
       
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
@@ -165,9 +264,6 @@ export const actions = {
       this.is_loading = false
       return Promise.resolve(result)
     } catch (error: any) {
-      if (this.config.debug) {
-        console.error("[ auth guard ]: Google popup auth failed:", error)
-      }
       this.error = error
       this.is_loading = false
       return Promise.reject(error)
@@ -178,8 +274,8 @@ export const actions = {
     try {
       this.is_loading = true
       const provider = new FacebookAuthProvider()
-      const auth: Auth = getAuth(this.config.firebase)
-      const result: UserCredential = await signInWithPopup(auth, provider)
+      
+      const result = await this._signInWithProvider(provider, 'Facebook')
 
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
@@ -206,8 +302,8 @@ export const actions = {
     try {
       this.is_loading = true
       const provider = new SAMLAuthProvider(this.config.saml_provider_id)
-      const auth: Auth = getAuth(this.config.firebase)
-      const result: UserCredential = await signInWithPopup(auth, provider)
+      
+      const result = await this._signInWithProvider(provider, 'SAML')
 
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
