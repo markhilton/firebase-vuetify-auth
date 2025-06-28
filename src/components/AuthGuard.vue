@@ -17,7 +17,7 @@
           <div v-else>
             <v-tabs v-model="tab" grow>
               <v-tab :key="0" :value="0"> Sign In </v-tab>
-              <v-tab v-if="isUserRegistrationAllowed" :key="1" :value="1" > Register </v-tab>
+              <v-tab v-if="isUserRegistrationAllowed" :key="1" :value="1" @click="() => console.log('[AuthGuard] Register tab clicked!')"> Register </v-tab>
               <v-tab v-if="isResetPasswordScreenShown && config.email" :key="2" :value="2">
                 Reset Password
               </v-tab>
@@ -69,27 +69,64 @@ import LoginWithProvider from "./LoginWithProvider.vue"
 import { useRoute, type RouteLocationNormalized } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 const store = useAuthStore()
-const { initializeGuard, SET_TAB, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_SHOW_LOGIN_WITH_PHONE } = store // Actions
+const { initializeGuard } = store // Actions
 
-// Use computed to safely access store properties
-const tab = computed({
-  get: () => store.tab,
-  set: (value: number) => {
-    store.SET_TAB(value)
-    // Reset password screen state when changing tabs
-    if (value !== 2) {
+// Use a local ref for tab to ensure reactivity
+const localTab = ref(store.tab)
+
+// Watch for store tab changes and update local ref
+watch(() => store.tab, (newTab) => {
+  console.log('[AuthGuard] Store tab changed to:', newTab)
+  localTab.value = newTab
+})
+
+// Watch for phone login state changes
+watch(() => store.isLoginWithPhoneShown, (isShown) => {
+  console.log('[AuthGuard] Phone login shown:', isShown)
+  if (isShown) {
+    localTab.value = 3
+  }
+})
+
+// Watch for reset password state changes
+watch(() => store.isResetPasswordScreenShown, (isShown) => {
+  console.log('[AuthGuard] Reset password shown:', isShown)
+  if (isShown) {
+    localTab.value = 2
+  }
+})
+
+// Watch for local tab changes and update store
+watch(localTab, (newTab, oldTab) => {
+  console.log('[AuthGuard] Local tab changed from', oldTab, 'to:', newTab)
+  
+  // Only update store if it's different from current store value
+  if (store.tab !== newTab) {
+    store.SET_TAB(newTab)
+  }
+  
+  // Reset states based on tab changes
+  if (newTab === 0 || newTab === 1) {
+    // Going to Sign In or Register - reset special states
+    if (store.isResetPasswordScreenShown) {
       store.SET_PASSWORD_RESET_SCREEN_SHOWN(false)
     }
-    // Reset phone login state when changing tabs
-    if (value !== 3) {
+    if (store.isLoginWithPhoneShown) {
       store.SET_SHOW_LOGIN_WITH_PHONE(false)
     }
   }
 })
+
+// Use localTab for v-model binding
+const tab = localTab
 const config = computed(() => store.config)
 const is_loading = computed(() => store.is_loading)
 const isLoginWithPhoneShown = computed(() => store.isLoginWithPhoneShown)
-const isUserRegistrationAllowed = computed(() => store.isUserRegistrationAllowed)
+const isUserRegistrationAllowed = computed(() => {
+  const allowed = store.isUserRegistrationAllowed
+  console.log('[AuthGuard] isUserRegistrationAllowed:', allowed)
+  return allowed
+})
 const isResetPasswordScreenShown = computed(() => store.isResetPasswordScreenShown)
 const isEmailVerificationScreenShown = computed(() => store.isEmailVerificationScreenShown)
 const persistent = computed(() => store.is_authguard_dialog_persistent)

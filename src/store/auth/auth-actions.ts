@@ -43,7 +43,10 @@ interface AuthActionContext {
 
 export const actions = {
   SET_TAB(this: AuthActionContext, index: number): void {
+    console.log('[auth-actions] SET_TAB called with index:', index)
+    console.log('[auth-actions] Current tab:', this.tab)
     this.tab = index
+    console.log('[auth-actions] Tab after update:', this.tab)
   },
 
   SET_EMAIL_VERIFICATION_SCREEN_SHOWN(this: AuthActionContext, status: boolean): void {
@@ -52,7 +55,9 @@ export const actions = {
   },
 
   SET_REGISTER_SCREEN_SHOWN(this: AuthActionContext, status: boolean): void {
+    console.log('[auth-actions] SET_REGISTER_SCREEN_SHOWN called with status:', status)
     this.tab = status ? 1 : 0
+    console.log('[auth-actions] Tab set to:', this.tab)
   },
 
   SET_PASSWORD_RESET_SCREEN_SHOWN(this: AuthActionContext, status: boolean): void {
@@ -62,9 +67,11 @@ export const actions = {
   },
 
   SET_SHOW_LOGIN_WITH_PHONE(this: AuthActionContext, status: boolean): void {
+    console.log('[auth-actions] SET_SHOW_LOGIN_WITH_PHONE called with status:', status)
     this.tab = status ? 3 : 0
     this.is_login_with_phone_shown = status
     if (status === false) this.sign_by_phone_step = 1
+    console.log('[auth-actions] After SET_SHOW_LOGIN_WITH_PHONE - tab:', this.tab, 'is_login_with_phone_shown:', this.is_login_with_phone_shown)
   },
 
   async initializeGuard(this: AuthActionContext): Promise<void> {

@@ -114,9 +114,10 @@ describe('LoginCard Component', () => {
       // Try to submit empty form
       await form.trigger('submit')
       
-      // loginWithEmail should not be called with empty fields
-      // The store action is not a spy by default
-      expect(wrapper.find('.v-alert').exists()).toBe(false)
+      // When submitting with empty fields, a validation error alert should be shown
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.v-alert').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Provided credentials are invalid.')
     })
 
   })

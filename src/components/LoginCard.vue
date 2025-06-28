@@ -119,7 +119,6 @@ const error = computed({
   get: () => store.error,
   set: (value) => { store.error = value }
 })
-const sessionPersistence = computed(() => store.sessionPersistence)
 const getError = computed(() => store.getError)
 const isUserRegistrationAllowed = computed(() => store.isUserRegistrationAllowed)
 const isResetPasswordScreenShown = computed(() => store.isResetPasswordScreenShown)
