@@ -29,6 +29,7 @@ export const state = (): AuthState & {
   // Auth guard dialog states
   init: boolean
   is_loading: boolean
+  is_checking_auth: boolean
   is_session_persistant: boolean
   is_login_with_phone_shown: boolean
   is_authguard_dialog_shown: boolean
@@ -78,6 +79,7 @@ export const state = (): AuthState & {
   // Auth guard dialog states
   init: false,
   is_loading: false,
+  is_checking_auth: false,
   is_session_persistant: true,
   is_login_with_phone_shown: false,
   is_authguard_dialog_shown: false,

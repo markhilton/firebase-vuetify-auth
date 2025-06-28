@@ -20,7 +20,8 @@
       "Bash(cat:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

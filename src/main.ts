@@ -9,6 +9,16 @@ import { loadFonts } from "./plugins/webfontloader"
 
 loadFonts()
 
+// Handle navigation errors globally
+window.addEventListener('unhandledrejection', (event) => {
+  // Check if this is a navigation error
+  if (event.reason && event.reason.message && event.reason.message.includes('Navigation aborted')) {
+    // Prevent the error from being logged to console
+    event.preventDefault()
+    return
+  }
+})
+
 const app = createApp(App)
 const pinia = createPinia()
 

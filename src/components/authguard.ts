@@ -46,15 +46,13 @@ export const authGuard = async (to: RouteLocationNormalized, from: RouteLocation
 
       authStore.toggleAuthDialog(true)
       
-      // If navigating to the same route (e.g., after sign out), don't block
-      if (to.fullPath === from.fullPath) {
-        next()
-      } else if (isDirectAccess) {
-        // On direct access (page reload), allow navigation to proceed
-        next()
-      } else {
-        next(false)
-      }
+      // Always block navigation to protected routes when not authenticated
+      // This prevents protected content from showing behind the auth dialog
+      if (debug) console.log("[ auth guard ]: Blocking navigation to protected route")
+      
+      // Block navigation by calling next(false)
+      // The navigation error will be handled by the router's error handler
+      next(false)
     }
   } else {
     next()

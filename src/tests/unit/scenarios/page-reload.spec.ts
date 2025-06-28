@@ -141,7 +141,8 @@ describe('Page Reload Scenarios', () => {
       // Auth dialog SHOULD appear with persistence
       expect(store.is_authguard_dialog_shown).toBe(true)
       expect(store.is_authguard_dialog_persistent).toBe(true)
-      expect(mockNext).toHaveBeenCalledWith()
+      // Navigation should be blocked now
+      expect(mockNext).toHaveBeenCalledWith(false)
     })
 
     it('should load route content immediately when authenticated on reload', async () => {
@@ -252,8 +253,8 @@ describe('Page Reload Scenarios', () => {
       // Should show persistent dialog on direct access
       expect(store.is_authguard_dialog_persistent).toBe(true)
       expect(store.is_authguard_dialog_shown).toBe(true)
-      // On initial page load with no auth, next() is called (not next(false))
-      expect(mockNext).toHaveBeenCalledWith()
+      // Navigation should always be blocked when not authenticated
+      expect(mockNext).toHaveBeenCalledWith(false)
     })
 
     it('should detect navigation from another route', async () => {
@@ -283,9 +284,9 @@ describe('Page Reload Scenarios', () => {
       
       await authGuard(to, from, mockNext)
       
-      // Should allow navigation to same route
+      // Should block navigation even to same route when not authenticated
       expect(store.is_authguard_dialog_shown).toBe(true)
-      expect(mockNext).toHaveBeenCalledWith()
+      expect(mockNext).toHaveBeenCalledWith(false)
     })
   })
 })

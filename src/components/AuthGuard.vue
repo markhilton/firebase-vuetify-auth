@@ -7,7 +7,7 @@
     content-class="elevation-0"
   >
       <v-container style="max-width: 500px" class="mb-5">
-        <v-card flat outlined>
+        <v-card flat outlined style="min-height: 500px; display: flex; flex-direction: column;">
           <v-progress-linear :indeterminate="is_loading" />
 
           <div v-if="isEmailVerificationScreenShown">
@@ -17,20 +17,19 @@
           <div v-else>
             <v-tabs v-model="tab" grow>
               <v-tab :key="0" :value="0"> Sign In </v-tab>
-              <v-tab v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :key="1" :value="1" > Register </v-tab>
-              <v-tab v-show="(isResetPasswordScreenShown || !isUserRegistrationAllowed) && config.email" :key="2" :value="2">
+              <v-tab v-if="isUserRegistrationAllowed" :key="1" :value="1" > Register </v-tab>
+              <v-tab v-if="isResetPasswordScreenShown && config.email" :key="2" :value="2">
                 Reset Password
+              </v-tab>
+              <v-tab v-if="isLoginWithPhoneShown && config.phone" :key="3" :value="3">
+                Log in with Phone
               </v-tab>
             </v-tabs>
 
             <v-card-text>
               <v-tabs-window v-model="tab">
-                <v-tabs-window-item v-show="!isLoginWithPhoneShown" :key="0" :value="0" class="pt--1">
+                <v-tabs-window-item :key="0" :value="0" class="pt--1">
                   <LoginCard />
-                </v-tabs-window-item>
-
-                <v-tabs-window-item v-show="!isResetPasswordScreenShown && isUserRegistrationAllowed" :key="0" :value="0" class="pt-5">
-                  <LoginWithPhone />
                 </v-tabs-window-item>
 
                 <v-tabs-window-item :key="1" :value="1" class="pt-5">
@@ -39,6 +38,10 @@
 
                 <v-tabs-window-item :key="2" :value="2">
                   <PasswordReset />
+                </v-tabs-window-item>
+
+                <v-tabs-window-item :key="3" :value="3">
+                  <LoginWithPhone />
                 </v-tabs-window-item>
               </v-tabs-window>
             </v-card-text>
@@ -53,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, onMounted, type ComputedRef } from "vue"
+import { computed, watch, onMounted, ref, type ComputedRef } from "vue"
 import authcheck from "./authcheck" // The core logic for showing/hiding dialog and checking auth status
 
 import LoginCard from "./LoginCard.vue"
@@ -66,10 +69,23 @@ import LoginWithProvider from "./LoginWithProvider.vue"
 import { useRoute, type RouteLocationNormalized } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 const store = useAuthStore()
-const { initializeGuard } = store // Action to initialize auth state listener
+const { initializeGuard, SET_TAB, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_SHOW_LOGIN_WITH_PHONE } = store // Actions
 
 // Use computed to safely access store properties
-const tab = computed(() => store.tab)
+const tab = computed({
+  get: () => store.tab,
+  set: (value: number) => {
+    store.SET_TAB(value)
+    // Reset password screen state when changing tabs
+    if (value !== 2) {
+      store.SET_PASSWORD_RESET_SCREEN_SHOWN(false)
+    }
+    // Reset phone login state when changing tabs
+    if (value !== 3) {
+      store.SET_SHOW_LOGIN_WITH_PHONE(false)
+    }
+  }
+})
 const config = computed(() => store.config)
 const is_loading = computed(() => store.is_loading)
 const isLoginWithPhoneShown = computed(() => store.isLoginWithPhoneShown)

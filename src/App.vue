@@ -29,16 +29,21 @@
 
         <div class="my-4">
           <b class="mr-2">Route to:</b>
-          <router-link to="/">Home ({{ homeRouteStatus }})</router-link>
+          <a href="#" @click.prevent="navigateTo('/')">Home ({{ homeRouteStatus }})</a>
           <span class="mx-2">|</span>
-          <router-link to="/public">Public Route</router-link>
+          <a href="#" @click.prevent="navigateTo('/public')">Public Route</a>
           <span class="mx-2">|</span>
-          <router-link to="/protected">Protected Route</router-link>
+          <a href="#" @click.prevent="navigateTo('/protected')">Protected Route</a>
         </div>
 
         <v-btn variant="tonal" color="primary" class="mb-4" @click="toggleHomeRouteProtection">{{ buttonText }}</v-btn>
 
-        <hr />
+        <hr class="my-4" />
+        
+        <!-- Auth Settings Panel -->
+        <AuthSettingsPanel class="mb-4" />
+        
+        <hr class="my-4" />
       </v-container>
 
       <!-- v-router view -->
@@ -47,12 +52,19 @@
 
     <!-- auth guard -->
     <AuthenticationGuard/>
+    
+    <!-- Required for phone authentication -->
+    <div id="recaptcha-container"></div>
   </v-app>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import { useAuthStore } from "@/store/auth"
+import AuthSettingsPanel from "@/demo/components/AuthSettingsPanel.vue"
+
+const router = useRouter()
 const store = useAuthStore()
 const { signOut } = store
 
@@ -73,9 +85,31 @@ const toggleHomeRouteProtection = (): void => {
   localStorage.setItem("isHomeRouteProtected", String(isHomeRouteProtected.value))
 }
 
+// Navigate with error handling
+const navigateTo = (path: string): void => {
+  // Use router.push with error handling
+  router.push(path).catch((error) => {
+    // Ignore navigation aborted errors - these are expected when auth guard blocks navigation
+    if (error.name !== 'NavigationDuplicated' && error.message.indexOf('Navigation aborted') === -1) {
+      console.error('Navigation error:', error)
+    }
+  })
+}
+
 // Computed properties
 const isAuthenticated = computed(() => store.isAuthenticated)
 const getDisplayName = computed(() => store.getDisplayName)
 const homeRouteStatus = computed(() => isHomeRouteProtected.value ? "protected" : "public")
 const buttonText = computed(() => isHomeRouteProtected.value ? "Set Home to PUBLIC" : "Set Home to PROTECTED")
 </script>
+
+<style scoped>
+a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+</style>

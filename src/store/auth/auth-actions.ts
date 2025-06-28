@@ -32,10 +32,13 @@ interface AuthActionContext {
   config: any
   current_user: AuthUser | null
   is_loading: boolean
+  is_checking_auth: boolean
   is_session_persistant: boolean
   text_confirmation: ConfirmationResult | null
   is_authguard_dialog_shown: boolean
   is_email_verification_link_sent: boolean
+  loginState: string | null
+  router: any
 }
 
 export const actions = {
@@ -49,18 +52,17 @@ export const actions = {
   },
 
   SET_REGISTER_SCREEN_SHOWN(this: AuthActionContext, status: boolean): void {
-    this.tab = status ? 0 : 1
-    this.is_reset_password_screen_shown = status
+    this.tab = status ? 1 : 0
   },
 
   SET_PASSWORD_RESET_SCREEN_SHOWN(this: AuthActionContext, status: boolean): void {
-    this.tab = status ? 1 : 0
+    this.tab = status ? 2 : 0
     this.is_reset_password_screen_shown = status
     if (status === false) this.is_email_reset_password_link_sent = false
   },
 
   SET_SHOW_LOGIN_WITH_PHONE(this: AuthActionContext, status: boolean): void {
-    this.tab = 0
+    this.tab = status ? 3 : 0
     this.is_login_with_phone_shown = status
     if (status === false) this.sign_by_phone_step = 1
   },
@@ -70,6 +72,9 @@ export const actions = {
     const auth: Auth = getAuth(this.config.firebase)
 
     if (debug) console.log("[ auth guard ]: component initialization")
+    
+    // Set checking auth state
+    this.is_checking_auth = true
 
     // Check for redirect result first
     try {
@@ -82,6 +87,9 @@ export const actions = {
         this.data = result.user
         this.is_authguard_dialog_shown = false
         this.is_loading = false
+        
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
       }
     } catch (error: any) {
       if (debug) console.error("[ auth guard ]: redirect result error:", error)
@@ -120,10 +128,25 @@ export const actions = {
         }
 
         // Resolve the promise on first auth state change (initialization complete)
+        this.is_checking_auth = false
         unsubscribe()
         resolve()
       })
     })
+  },
+
+  // Helper function to handle post-authentication redirect
+  _handlePostAuthRedirect(this: AuthActionContext): void {
+    if (this.loginState && this.router) {
+      const debug = this.config?.debug ?? false
+      if (debug) console.log("[ auth guard ]: Redirecting to:", this.loginState)
+      
+      // Navigate to the stored route
+      this.router.push(this.loginState)
+      
+      // Clear the stored login state
+      this.loginState = null
+    }
   },
 
   // Helper function to detect if device is mobile
@@ -230,6 +253,12 @@ export const actions = {
       if (userCredential.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = userCredential.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = userCredential.user
+        this.is_authguard_dialog_shown = false
+        
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
       }
 
       this.is_loading = false
@@ -259,6 +288,9 @@ export const actions = {
         this.loggedIn = true
         this.data = result.user
         this.is_authguard_dialog_shown = false
+        
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
       }
       
       this.is_loading = false
@@ -283,6 +315,9 @@ export const actions = {
         this.loggedIn = true
         this.data = result.user
         this.is_authguard_dialog_shown = false
+        
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
       }
 
       this.is_loading = false
@@ -311,6 +346,9 @@ export const actions = {
         this.loggedIn = true
         this.data = result.user
         this.is_authguard_dialog_shown = false
+        
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
       }
 
       this.is_loading = false
@@ -330,8 +368,13 @@ export const actions = {
       this.is_loading = true
       this.text_confirmation = null
 
-      const phone = "+1" + phoneNumber.replace(/\D/g, "")
+      const phone = phoneNumber.startsWith("+") ? phoneNumber : "+1" + phoneNumber.replace(/\D/g, "")
       const auth: Auth = getAuth(this.config.firebase)
+      
+      if (this.config.debug) {
+        console.log("[textPhoneVerificationCode]: Sending verification code to:", phone)
+      }
+      
       const confirmationResult: ConfirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier)
 
       this.is_loading = false
@@ -340,7 +383,28 @@ export const actions = {
 
       return Promise.resolve(confirmationResult)
     } catch (error: any) {
-      this.error = error
+      console.error("[textPhoneVerificationCode]: Error sending verification code:", error)
+      
+      // Provide more user-friendly error messages
+      if (error.code === 'auth/invalid-app-credential') {
+        this.error = { 
+          message: "Phone authentication is not properly configured. Please check that phone authentication is enabled in your Firebase Console and that your domain is authorized.",
+          code: error.code 
+        }
+      } else if (error.code === 'auth/quota-exceeded') {
+        this.error = { 
+          message: "Too many requests. Please try again later.",
+          code: error.code 
+        }
+      } else if (error.code === 'auth/captcha-check-failed') {
+        this.error = { 
+          message: "reCAPTCHA verification failed. Please try again.",
+          code: error.code 
+        }
+      } else {
+        this.error = error
+      }
+      
       this.is_loading = false
       return Promise.reject(error)
     }
@@ -362,6 +426,12 @@ export const actions = {
       if (result.user) {
         const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
         this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = result.user
+        this.is_authguard_dialog_shown = false
+        
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
       }
 
       this.is_loading = false

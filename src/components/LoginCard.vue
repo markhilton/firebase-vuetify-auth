@@ -115,8 +115,10 @@ const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHO
 
 // Use computed to safely access store properties
 const config = computed(() => store.config)
-const error = computed(() => store.error)
-const is_session_persistant = computed(() => store.is_session_persistant)
+const error = computed({
+  get: () => store.error,
+  set: (value) => { store.error = value }
+})
 const sessionPersistence = computed(() => store.sessionPersistence)
 const getError = computed(() => store.getError)
 const isUserRegistrationAllowed = computed(() => store.isUserRegistrationAllowed)
@@ -150,12 +152,13 @@ const handleLogin = (): void => {
 }
 
 const updateSessionPersistence = (): void => {
-  is_session_persistant.value = remember.value
+  // Update the store's is_session_persistant state directly
+  store.is_session_persistant = remember.value
 }
 
 onMounted((): void => {
-  // Initialize the "remember me" checkbox
-  remember.value = sessionPersistence.value === 'LOCAL'
+  // Initialize the "remember me" checkbox based on current session persistence
+  remember.value = store.is_session_persistant
 })
 
 // Clear error automatically when it's set

@@ -14,6 +14,7 @@ interface AuthStoreState {
   loginState: string | null
   init: boolean
   is_loading: boolean
+  is_checking_auth: boolean
   is_session_persistant: boolean
   is_login_with_phone_shown: boolean
   is_authguard_dialog_shown: boolean
@@ -166,5 +167,8 @@ export const getters = {
       config.saml || 
       config.phone
     )
-  }
+  },
+  
+  isCheckingAuth: (state: AuthStoreState): boolean => 
+    state.is_checking_auth
 }

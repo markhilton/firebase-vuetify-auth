@@ -260,6 +260,15 @@ export default router;
 
 **Important:** Add `meta: { requiresAuth: true }` only to routes that require authentication. Routes without this meta property are considered public and will never show the authentication dialog.
 
+### Secure Navigation Behavior
+
+This package implements secure navigation blocking to prevent protected content from being displayed before authentication:
+
+- **Navigation Blocking**: When an unauthenticated user attempts to access a protected route, the navigation is completely blocked (`next(false)`). The user remains on their current route and the authentication dialog appears.
+- **No Content Exposure**: Protected route components are never rendered or mounted when the user is not authenticated. This ensures sensitive content cannot be seen, even momentarily, before the authentication dialog appears.
+- **Post-Authentication Redirect**: After successful authentication, users are automatically redirected to the route they originally attempted to access.
+- **Clean User Experience**: The browser URL does not change to the protected route until authentication is successful, providing a cleaner and more secure experience.
+
 #### STEP 5: Access authentication state in your components (Optional)
 
 Once the package is set up, you can access the authentication state in any component using the Pinia store:
@@ -457,7 +466,14 @@ This document provides a structured way to test the core functionalities and edg
 
 ## Phone Authentication (reCAPTCHA)
 
-If you enable phone authentication (`phone: true` in `authGuardSettings`), Firebase requires a reCAPTCHA verifier. You **must** include an empty `div` with the ID `recaptcha-container` in your main application template (e.g., `App.vue` or wherever the `AuthenticationGuard` component is rendered). This `div` is used by Firebase to render the reCAPTCHA element (it's usually invisible).
+If you enable phone authentication (`phone: true` in `authGuardSettings`), you must:
+
+1. **Enable Phone Authentication in Firebase Console**:
+   - Go to Firebase Console → Authentication → Sign-in method
+   - Enable "Phone" as a sign-in provider
+   - Add your testing phone numbers if in development
+
+2. **Include reCAPTCHA container**: Add an empty `div` with ID `recaptcha-container` in your main application template:
 
 Example in `App.vue`:
 ```html
@@ -472,7 +488,11 @@ Example in `App.vue`:
   </v-app>
 </template>
 ```
-Ensure this `div` is present in the DOM when phone authentication is attempted.
+
+3. **Common Issues**:
+   - If you see "appVerificationDisabledForTesting" error, ensure phone auth is enabled in Firebase Console
+   - The reCAPTCHA verifier requires a valid Firebase project with phone authentication enabled
+   - In development, add test phone numbers in Firebase Console to bypass SMS verification
 
 ## Security Note
 
@@ -480,11 +500,36 @@ This package facilitates client-side authentication flows with Firebase. **It is
 
 **True security for your application's data and backend resources must be enforced through Firebase Security Rules** (for Firestore, Realtime Database, and Cloud Storage) and by correctly configuring your Firebase Authentication providers in the Firebase console. This package helps manage the user's authentication state on the client but does not, by itself, secure your backend. Always ensure your Firebase Security Rules are robust and properly tested.
 
+## Troubleshooting
+
+### Authentication Dialog Shows a Loading State
+During initial page load or after a page refresh, you may briefly see a loading state in the authentication dialog. This is normal behavior as the package waits for Firebase to restore the authentication state. The loading state ensures that:
+- Previously authenticated users are not incorrectly shown the login form
+- The authentication state is fully initialized before making navigation decisions
+- Firebase has time to check for redirect results from OAuth providers
+
+### Protected Routes and Direct URL Access
+When accessing a protected route directly (e.g., by entering the URL in the browser):
+- If authenticated: The route loads immediately
+- If not authenticated: Navigation is blocked, and the authentication dialog appears as a persistent modal
+- After successful authentication: You are automatically redirected to the originally requested route
+
 ### That's it!
 
 After following implementation instruction requests to protected views, should render a login / registration view, unless user is already logged into the application.
 
 For more usage examples (how to log in/sign out and so on) please check the package source code
+
+## Demo Application
+
+The included demo application (`npm run dev`) features an interactive settings panel that allows you to:
+- Toggle authentication providers (Email, Phone, Google, Facebook, SAML) on/off
+- Enable/disable user registration
+- Toggle email verification requirements
+- See real-time which providers are active
+- All settings are persisted in localStorage
+
+This makes it easy to test different authentication configurations without modifying code. Simply toggle the settings you want to test and refresh the page to apply the changes.
 
 ## Available settings
 
