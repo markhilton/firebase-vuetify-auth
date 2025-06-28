@@ -46,8 +46,8 @@
         <hr class="my-4" />
       </v-container>
 
-      <!-- v-router view - conditionally rendered based on auth state -->
-      <router-view v-if="shouldShowRouterView" />
+      <!-- Use AuthRouterView from the package -->
+      <AuthRouterView />
     </v-main>
 
     <!-- auth guard -->
@@ -60,12 +60,13 @@
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from "vue"
-import { useRouter, useRoute } from "vue-router"
+import { useRouter } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 import AuthSettingsPanel from "@/demo/components/AuthSettingsPanel.vue"
+// Import AuthRouterView from the component directly
+import AuthRouterView from "@/components/AuthRouterView.vue"
 
 const router = useRouter()
-const route = useRoute()
 const store = useAuthStore()
 const { signOut } = store
 
@@ -102,20 +103,6 @@ const isAuthenticated = computed(() => store.isAuthenticated)
 const getDisplayName = computed(() => store.getDisplayName)
 const homeRouteStatus = computed(() => isHomeRouteProtected.value ? "protected" : "public")
 const buttonText = computed(() => isHomeRouteProtected.value ? "Set Home to PUBLIC" : "Set Home to PROTECTED")
-
-// Determine if router-view should be shown
-const shouldShowRouterView = computed(() => {
-  // Check if current route requires authentication
-  const requiresAuth = route.matched.some((record) => record.meta.requiresAuth)
-  
-  // If route doesn't require auth, always show content
-  if (!requiresAuth) {
-    return true
-  }
-  
-  // If route requires auth, only show content if user is authenticated
-  return store.isAuthenticated
-})
 </script>
 
 <style scoped>

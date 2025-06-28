@@ -216,4 +216,7 @@ export default {
   },
 }
 
-export { AuthMiddleware, useAuthStore } // export vue router middleware
+// Import the AuthRouterView component
+import AuthRouterView from "./components/AuthRouterView.vue"
+
+export { AuthMiddleware, useAuthStore, AuthRouterView } // export vue router middleware and components

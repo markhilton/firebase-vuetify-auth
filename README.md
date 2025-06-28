@@ -307,9 +307,9 @@ const handleSignOut = async () => {
 </script>
 ```
 
-### Protecting Route Content
+### Protecting Route Content with AuthRouterView
 
-When a user signs out while on a protected route, you may want to hide the route content while keeping your app's layout (header, footer, etc.) visible. The package provides a `ProtectedContent` component for this purpose:
+When a user signs out while on a protected route, you may want to show fallback content while keeping the URL intact. The package provides an `AuthRouterView` component that automatically swaps protected content with a fallback route's content based on authentication state:
 
 ```vue
 <template>
@@ -317,11 +317,8 @@ When a user signs out while on a protected route, you may want to hide the route
     <!-- Your app header remains visible -->
     <AppHeader />
     
-    <!-- Wrap your protected content -->
-    <ProtectedContent>
-      <MyProtectedComponent />
-      <!-- This content is only visible when authenticated -->
-    </ProtectedContent>
+    <!-- Use AuthRouterView instead of router-view -->
+    <AuthRouterView fallback-route="/" />
     
     <!-- Your app footer remains visible -->
     <AppFooter />
@@ -329,18 +326,30 @@ When a user signs out while on a protected route, you may want to hide the route
 </template>
 
 <script setup>
-import { ProtectedContent } from '@nerd305/firebase-vuetify-auth'
+import { AuthRouterView } from '@nerd305/firebase-vuetify-auth'
 import AppHeader from './components/AppHeader.vue'
 import AppFooter from './components/AppFooter.vue'
-import MyProtectedComponent from './components/MyProtectedComponent.vue'
 </script>
 ```
 
-The `ProtectedContent` component:
-- Shows its slot content when the user is authenticated
-- Shows a placeholder message when the user is not authenticated
-- Automatically updates when authentication state changes
-- Keeps your app layout visible while hiding only the protected content
+The `AuthRouterView` component:
+- Shows the actual route component when the user is authenticated
+- Shows the home page content (or specified fallback route) when user is not authenticated on a protected route
+- If the fallback route is also protected, shows empty content instead to prevent infinite loops
+- Keeps the URL unchanged (e.g., stays on `/protected` while showing home or empty content)
+- Automatically switches back to protected content when user signs in
+- Maintains your app layout (header, footer, etc.) visible at all times
+
+**Props:**
+- `fallback-route` (optional): The route path to use as fallback content. Defaults to `'/'`
+
+**Example with custom fallback:**
+```vue
+<!-- Show /public-info content when unauthenticated on protected routes -->
+<AuthRouterView fallback-route="/public-info" />
+```
+
+This provides a seamless experience where users can see meaningful content even when signed out, while the URL indicates their intended destination.
 
 ### Available Store Properties and Methods
 
