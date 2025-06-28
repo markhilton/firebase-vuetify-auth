@@ -307,6 +307,41 @@ const handleSignOut = async () => {
 </script>
 ```
 
+### Protecting Route Content
+
+When a user signs out while on a protected route, you may want to hide the route content while keeping your app's layout (header, footer, etc.) visible. The package provides a `ProtectedContent` component for this purpose:
+
+```vue
+<template>
+  <div>
+    <!-- Your app header remains visible -->
+    <AppHeader />
+    
+    <!-- Wrap your protected content -->
+    <ProtectedContent>
+      <MyProtectedComponent />
+      <!-- This content is only visible when authenticated -->
+    </ProtectedContent>
+    
+    <!-- Your app footer remains visible -->
+    <AppFooter />
+  </div>
+</template>
+
+<script setup>
+import { ProtectedContent } from '@nerd305/firebase-vuetify-auth'
+import AppHeader from './components/AppHeader.vue'
+import AppFooter from './components/AppFooter.vue'
+import MyProtectedComponent from './components/MyProtectedComponent.vue'
+</script>
+```
+
+The `ProtectedContent` component:
+- Shows its slot content when the user is authenticated
+- Shows a placeholder message when the user is not authenticated
+- Automatically updates when authentication state changes
+- Keeps your app layout visible while hiding only the protected content
+
 ### Available Store Properties and Methods
 
 **State Properties:**

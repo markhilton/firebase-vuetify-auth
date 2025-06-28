@@ -138,6 +138,12 @@ export default {
               
               // Set dialog as persistent since user is on a protected route
               authStore.is_authguard_dialog_persistent = true
+              
+              // Force router to re-evaluate the current route
+              // This will trigger the auth guard again and block the route
+              router.replace(currentRoute.fullPath).catch((error) => {
+                if (debug) console.log("[ auth guard ]: Route re-evaluation error:", error)
+              })
             }
           })
         }
@@ -158,11 +164,30 @@ export default {
           authStore.toggleAuthDialog(false)
         }
 
-        // Clear loginState since user is now authenticated
-        // No need to navigate as the route should already be loaded
+        // Navigate to the stored route after successful authentication
         if (authStore.loginState) {
-          if (debug) console.log("[ auth guard ]: Clearing loginState:", authStore.loginState)
+          const targetRoute = authStore.loginState
+          if (debug) console.log("[ auth guard ]: Navigating to stored route:", targetRoute)
+          
+          // Clear the loginState first
           authStore.loginState = null
+          
+          // Navigate to the protected route
+          router.push(targetRoute).catch((error) => {
+            // Handle navigation errors (e.g., if the route doesn't exist)
+            if (debug) console.error("[ auth guard ]: Navigation error:", error)
+          })
+        } else {
+          // If no stored route but we're on a protected route, force re-evaluation
+          const currentRoute = router.currentRoute.value
+          const requiresAuth = currentRoute.matched.some((record) => record.meta.requiresAuth)
+          
+          if (requiresAuth) {
+            if (debug) console.log("[ auth guard ]: User authenticated on protected route, forcing re-evaluation")
+            // Force the router to re-evaluate the current route
+            // This will make the content visible now that the user is authenticated
+            router.replace(currentRoute.fullPath)
+          }
         }
 
         const currentUser = auth.currentUser
