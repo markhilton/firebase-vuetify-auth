@@ -72,7 +72,7 @@ export default {
     const authStore = useAuthStore()
 
     // commit npm package config to the store
-    authStore.config = globalConfig
+    authStore.config = globalConfig as any
 
     // Catch navigation errors from initial route resolution.
     // When an unauthenticated user directly loads a protected URL, the auth guard

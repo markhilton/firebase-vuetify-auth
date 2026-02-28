@@ -1,5 +1,6 @@
 NOTES.md
 .DS_Store
+.mcp.json
 node_modules
 
 .claude

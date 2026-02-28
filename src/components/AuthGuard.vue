@@ -18,10 +18,10 @@
             <v-tabs v-model="tab" grow>
               <v-tab :key="0" :value="0"> Sign In </v-tab>
               <v-tab v-if="isUserRegistrationAllowed" :key="1" :value="1" @click="() => console.log('[AuthGuard] Register tab clicked!')"> Register </v-tab>
-              <v-tab v-if="isResetPasswordScreenShown && config.email" :key="2" :value="2">
+              <v-tab v-if="isResetPasswordScreenShown && config?.email" :key="2" :value="2">
                 Reset Password
               </v-tab>
-              <v-tab v-if="isLoginWithPhoneShown && config.phone" :key="3" :value="3">
+              <v-tab v-if="isLoginWithPhoneShown && config?.phone" :key="3" :value="3">
                 Log in with Phone
               </v-tab>
             </v-tabs>
@@ -69,7 +69,6 @@ import LoginWithProvider from "./LoginWithProvider.vue"
 import { useRoute, type RouteLocationNormalized } from "vue-router"
 import { useAuthStore } from "@/store/auth"
 const store = useAuthStore()
-const { initializeGuard } = store // Actions
 
 // Use a local ref for tab to ensure reactivity
 const localTab = ref(store.tab)
@@ -160,7 +159,7 @@ const handleDialogClose = (): void => {
 
 // Initialize the authentication guard when the component is mounted
 onMounted((): void => {
-  initializeGuard()
+  store.initializeGuard()
 })
 
 // Watch for changes in the current route path.

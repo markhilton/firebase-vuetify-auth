@@ -2,9 +2,6 @@ import type { AuthGuardSettings } from '../types'
 
 const defaultSettings: Partial<AuthGuardSettings> = {
   debug: false,
-  store: null, // vuex store
-  router: null, // routes
-  firebase: null, // pass on firebase middleware app init
   session: "local",
 
   saml: false, // allow authentication with saml

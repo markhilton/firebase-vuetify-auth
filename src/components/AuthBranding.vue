@@ -1,5 +1,5 @@
 <template>
-  <v-list lines="two" dense>
+  <v-list v-if="config" lines="two" dense>
     <v-list-item :title="config.title" :subtitle="config.subtitle">
       <template #title>
         <v-icon :color="config.iconColor">{{ config.icon }}</v-icon>

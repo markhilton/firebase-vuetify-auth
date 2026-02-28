@@ -1,10 +1,10 @@
 <template>
   <v-container>
     <v-card flat>
-      <v-form ref="form" v-model="valid" @submit.prevent="handlePasswordReset(email)">
+      <v-form ref="form" v-model="valid" @submit.prevent="handlePasswordReset()">
         <!-- error alerts -->
         <v-alert v-if="Boolean(getError)" type="error" dismissible @click="error = null">
-          {{ getError.message }}
+          {{ getError?.message }}
         </v-alert>
 
         <!-- application branding -->
@@ -45,7 +45,7 @@
           >
 
           <v-card-actions>
-            <v-btn block large depressed color="primary" @click="SET_PASSWORD_RESET_SCREEN_SHOWN(false)"> Login </v-btn>
+            <v-btn block large depressed color="primary" @click="store.SET_PASSWORD_RESET_SCREEN_SHOWN(false)"> Login </v-btn>
           </v-card-actions>
         </v-container>
       </v-form>
@@ -58,10 +58,9 @@ import { ref, computed } from "vue"
 import AuthBranding from "./AuthBranding.vue"
 
 import { useAuthStore } from "@/store/auth"
-import type { AuthError, ValidationRule } from "../types"
+import type { AuthError } from "../types"
 
 const store = useAuthStore()
-const { emailPasswordResetLink, SET_PASSWORD_RESET_SCREEN_SHOWN } = store
 
 // Replace storeToRefs with computed properties to safely access store properties
 const error = computed({
@@ -75,11 +74,7 @@ const isEmailResetPasswordLinkSent = computed(() => store.isEmailResetPasswordLi
 const email = ref<string>("")
 const valid = ref<boolean>(false)
 
-interface ValidationRules {
-  email: ValidationRule
-}
-
-const rules = computed<ValidationRules>(() => {
+const rules = computed<{ email: string | boolean }>(() => {
   return {
     email: email.value === "" ? "Email cannot be empty" : true,
   }
@@ -91,7 +86,7 @@ const clearError = (): void => {
 
 const handlePasswordReset = (): void => {
   if (email.value) {
-    emailPasswordResetLink(email.value);
+    store.emailPasswordResetLink(email.value);
   } else {
     error.value = { message: "Email cannot be empty" } as AuthError;
     setTimeout(clearError, 5000); // Hide the error

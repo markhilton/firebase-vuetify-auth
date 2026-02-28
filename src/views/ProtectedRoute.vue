@@ -8,7 +8,7 @@
     <v-card flat width="350">
       <v-form ref="form" v-model="valid" @submit.prevent="updateUser()">
         <!-- error alerts -->
-        <v-alert v-if="error" v-model="alert" type="error" dismissible>
+        <v-alert v-if="error" v-model="showAlert" type="error" dismissible>
           {{ error.message }}
         </v-alert>
 
@@ -56,7 +56,7 @@
 <script setup lang="ts">
 import { onMounted, computed, ref, reactive } from "vue"
 import { useAuthStore } from "../store/auth"
-import type { AuthError, ValidationRule } from "../types"
+import type { AuthError } from "../types"
 
 const store = useAuthStore()
 
@@ -74,7 +74,7 @@ const form = reactive<UserForm>({
   agree: true,
 })
 
-const alert = ref<boolean>(true)
+const showAlert = ref<boolean>(true)
 const valid = ref<boolean>(false)
 const error = ref<AuthError | null>(null)
 const progress = ref<boolean>(false)
@@ -86,10 +86,10 @@ onMounted(() => {
 })
 
 interface ValidationRules {
-  password: ValidationRule
-  name: ValidationRule
-  confirm: ValidationRule
-  email?: ValidationRule
+  password: string | boolean
+  name: string | boolean
+  confirm: string | boolean
+  email?: string | boolean
 }
 
 const rules = computed<ValidationRules>(() => {
@@ -112,6 +112,6 @@ const rules = computed<ValidationRules>(() => {
 })
 
 const updateUser = (): void => {
-  alert("this is just a test!")
+  console.log("this is just a test!")
 }
 </script>

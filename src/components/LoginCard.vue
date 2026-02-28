@@ -19,7 +19,7 @@
     </v-card>
 
     <!-- Login Form -->
-    <v-card v-if="config.email" flat>
+    <v-card v-if="config?.email" flat>
       <form @submit.prevent="handleLogin">
         <v-card-text class="mb-0 pb-0">
           <v-text-field
@@ -60,7 +60,7 @@
           variant="text"
           size="x-small"
           color="primary"
-          @click="SET_PASSWORD_RESET_SCREEN_SHOWN(true), SET_TAB(2)"
+          @click="store.SET_PASSWORD_RESET_SCREEN_SHOWN(true), store.SET_TAB(2)"
         >
           Forgot Password?
         </v-btn>
@@ -70,7 +70,7 @@
           variant="text"
           size="x-small"
           color="primary"
-          @click="SET_REGISTER_SCREEN_SHOWN(false) , SET_TAB(1)"
+          @click="store.SET_REGISTER_SCREEN_SHOWN(false) , store.SET_TAB(1)"
         >
           Register as new user
         </v-btn>
@@ -111,7 +111,6 @@ import { useAuthStore } from "@/store/auth"
 import type { LoginForm, AuthError } from "@/types"
 
 const store = useAuthStore()
-const { loginWithEmail, SET_PASSWORD_RESET_SCREEN_SHOWN, SET_REGISTER_SCREEN_SHOWN, SET_TAB } = store
 
 // Use computed to safely access store properties
 const config = computed(() => store.config)
@@ -137,7 +136,7 @@ const handleLogin = (): void => {
       email: email.value, 
       password: password.value 
     }
-    loginWithEmail(loginData)
+    store.loginWithEmail(loginData)
     // Reset inputs after login attempt
     password.value = ""
   } else {

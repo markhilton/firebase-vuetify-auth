@@ -20,25 +20,68 @@ import {
 } from "firebase/auth"
 import type { UserCredential, Auth, ConfirmationResult } from "firebase/auth"
 import type { AuthUser } from '../../types'
+import type { AuthError } from '../../types/forms'
 
 interface AuthActionContext {
-  tab: number
-  error: string | null
-  is_email_verification_screen_shown: boolean
-  is_reset_password_screen_shown: boolean
-  is_email_reset_password_link_sent: boolean
-  is_login_with_phone_shown: boolean
-  sign_by_phone_step: number
+  // Core auth state (from AuthState interface)
+  loggedIn: boolean
+  initialized: boolean
+  data: any
+  loginState: string | null
+  registrationPending: boolean
+  registrationData: any
+  phoneAuthCredential: any
+
+  // Additional internal state (typed as any to avoid Pinia Ref-unwrapping incompatibility)
   config: any
-  current_user: AuthUser | null
+  error: AuthError | null
+  loading: boolean
+  showPassword: boolean
+  showPhoneAuth: boolean
+  showSamlSSO: boolean
+  showRegister: boolean
+  showVerifyEmail: boolean
+  showForgotPassword: boolean
+  showResetPassword: boolean
+  currentTab: string | null
+  samlError: string | null
+  samlProviderId: string | null
+  phoneAuthInProgress: boolean
+  phoneAuthVerificationId: string | null
+  phoneConfirmationResult: any
+  localLoginData: any
+  routesInitialized: boolean
+  current_user: any
+
+  // Auth guard dialog states
+  init: boolean
   is_loading: boolean
   is_checking_auth: boolean
   is_session_persistant: boolean
-  text_confirmation: ConfirmationResult | null
+  is_login_with_phone_shown: boolean
   is_authguard_dialog_shown: boolean
+  is_authguard_dialog_persistent: boolean
   is_email_verification_link_sent: boolean
-  loginState: string | null
-  router: any
+  is_email_reset_password_link_sent: boolean
+  is_email_verification_screen_shown: boolean
+  is_reset_password_screen_shown: boolean
+  is_route_public: boolean
+  is_from_public_to_auth: boolean
+
+  // Phone auth states
+  text_confirmation: ConfirmationResult | null
+  sign_by_phone_step: number
+  tab: number
+
+  // Action methods called via this
+  _handlePostAuthRedirect(): void
+  _signInWithProvider(
+    provider: GoogleAuthProvider | FacebookAuthProvider | SAMLAuthProvider,
+    providerName: string
+  ): Promise<UserCredential>
+  _isMobileDevice(): boolean
+  _getAuthMethod(): 'popup' | 'redirect'
+  toggleAuthDialog(value?: boolean): void
 }
 
 export const actions = {
@@ -121,9 +164,9 @@ export const actions = {
           if (debug) console.log("[ auth guard ]: initialization - no user")
           
           // If user was authenticated and signed out, show auth dialog on protected routes
-          if (this.init && wasAuthenticated && this.router?.currentRoute.value) {
-            const currentRoute = this.router.currentRoute.value
-            const requiresAuth = currentRoute.matched.some((record) => record.meta.requiresAuth)
+          if (this.init && wasAuthenticated && this.config?.router?.currentRoute.value) {
+            const currentRoute = this.config.router.currentRoute.value
+            const requiresAuth = currentRoute.matched.some((record: any) => record.meta.requiresAuth)
             
             if (requiresAuth) {
               this.loginState = currentRoute.fullPath
@@ -144,7 +187,8 @@ export const actions = {
 
   // Helper function to handle post-authentication redirect
   _handlePostAuthRedirect(this: AuthActionContext): void {
-    if (this.loginState && this.router) {
+    const router = this.config?.router
+    if (this.loginState && router) {
       const debug = this.config?.debug ?? false
       if (debug) console.log("[ auth guard ]: Redirecting to:", this.loginState)
 
@@ -154,8 +198,8 @@ export const actions = {
       this.loginState = null
 
       // Navigate to the stored route
-      this.router.push(targetRoute).catch((error: any) => {
-        if (debug) console.log("[ auth guard ]: Post-auth redirect navigation error:", error)
+      router.push(targetRoute).catch((err: any) => {
+        if (debug) console.log("[ auth guard ]: Post-auth redirect navigation error:", err)
       })
     }
   },

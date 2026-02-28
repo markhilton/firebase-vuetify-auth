@@ -6,7 +6,7 @@
     <v-card flat>
       <!-- error alerts -->
       <v-alert v-if="Boolean(getError)" class="my-3" type="error" dismissible transition="fade-transition" @click="error = null">
-        {{ getError.message || getError }}
+        {{ getError?.message || getError }}
       </v-alert>
 
       <!-- application branding -->
@@ -67,16 +67,16 @@
         </p>
 
         <v-row class="centered-input">
-          <v-col v-for="(element, index) in 6" :key="index" cols="2">
+          <v-col v-for="(_element, index) in 6" :key="index" cols="2">
             <v-text-field
-              :ref="el => codeFieldRefs[index] = el"
+              :ref="(el: any) => codeFieldRefs[index] = el"
               :key="index"
               v-model="code[index]"
               v-maska="digitMask"
               variant="outlined"
               maxlength="1"
               hide-details
-              @keyup="event => nextElementFocus(index, event)"
+              @keyup="(event: KeyboardEvent) => nextElementFocus(index, event)"
               @paste="onPaste"
             />
           </v-col>
@@ -105,7 +105,7 @@
 <script setup lang="ts">
 import AuthBranding from "./AuthBranding.vue"
 import { getAuth, RecaptchaVerifier, type Auth } from "firebase/auth"
-import { computed, onUnmounted, ref, nextTick, type Ref, type ComputedRef } from "vue"
+import { computed, onUnmounted, ref, nextTick, type Ref } from "vue"
 import { useAuthStore } from "@/store/auth"
 import type { PhoneAuthData } from "@/types"
 import { checkFirebasePhoneAuthConfig } from "@/utils/check-firebase-config"
@@ -127,7 +127,6 @@ const countryCode: Ref<string> = ref("+1") // default to US/Canada
 let recaptchaVerifier: RecaptchaVerifier | null = null
 
 const store = useAuthStore()
-const { textPhoneVerificationCode, confirmCode } = store
 
 // Replace storeToRefs with computed properties to safely access store properties
 const error = computed({
@@ -194,7 +193,7 @@ const currentCountry = computed(() =>
 )
 
 // Validation rules with proper typing
-const rules: ComputedRef<{ phoneNumber: string | boolean }> = computed(() => {
+const rules = computed<{ phoneNumber: string | boolean }>(() => {
   const digits = phoneNumber.value.replace(/\D/g, "")
   const country = currentCountry.value
   
@@ -228,12 +227,12 @@ const handleTextPhoneVerificationCode = async (): Promise<void> => {
         phoneNumber: countryCode.value + phoneNumber.value.replace(/\D/g, ''),
         recaptchaVerifier
       }
-      textPhoneVerificationCode(phoneAuthData)
+      store.textPhoneVerificationCode(phoneAuthData)
     } else {
       console.error("[LoginWithPhone]: Failed to initialize reCAPTCHA. Please check:")
       console.error("1. Phone authentication is enabled in Firebase Console")
       console.error("2. Your Firebase configuration is correct")
-      error.value = { message: "Failed to initialize phone authentication. Please try again." }
+      error.value = { code: "recaptcha-init-failed", message: "Failed to initialize phone authentication. Please try again." }
     }
   } catch (err: any) {
     console.error("[LoginWithPhone]: Error in phone verification:", err)
@@ -242,7 +241,7 @@ const handleTextPhoneVerificationCode = async (): Promise<void> => {
 }
 
 const handleConfirmCode = (): void => {
-  confirmCode(code.value)
+  store.confirmCode(code.value)
 }
 
 // Get placeholder based on country
@@ -309,7 +308,7 @@ const initializeRecaptcha = async (): Promise<void> => {
       // Check if auth is properly initialized
       if (!auth || !auth.app) {
         console.error("[LoginWithPhone]: Firebase Auth is not properly initialized")
-        error.value = { message: "Firebase authentication is not properly configured. Please check your Firebase setup." }
+        error.value = { code: "auth-not-initialized", message: "Firebase authentication is not properly configured. Please check your Firebase setup." }
         return
       }
       
@@ -320,7 +319,7 @@ const initializeRecaptcha = async (): Promise<void> => {
         if (container) {
           container.innerHTML = ''
         }
-        
+
         // For Firebase v9+, the order is: auth, containerId, parameters
         recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
           'size': 'invisible',
@@ -334,22 +333,22 @@ const initializeRecaptcha = async (): Promise<void> => {
             recaptchaVerifier = null
           }
         })
-        
+
         // Render the verifier (required for invisible reCAPTCHA)
         await recaptchaVerifier.render()
-        
+
         console.log("[LoginWithPhone]: RecaptchaVerifier created successfully")
-      } catch (error: any) {
-        console.error("[LoginWithPhone]: Error creating RecaptchaVerifier:", error)
-        
+      } catch (recaptchaError: any) {
+        console.error("[LoginWithPhone]: Error creating RecaptchaVerifier:", recaptchaError)
+
         // If it fails, it might be because phone auth is not enabled
-        if (error.message?.includes('appVerificationDisabledForTesting')) {
+        if (recaptchaError.message?.includes('appVerificationDisabledForTesting')) {
           console.error("[LoginWithPhone]: This error often occurs when:")
           console.error("1. Phone authentication is not enabled in Firebase Console")
           console.error("2. Firebase Auth is not properly initialized")
           console.error("3. There's a version mismatch in Firebase SDK")
         }
-        
+
         // Try to clear any existing verifier
         if (recaptchaVerifier) {
           try {
@@ -359,12 +358,12 @@ const initializeRecaptcha = async (): Promise<void> => {
           }
           recaptchaVerifier = null
         }
-        
-        error.value = { message: "Failed to initialize phone authentication. Please try again." }
+
+        error.value = { code: "recaptcha-init-failed", message: "Failed to initialize phone authentication. Please try again." }
       }
     }
-  } catch (error) {
-    console.error("[LoginWithPhone]: Error in recaptcha initialization:", error)
+  } catch (initError) {
+    console.error("[LoginWithPhone]: Error in recaptcha initialization:", initError)
   }
 }
 

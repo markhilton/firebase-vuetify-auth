@@ -17,7 +17,7 @@
           {{ getError?.message  }}
         </v-alert>
 
-        <v-btn class="mt-2" color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
+        <v-btn class="mt-2" color="primary" @click="store.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
           Back to Login
         </v-btn>
       </div>
@@ -49,14 +49,14 @@
             If you have not received a verification email,<br />click the button below.
           </p>
 
-          <v-btn :disabled="is_loading" color="primary" @click="handleSendVerificationEmail">
+          <v-btn :disabled="store.is_loading" color="primary" @click="handleSendVerificationEmail">
             Send Verification Email
           </v-btn>
         </div>
 
         <!-- Back to Login Page Button -->
         <div v-if="isEmailResetPasswordLinkSent">
-          <v-btn color="primary" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
+          <v-btn color="primary" @click="store.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
             Back to Login
           </v-btn>
         </div>
@@ -64,10 +64,10 @@
         <!-- Allow to Log Out -->
         <v-container>
           <div class="caption mb-2">- or -</div>
-          <v-btn v-if="isAuthenticated" color="primary" variant="outlined" @click="signOut">
+          <v-btn v-if="isAuthenticated" color="primary" variant="outlined" @click="store.signOut()">
             Sign Out
           </v-btn>
-          <v-btn v-else color="primary" variant="outlined" @click="SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
+          <v-btn v-else color="primary" variant="outlined" @click="store.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(false)">
             Sign In
           </v-btn>
         </v-container>
@@ -82,12 +82,6 @@ import { useAuthStore } from "../store/auth";
 import type { AuthError } from "../types";
 
 const store = useAuthStore();
-const {
-  is_loading,
-  signOut,
-  sendVerificationEmail,
-  SET_EMAIL_VERIFICATION_SCREEN_SHOWN,
-} = store;
 
 // Replace storeToRefs with computed properties to safely access store properties
 const error = computed({
@@ -104,7 +98,7 @@ const clearError = (): void => {
 };
 
 const handleSendVerificationEmail = (): void => {
-  sendVerificationEmail();
+  store.sendVerificationEmail();
 };
 
 // Watch for errors and clear them after 5 seconds

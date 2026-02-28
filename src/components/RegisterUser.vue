@@ -10,7 +10,7 @@
           transition="fade-transition"
           @click="clearError"
         >
-          {{ error.message }}
+          {{ error?.message }}
         </v-alert>
 
         <!-- Application Branding -->
@@ -77,7 +77,6 @@ import AuthBranding from "./AuthBranding.vue"
 import type { RegisterForm, AuthError } from "@/types"
 
 const store = useAuthStore()
-const { registerUser } = store
 
 // Replace storeToRefs with computed properties to safely access store properties
 const getError = computed(() => store.getError)
@@ -116,8 +115,8 @@ watch(getError, (newError: AuthError | null): void => {
 
 // Handle registration
 const register = (): void => {
-  if (form.value?.validate() && registerUser) {
-    registerUser(displayName.value, email.value, password.value)
+  if (form.value?.validate()) {
+    store.registerUser(displayName.value, email.value, password.value)
   }
 }
 </script>
