@@ -40,40 +40,7 @@ Current master branch supports Vue 3 application. For Vue 2 please see vue2 bran
 
 **Note:** This package is compatible only with Pinia versions 3 and above.
 
-This package assumes your VUE project is already integrated with Firebase & Vuetify. Example integration:
-
-The Firebase config file, example: `./src/middleware/firebase` is created to initiate Firebase Modular v9 SDK
-
-example:
-
-```javascript
-import { initializeApp } from "firebase/app"
-
-const config = {
-  appId: process.env.VITE_APP_FIREBASE_APP_ID,
-  apiKey: process.env.VITE_APP_FIREBASE_APIKEY,
-  authDomain: process.env.VITE_APP_FIREBASE_AUTH,
-  databaseURL: process.env.VITE_APP_FIREBASE_DATABASE,
-  projectId: process.env.VITE_APP_FIREBASE_PROJECT,
-  storageBucket: process.env.VITE_APP_FIREBASE_STORAGE,
-  messagingSenderId: process.env.VITE_APP_FIREBASE_MESSAGING,
-  measurementId: process.env.VITE_APP_FIREBASE_MEASUREMENT_ID,
-}
-
-const app = initializeApp(config)
-
-export default app
-```
-
-Additionally, please ensure that you have installed the mdi/fonts package.
-
-example of integration:
-
-```javascript
-import "@mdi/font/css/materialdesignicons.css"
-```
-
-add this into your vuetify.js
+This package assumes your Vue 3 project is already integrated with Firebase & Vuetify, and that `@mdi/font` is installed (import `@mdi/font/css/materialdesignicons.css` in your Vuetify setup).
 
 ## Install
 
@@ -95,99 +62,53 @@ Integrating `@nerd305/firebase-vuetify-auth` into your Vue 3 and Vuetify 3 proje
 
 First, create a Firebase configuration file. This is **required** and must be done before using the package.
 
-Create a file at `src/middleware/firebase.js` (or your preferred location):
+1. Copy `src/firebase.config.example.ts` → `src/firebase.config.ts`
+2. Fill in your Firebase project credentials (Firebase Console → Project Settings → Your apps):
 
-```javascript
-import { initializeApp } from "firebase/app"
+```typescript
+// src/firebase.config.ts
+import type { FirebaseConfig } from './types'
 
-const config = {
-  appId: process.env.VITE_APP_FIREBASE_APP_ID,
-  apiKey: process.env.VITE_APP_FIREBASE_APIKEY,
-  authDomain: process.env.VITE_APP_FIREBASE_AUTH,
-  databaseURL: process.env.VITE_APP_FIREBASE_DATABASE,
-  projectId: process.env.VITE_APP_FIREBASE_PROJECT,
-  storageBucket: process.env.VITE_APP_FIREBASE_STORAGE,
-  messagingSenderId: process.env.VITE_APP_FIREBASE_MESSAGING,
-  measurementId: process.env.VITE_APP_FIREBASE_MEASUREMENT_ID,
+export const firebaseConfig: FirebaseConfig = {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'YOUR_PROJECT.firebaseapp.com',
+  projectId: 'YOUR_PROJECT',
+  storageBucket: 'YOUR_PROJECT.appspot.com',
+  messagingSenderId: '123456789',
+  appId: '1:123456789:web:abc123',
+  measurementId: 'G-XXXXXXXXXX',  // optional
 }
-
-const app = initializeApp(config)
-
-export default app
 ```
 
-**Important:** Make sure to set up your environment variables in your `.env` file with your actual Firebase project configuration.
+> **Note:** `src/firebase.config.ts` is gitignored so your credentials stay out of version control.
 
 #### STEP 2: Update your `main.js` app file
-
-This example assumes that you're using `vue-router` and `pinia` packages with your app, so we initialize VUE class by passing in `router`, `store` & `vuetify` objects.
 
 ```javascript
 import { createApp } from "vue"
 import { createPinia } from "pinia"
 
-import App from "@/App" // Your root App component
-import router from "@/router" // Your Vue Router instance
-import vuetify from "@/plugins/vuetify" // Your Vuetify instance
+import App from "@/App"
+import router from "@/router"
+import vuetify from "@/plugins/vuetify"
 import AuthGuard from "@nerd305/firebase-vuetify-auth"
-
-import firebaseApp from "@/middleware/firebase" // Your initialized Firebase app instance
-
-const authGuardSettings = {
-  debug: true, // enable debug messages in console log
-  session: "local", // Default session persistence for all auth methods.
-                   // Options:
-                   //   "local": Persists session across browser closures (user stays logged in).
-                   //   "browser" (or "session"): Session lasts only as long as the browser tab/window is open.
-                   //   "none": Session is in memory only, lost on page refresh/tab close (Firebase interprets this as browserSessionPersistence).
-                   // The "Remember me" checkbox in the email/password form overrides this setting specifically for email/password logins.
-
-  router,          // Your Vue Router instance
-  firebase: firebaseApp, // Your initialized Firebase app instance
-
-  saml: false, // allow authentication with SAML
-  saml_text: "Login with OKTA", // text for large login button if SAML is the only 3rd party provider
-  saml_provider_id: "saml.okta", // firebase provider ID for SAML
-
-  email: true, // allow authentication with email
-  phone: false, // allow authentication with phone
-  google: true, // allow authentication with gmail account
-  facebook: false, // allow authentication with facebook account
-
-  verification: false, // require user email to be verified before granting access.
-                       // Can be true (for all) or an array of domains (e.g., ['example.com']).
-  registration: true, // allow new user registrations
-  
-  // Authentication Flow Configuration
-  authMethod: "auto", // Authentication flow method for OAuth providers
-                     // Options:
-                     //   "auto": Automatically selects based on device type (popup for desktop, redirect for mobile)
-                     //   "popup": Always use popup method (may be blocked on some browsers/devices)
-                     //   "redirect": Always use redirect method (requires additional setup for modern browsers)
-                     // Default: "auto"
-  
-  authMethodFallback: null, // Fallback method when primary method fails
-                           // Options:
-                           //   "popup": Use popup as fallback
-                           //   "redirect": Use redirect as fallback
-                           //   null: No fallback, show error
-                           // Default: opposite of authMethod (redirect if authMethod is popup, popup if authMethod is redirect)
-  
-  // Optional UI Customizations
-  // title: "My App Authentication",
-  // subtitle: "Please sign in to continue",
-  // icon: "mdi-lock",
-  // iconColor: "blue"
-}
+import firebaseApp from "@/middleware/firebase"
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
 app.use(vuetify)
-app.use(AuthGuard, authGuardSettings) // Initialize AuthGuard plugin
+app.use(AuthGuard, {
+  router,
+  firebase: firebaseApp,
+  google: true,
+  email: true,
+})
 app.mount("#app")
 ```
+
+> See the full [Available settings](#available-settings) table for all options (session persistence, SAML, phone auth, UI customization, etc.).
 
 #### STEP 3: Add AuthenticationGuard to your App.vue template
 
@@ -371,8 +292,7 @@ This provides a seamless experience where users can see meaningful content even 
 
 Before proceeding, ensure you have completed all required steps:
 
-- [ ] **Firebase config file created** (`src/middleware/firebase.js`)
-- [ ] **Environment variables set** (`.env` file with Firebase config)
+- [ ] **Firebase config file created** (copy `src/firebase.config.example.ts` → `src/firebase.config.ts` and fill in credentials)
 - [ ] **Package initialized in main.js** with proper settings including `router` and `firebase` properties
 - [ ] **`<AuthenticationGuard />` component added to App.vue** inside the `<v-app>` component
 - [ ] **AuthMiddleware applied to router** using `router.beforeEach(AuthMiddleware)`

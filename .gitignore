@@ -13,6 +13,9 @@ CLAUDE.md
 .env.local
 .env.*.local
 
+# Firebase config with real credentials
+src/firebase.config.ts
+
 # Log files
 npm-debug.log*
 yarn-debug.log*

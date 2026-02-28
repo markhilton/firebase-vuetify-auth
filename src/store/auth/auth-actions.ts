@@ -147,12 +147,16 @@ export const actions = {
     if (this.loginState && this.router) {
       const debug = this.config?.debug ?? false
       if (debug) console.log("[ auth guard ]: Redirecting to:", this.loginState)
-      
-      // Navigate to the stored route
-      this.router.push(this.loginState)
-      
-      // Clear the stored login state
+
+      const targetRoute = this.loginState
+
+      // Clear the stored login state before navigating
       this.loginState = null
+
+      // Navigate to the stored route
+      this.router.push(targetRoute).catch((error: any) => {
+        if (debug) console.log("[ auth guard ]: Post-auth redirect navigation error:", error)
+      })
     }
   },
 

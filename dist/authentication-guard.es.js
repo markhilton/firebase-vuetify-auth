@@ -1,23 +1,23 @@
 (function(){"use strict";try{if(typeof document<"u"){var e=document.createElement("style");e.appendChild(document.createTextNode(".large-font>input[data-v-e9ad2744]{font-size:1.5rem}.centered-input>input[data-v-e9ad2744]{text-align:center;font-weight:700;font-size:1.5rem}")),document.head.appendChild(e)}}catch(t){console.error("vite-plugin-css-injected-by-js",t)}})();
-import { defineStore as Le, createPinia as Re } from "pinia";
-import { getAuth as $, sendEmailVerification as ce, signOut as de, sendPasswordResetEmail as Ve, createUserWithEmailAndPassword as Ce, signInWithEmailAndPassword as he, updateProfile as xe, signInWithPhoneNumber as Ie, SAMLAuthProvider as Ne, FacebookAuthProvider as Te, GoogleAuthProvider as We, setPersistence as re, browserLocalPersistence as be, browserSessionPersistence as le, signInWithPopup as ge, signInWithRedirect as me, getRedirectResult as ye, RecaptchaVerifier as Ue, onAuthStateChanged as De } from "firebase/auth";
-import { defineComponent as H, computed as S, createBlock as A, openBlock as v, withCtx as u, createVNode as h, createTextVNode as E, toDisplayString as K, ref as I, onMounted as ke, watch as G, createCommentVNode as V, createElementVNode as C, withModifiers as ie, unref as N, createElementBlock as U, onUnmounted as Oe, resolveDirective as $e, Fragment as Me, renderList as Fe, withDirectives as ze, nextTick as He, isRef as fe, resolveComponent as qe, resolveDynamicComponent as Ge, defineAsyncComponent as Be } from "vue";
+import { defineStore as Ve, createPinia as Ce } from "pinia";
+import { getAuth as $, sendEmailVerification as ce, signOut as de, sendPasswordResetEmail as xe, createUserWithEmailAndPassword as Ie, signInWithEmailAndPassword as he, updateProfile as Ne, signInWithPhoneNumber as Te, SAMLAuthProvider as We, FacebookAuthProvider as Ue, GoogleAuthProvider as De, setPersistence as re, browserLocalPersistence as ke, browserSessionPersistence as le, signInWithPopup as ge, signInWithRedirect as me, getRedirectResult as we, RecaptchaVerifier as Oe, onAuthStateChanged as $e } from "firebase/auth";
+import { useRoute as Fe, useRouter as Me, isNavigationFailure as fe, NavigationFailureType as pe } from "vue-router";
+import { defineComponent as H, computed as S, createBlock as A, openBlock as v, withCtx as u, createVNode as h, createTextVNode as E, toDisplayString as K, ref as I, onMounted as Ae, watch as G, createCommentVNode as V, createElementVNode as C, withModifiers as ie, unref as N, createElementBlock as U, onUnmounted as ze, resolveDirective as He, Fragment as qe, renderList as Ge, withDirectives as Be, nextTick as je, isRef as _e, resolveComponent as Ke, resolveDynamicComponent as Je, defineAsyncComponent as Xe } from "vue";
 import { VIcon as j } from "vuetify/components/VIcon";
-import { VList as je, VListItem as Ke } from "vuetify/components/VList";
+import { VList as Ze, VListItem as Ye } from "vuetify/components/VList";
 import { VAlert as Y } from "vuetify/components/VAlert";
 import { VBtn as x } from "vuetify/components/VBtn";
 import { VCard as z, VCardText as B, VCardActions as J } from "vuetify/components/VCard";
-import { VCheckbox as Je } from "vuetify/components/VCheckbox";
-import { VContainer as M, VRow as Xe, VCol as Ze } from "vuetify/components/VGrid";
-import { VTextField as F } from "vuetify/components/VTextField";
-import { VForm as we } from "vuetify/components/VForm";
-import { VSelect as Ye } from "vuetify/components/VSelect";
+import { VCheckbox as Qe } from "vuetify/components/VCheckbox";
+import { VContainer as F, VRow as et, VCol as tt } from "vuetify/components/VGrid";
+import { VTextField as M } from "vuetify/components/VTextField";
+import { VForm as Pe } from "vuetify/components/VForm";
+import { VSelect as ot } from "vuetify/components/VSelect";
 import { VTooltip as Q } from "vuetify/components/VTooltip";
-import { useRoute as Qe, useRouter as et } from "vue-router";
-import { VDialog as tt } from "vuetify/components/VDialog";
-import { VProgressLinear as ot } from "vuetify/components/VProgressLinear";
-import { VTabs as it, VTab as ee, VTabsWindow as st, VTabsWindowItem as te } from "vuetify/components/VTabs";
-const nt = () => ({
+import { VDialog as it } from "vuetify/components/VDialog";
+import { VProgressLinear as at } from "vuetify/components/VProgressLinear";
+import { VTabs as nt, VTab as ee, VTabsWindow as st, VTabsWindowItem as te } from "vuetify/components/VTabs";
+const rt = () => ({
   // Core auth state from AuthState interface
   loggedIn: !1,
   initialized: !1,
@@ -64,7 +64,7 @@ const nt = () => ({
   text_confirmation: null,
   sign_by_phone_step: 1,
   tab: 0
-}), at = {
+}), lt = {
   getError: (t) => t.error,
   sessionPersistence: (t) => {
     var e;
@@ -111,18 +111,18 @@ const nt = () => ({
   requiresEmailVerification: (t) => {
     var e, o, i;
     if ((e = t.config) != null && e.requireEmailVerification && !((o = t.current_user) != null && o.emailVerified)) {
-      const s = t.config.allowedDomains, n = (i = t.current_user) == null ? void 0 : i.email;
-      if (s != null && s.length && n) {
-        const a = n.split("@")[1];
-        return s.includes(a);
+      const a = t.config.allowedDomains, n = (i = t.current_user) == null ? void 0 : i.email;
+      if (a != null && a.length && n) {
+        const s = n.split("@")[1];
+        return a.includes(s);
       }
       return !0;
     }
     return !1;
   },
   isDomainAllowed: (t) => {
-    var s, n;
-    const e = (s = t.config) == null ? void 0 : s.allowedDomains;
+    var a, n;
+    const e = (a = t.config) == null ? void 0 : a.allowedDomains;
     if (!(e != null && e.length)) return !0;
     const o = (n = t.current_user) == null ? void 0 : n.email;
     if (!o) return !0;
@@ -130,15 +130,15 @@ const nt = () => ({
     return e.includes(i);
   },
   isUserAllowed: (t) => {
-    var i, s;
+    var i, a;
     const e = (i = t.config) == null ? void 0 : i.allowedUsers;
     if (!(e != null && e.length)) return !0;
-    const o = (s = t.current_user) == null ? void 0 : s.email;
+    const o = (a = t.current_user) == null ? void 0 : a.email;
     return o ? e.includes(o) : !1;
   },
   hasProvider: (t) => (e) => {
     var o, i;
-    return ((i = (o = t.current_user) == null ? void 0 : o.providerData) == null ? void 0 : i.some((s) => s.providerId === e)) || !1;
+    return ((i = (o = t.current_user) == null ? void 0 : o.providerData) == null ? void 0 : i.some((a) => a.providerId === e)) || !1;
   },
   hasPasswordProvider: (t) => {
     var e, o;
@@ -180,7 +180,7 @@ const nt = () => ({
     return e ? !!(e.google || e.facebook || e.saml || e.phone) : !1;
   },
   isCheckingAuth: (t) => t.is_checking_auth
-}, rt = {
+}, ut = {
   SET_TAB(t) {
     console.log("[auth-actions] SET_TAB called with index:", t), console.log("[auth-actions] Current tab:", this.tab), this.tab = t, console.log("[auth-actions] Tab after update:", this.tab);
   },
@@ -200,24 +200,24 @@ const nt = () => ({
     const t = this.config.debug, e = $(this.config.firebase);
     t && console.log("[ auth guard ]: component initialization"), this.is_checking_auth = !0;
     try {
-      const o = await ye(e);
+      const o = await we(e);
       if (o && o.user) {
         t && console.log("[ auth guard ]: redirect result found, processing...");
-        const { uid: i, displayName: s, email: n, emailVerified: a, isAnonymous: g, phoneNumber: c, photoURL: m } = o.user;
-        this.current_user = { uid: i, displayName: s, email: n, emailVerified: a, isAnonymous: g, phoneNumber: c, photoURL: m }, this.loggedIn = !0, this.data = o.user, this.is_authguard_dialog_shown = !1, this.is_loading = !1, this._handlePostAuthRedirect();
+        const { uid: i, displayName: a, email: n, emailVerified: s, isAnonymous: g, phoneNumber: c, photoURL: m } = o.user;
+        this.current_user = { uid: i, displayName: a, email: n, emailVerified: s, isAnonymous: g, phoneNumber: c, photoURL: m }, this.loggedIn = !0, this.data = o.user, this.is_authguard_dialog_shown = !1, this.is_loading = !1, this._handlePostAuthRedirect();
       }
     } catch (o) {
       t && console.error("[ auth guard ]: redirect result error:", o), this.error = o, this.is_loading = !1;
     }
     return new Promise((o) => {
-      const i = e.onAuthStateChanged((s) => {
+      const i = e.onAuthStateChanged((a) => {
         var n;
-        if (s) {
-          const { uid: a, displayName: g, email: c, emailVerified: m, isAnonymous: l, phoneNumber: d, photoURL: w } = s;
-          this.current_user = { uid: a, displayName: g, email: c, emailVerified: m, isAnonymous: l, phoneNumber: d, photoURL: w }, this.loggedIn = !0, this.data = s, t && console.log("[ auth guard ]: initialization - user authenticated");
+        if (a) {
+          const { uid: s, displayName: g, email: c, emailVerified: m, isAnonymous: l, phoneNumber: d, photoURL: w } = a;
+          this.current_user = { uid: s, displayName: g, email: c, emailVerified: m, isAnonymous: l, phoneNumber: d, photoURL: w }, this.loggedIn = !0, this.data = a, t && console.log("[ auth guard ]: initialization - user authenticated");
         } else {
-          const a = this.loggedIn;
-          if (this.current_user = null, this.loggedIn = !1, this.data = null, t && console.log("[ auth guard ]: initialization - no user"), this.init && a && ((n = this.router) != null && n.currentRoute.value)) {
+          const s = this.loggedIn;
+          if (this.current_user = null, this.loggedIn = !1, this.data = null, t && console.log("[ auth guard ]: initialization - no user"), this.init && s && ((n = this.router) != null && n.currentRoute.value)) {
             const g = this.router.currentRoute.value;
             g.matched.some((m) => m.meta.requiresAuth) && (this.loginState = g.fullPath, this.toggleAuthDialog(!0), this.is_authguard_dialog_persistent = !0, t && console.log("[ auth guard ]: showing auth dialog after sign out on protected route"));
           }
@@ -229,13 +229,20 @@ const nt = () => ({
   // Helper function to handle post-authentication redirect
   _handlePostAuthRedirect() {
     var t;
-    this.loginState && this.router && ((((t = this.config) == null ? void 0 : t.debug) ?? !1) && console.log("[ auth guard ]: Redirecting to:", this.loginState), this.router.push(this.loginState), this.loginState = null);
+    if (this.loginState && this.router) {
+      const e = ((t = this.config) == null ? void 0 : t.debug) ?? !1;
+      e && console.log("[ auth guard ]: Redirecting to:", this.loginState);
+      const o = this.loginState;
+      this.loginState = null, this.router.push(o).catch((i) => {
+        e && console.log("[ auth guard ]: Post-auth redirect navigation error:", i);
+      });
+    }
   },
   // Helper function to detect if device is mobile
   _isMobileDevice() {
     if (typeof window > "u") return !1;
-    const t = window.navigator.userAgent.toLowerCase(), o = ["android", "webos", "iphone", "ipad", "ipod", "blackberry", "windows phone"].some((n) => t.includes(n)), i = "ontouchstart" in window || navigator.maxTouchPoints > 0, s = window.innerWidth <= 768;
-    return o || i && s;
+    const t = window.navigator.userAgent.toLowerCase(), o = ["android", "webos", "iphone", "ipad", "ipod", "blackberry", "windows phone"].some((n) => t.includes(n)), i = "ontouchstart" in window || navigator.maxTouchPoints > 0, a = window.innerWidth <= 768;
+    return o || i && a;
   },
   // Helper function to determine which auth method to use
   _getAuthMethod() {
@@ -244,7 +251,7 @@ const nt = () => ({
   },
   // Helper function to sign in with provider using the configured method
   async _signInWithProvider(t, e) {
-    const o = $(this.config.firebase), i = this._getAuthMethod(), s = this.config.authMethodFallback || (i === "popup" ? "redirect" : "popup");
+    const o = $(this.config.firebase), i = this._getAuthMethod(), a = this.config.authMethodFallback || (i === "popup" ? "redirect" : "popup");
     this.config.debug && console.log(`[ auth guard ]: Trying ${i} method for ${e} authentication`);
     try {
       let n = null;
@@ -254,12 +261,12 @@ const nt = () => ({
         return await me(o, t), Promise.resolve({});
       return n;
     } catch (n) {
-      if (this.config.debug && console.error(`[ auth guard ]: ${e} ${i} auth failed:`, n), s && n.code === "auth/popup-blocked") {
-        this.config.debug && console.log(`[ auth guard ]: Trying fallback ${s} method for ${e}`);
+      if (this.config.debug && console.error(`[ auth guard ]: ${e} ${i} auth failed:`, n), a && n.code === "auth/popup-blocked") {
+        this.config.debug && console.log(`[ auth guard ]: Trying fallback ${a} method for ${e}`);
         try {
-          return s === "popup" ? await ge(o, t) : (await me(o, t), Promise.resolve({}));
-        } catch (a) {
-          throw this.config.debug && console.error(`[ auth guard ]: ${e} fallback ${s} auth also failed:`, a), a;
+          return a === "popup" ? await ge(o, t) : (await me(o, t), Promise.resolve({}));
+        } catch (s) {
+          throw this.config.debug && console.error(`[ auth guard ]: ${e} fallback ${a} auth also failed:`, s), s;
         }
       }
       throw n;
@@ -268,11 +275,11 @@ const nt = () => ({
   async loginWithEmail({ email: t, password: e }) {
     try {
       const o = $(this.config.firebase);
-      this.is_loading = !0, await de(o), this.is_session_persistant ? await re(o, be) : await re(o, le);
+      this.is_loading = !0, await de(o), this.is_session_persistant ? await re(o, ke) : await re(o, le);
       const i = await he(o, t, e);
       if (i.user) {
-        const { uid: s, displayName: n, email: a, emailVerified: g, isAnonymous: c, phoneNumber: m, photoURL: l } = i.user;
-        this.current_user = { uid: s, displayName: n, email: a, emailVerified: g, isAnonymous: c, phoneNumber: m, photoURL: l }, this.loggedIn = !0, this.data = i.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
+        const { uid: a, displayName: n, email: s, emailVerified: g, isAnonymous: c, phoneNumber: m, photoURL: l } = i.user;
+        this.current_user = { uid: a, displayName: n, email: s, emailVerified: g, isAnonymous: c, phoneNumber: m, photoURL: l }, this.loggedIn = !0, this.data = i.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
       }
       return this.is_loading = !1, Promise.resolve();
     } catch (o) {
@@ -282,14 +289,14 @@ const nt = () => ({
   async loginWithGoogle() {
     try {
       this.is_loading = !0;
-      const t = new We();
+      const t = new De();
       t.setCustomParameters({
         prompt: "select_account"
       });
       const e = await this._signInWithProvider(t, "Google");
       if (e.user) {
-        const { uid: o, displayName: i, email: s, emailVerified: n, isAnonymous: a, phoneNumber: g, photoURL: c } = e.user;
-        this.current_user = { uid: o, displayName: i, email: s, emailVerified: n, isAnonymous: a, phoneNumber: g, photoURL: c }, this.loggedIn = !0, this.data = e.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
+        const { uid: o, displayName: i, email: a, emailVerified: n, isAnonymous: s, phoneNumber: g, photoURL: c } = e.user;
+        this.current_user = { uid: o, displayName: i, email: a, emailVerified: n, isAnonymous: s, phoneNumber: g, photoURL: c }, this.loggedIn = !0, this.data = e.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
       }
       return this.is_loading = !1, Promise.resolve(e);
     } catch (t) {
@@ -299,10 +306,10 @@ const nt = () => ({
   async loginWithFacebook() {
     try {
       this.is_loading = !0;
-      const t = new Te(), e = await this._signInWithProvider(t, "Facebook");
+      const t = new Ue(), e = await this._signInWithProvider(t, "Facebook");
       if (e.user) {
-        const { uid: o, displayName: i, email: s, emailVerified: n, isAnonymous: a, phoneNumber: g, photoURL: c } = e.user;
-        this.current_user = { uid: o, displayName: i, email: s, emailVerified: n, isAnonymous: a, phoneNumber: g, photoURL: c }, this.loggedIn = !0, this.data = e.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
+        const { uid: o, displayName: i, email: a, emailVerified: n, isAnonymous: s, phoneNumber: g, photoURL: c } = e.user;
+        this.current_user = { uid: o, displayName: i, email: a, emailVerified: n, isAnonymous: s, phoneNumber: g, photoURL: c }, this.loggedIn = !0, this.data = e.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
       }
       return this.is_loading = !1, Promise.resolve(e);
     } catch (t) {
@@ -314,10 +321,10 @@ const nt = () => ({
   async loginWithSaml() {
     try {
       this.is_loading = !0;
-      const t = new Ne(this.config.saml_provider_id), e = await this._signInWithProvider(t, "SAML");
+      const t = new We(this.config.saml_provider_id), e = await this._signInWithProvider(t, "SAML");
       if (e.user) {
-        const { uid: o, displayName: i, email: s, emailVerified: n, isAnonymous: a, phoneNumber: g, photoURL: c } = e.user;
-        this.current_user = { uid: o, displayName: i, email: s, emailVerified: n, isAnonymous: a, phoneNumber: g, photoURL: c }, this.loggedIn = !0, this.data = e.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
+        const { uid: o, displayName: i, email: a, emailVerified: n, isAnonymous: s, phoneNumber: g, photoURL: c } = e.user;
+        this.current_user = { uid: o, displayName: i, email: a, emailVerified: n, isAnonymous: s, phoneNumber: g, photoURL: c }, this.loggedIn = !0, this.data = e.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
       }
       return this.is_loading = !1, Promise.resolve(e);
     } catch (t) {
@@ -329,8 +336,8 @@ const nt = () => ({
       this.is_loading = !0, this.text_confirmation = null;
       const o = t.startsWith("+") ? t : "+1" + t.replace(/\D/g, ""), i = $(this.config.firebase);
       this.config.debug && console.log("[textPhoneVerificationCode]: Sending verification code to:", o);
-      const s = await Ie(i, o, e);
-      return this.is_loading = !1, this.sign_by_phone_step = 2, this.text_confirmation = s, Promise.resolve(s);
+      const a = await Te(i, o, e);
+      return this.is_loading = !1, this.sign_by_phone_step = 2, this.text_confirmation = a, Promise.resolve(a);
     } catch (o) {
       return console.error("[textPhoneVerificationCode]: Error sending verification code:", o), o.code === "auth/invalid-app-credential" ? this.error = {
         message: "Phone authentication is not properly configured. Please check that phone authentication is enabled in your Firebase Console and that your domain is authorized.",
@@ -352,8 +359,8 @@ const nt = () => ({
       this.config.debug && console.log("confirmationCode", e);
       const o = await this.text_confirmation.confirm(e);
       if (o.user) {
-        const { uid: i, displayName: s, email: n, emailVerified: a, isAnonymous: g, phoneNumber: c, photoURL: m } = o.user;
-        this.current_user = { uid: i, displayName: s, email: n, emailVerified: a, isAnonymous: g, phoneNumber: c, photoURL: m }, this.loggedIn = !0, this.data = o.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
+        const { uid: i, displayName: a, email: n, emailVerified: s, isAnonymous: g, phoneNumber: c, photoURL: m } = o.user;
+        this.current_user = { uid: i, displayName: a, email: n, emailVerified: s, isAnonymous: g, phoneNumber: c, photoURL: m }, this.loggedIn = !0, this.data = o.user, this.is_authguard_dialog_shown = !1, this._handlePostAuthRedirect();
       }
       return this.is_loading = !1, this.sign_by_phone_step = 1, Promise.resolve(o);
     } catch (e) {
@@ -363,18 +370,18 @@ const nt = () => ({
   async registerUser(t, e, o) {
     try {
       this.is_loading = !0;
-      const i = this.config.verification, s = $(this.config.firebase);
+      const i = this.config.verification, a = $(this.config.firebase);
       try {
-        await Ce(s, e, o), this.config.debug && console.log("User Account Created!");
-      } catch (a) {
-        throw this.error = a, this.is_loading = !1, this.config.debug && console.error("[ registerUser ]: Error occurred during creating user", a), a;
+        await Ie(a, e, o), this.config.debug && console.log("User Account Created!");
+      } catch (s) {
+        throw this.error = s, this.is_loading = !1, this.config.debug && console.error("[ registerUser ]: Error occurred during creating user", s), s;
       }
-      await he(s, e, o), this.current_user = {
+      await he(a, e, o), this.current_user = {
         ...this.current_user,
         displayName: t
-      }, s.currentUser && await xe(s.currentUser, { displayName: t });
+      }, a.currentUser && await Ne(a.currentUser, { displayName: t });
       const n = e.split("@")[1] || "XXX";
-      (i === !0 || Array.isArray(i) && i.includes(n)) && s.currentUser && await ce(s.currentUser), this.is_loading = !1;
+      (i === !0 || Array.isArray(i) && i.includes(n)) && a.currentUser && await ce(a.currentUser), this.is_loading = !1;
     } catch (i) {
       this.error = i, this.is_loading = !1;
     }
@@ -383,7 +390,7 @@ const nt = () => ({
     try {
       this.is_loading = !0;
       const e = $(this.config.firebase);
-      return await Ve(e, t), this.error = null, this.is_loading = !1, this.is_email_reset_password_link_sent = !0, Promise.resolve();
+      return await xe(e, t), this.error = null, this.is_loading = !1, this.is_email_reset_password_link_sent = !0, Promise.resolve();
     } catch (e) {
       return this.error = e, this.is_loading = !1, Promise.reject(e);
     }
@@ -411,48 +418,48 @@ const nt = () => ({
       return this.error = t, this.is_loading = !1, Promise.reject(t);
     }
   }
-}, D = Le("auth", {
-  state: nt,
-  getters: at,
-  actions: rt
+}, D = Ve("auth", {
+  state: rt,
+  getters: lt,
+  actions: ut
 });
-var lt = Object.defineProperty, ut = (t, e, o) => e in t ? lt(t, e, { enumerable: !0, configurable: !0, writable: !0, value: o }) : t[e] = o, Z = (t, e, o) => ut(t, typeof e != "symbol" ? e + "" : e, o);
-const pe = {
+var ct = Object.defineProperty, dt = (t, e, o) => e in t ? ct(t, e, { enumerable: !0, configurable: !0, writable: !0, value: o }) : t[e] = o, Z = (t, e, o) => dt(t, typeof e != "symbol" ? e + "" : e, o);
+const ve = {
   "#": { pattern: /[0-9]/ },
   "@": { pattern: /[a-zA-Z]/ },
   "*": { pattern: /[a-zA-Z0-9]/ }
-}, _e = (t, e, o) => t.replaceAll(e, "").replace(o, ".").replace("..", ".").replace(/[^.\d]/g, ""), ve = (t, e, o) => {
+}, be = (t, e, o) => t.replaceAll(e, "").replace(o, ".").replace("..", ".").replace(/[^.\d]/g, ""), ye = (t, e, o) => {
   var i;
   return new Intl.NumberFormat(((i = o.number) == null ? void 0 : i.locale) ?? "en", {
     minimumFractionDigits: t,
     maximumFractionDigits: e,
     roundingMode: "trunc"
   });
-}, ct = (t, e = !0, o) => {
-  var i, s, n, a;
-  const g = ((i = o.number) == null ? void 0 : i.unsigned) !== !0 && t.startsWith("-") ? "-" : "", c = ((s = o.number) == null ? void 0 : s.fraction) ?? 0;
-  let m = ve(0, c, o);
-  const l = m.formatToParts(1000.12), d = ((n = l.find((_) => _.type === "group")) == null ? void 0 : n.value) ?? " ", w = ((a = l.find((_) => _.type === "decimal")) == null ? void 0 : a.value) ?? ".", b = _e(t, d, w);
+}, ht = (t, e = !0, o) => {
+  var i, a, n, s;
+  const g = ((i = o.number) == null ? void 0 : i.unsigned) !== !0 && t.startsWith("-") ? "-" : "", c = ((a = o.number) == null ? void 0 : a.fraction) ?? 0;
+  let m = ye(0, c, o);
+  const l = m.formatToParts(1000.12), d = ((n = l.find((_) => _.type === "group")) == null ? void 0 : n.value) ?? " ", w = ((s = l.find((_) => _.type === "decimal")) == null ? void 0 : s.value) ?? ".", b = be(t, d, w);
   if (Number.isNaN(parseFloat(b))) return g;
   const r = b.split(".");
   if (r[1] != null && r[1].length >= 1) {
     const _ = r[1].length <= c ? r[1].length : c;
-    m = ve(_, c, o);
+    m = ye(_, c, o);
   }
   let f = m.format(parseFloat(b));
-  return e ? c > 0 && b.endsWith(".") && !b.slice(0, -1).includes(".") && (f += w) : f = _e(f, d, w), g + f;
+  return e ? c > 0 && b.endsWith(".") && !b.slice(0, -1).includes(".") && (f += w) : f = be(f, d, w), g + f;
 };
-class dt {
+class gt {
   constructor(e = {}) {
     Z(this, "opts", {}), Z(this, "memo", /* @__PURE__ */ new Map());
     const o = { ...e };
     if (o.tokens != null) {
-      o.tokens = o.tokensReplace ? { ...o.tokens } : { ...pe, ...o.tokens };
+      o.tokens = o.tokensReplace ? { ...o.tokens } : { ...ve, ...o.tokens };
       for (const i of Object.values(o.tokens))
         typeof i.pattern == "string" && (i.pattern = new RegExp(i.pattern));
     } else
-      o.tokens = pe;
-    Array.isArray(o.mask) && (o.mask.length > 1 ? o.mask = [...o.mask].sort((i, s) => i.length - s.length) : o.mask = o.mask[0] ?? ""), o.mask === "" && (o.mask = null), this.opts = o;
+      o.tokens = ve;
+    Array.isArray(o.mask) && (o.mask.length > 1 ? o.mask = [...o.mask].sort((i, a) => i.length - a.length) : o.mask = o.mask[0] ?? ""), o.mask === "" && (o.mask = null), this.opts = o;
   }
   masked(e) {
     return this.process(String(e), this.findMask(String(e)));
@@ -481,25 +488,25 @@ class dt {
     if (typeof o == "function")
       return o(e);
     const i = this.process(e, o.slice(-1).pop() ?? "", !1);
-    return o.find((s) => this.process(e, s, !1).length >= i.length) ?? "";
+    return o.find((a) => this.process(e, a, !1).length >= i.length) ?? "";
   }
   escapeMask(e) {
     const o = [], i = [];
-    return e.split("").forEach((s, n) => {
-      s === "!" && e[n - 1] !== "!" ? i.push(n - i.length) : o.push(s);
+    return e.split("").forEach((a, n) => {
+      a === "!" && e[n - 1] !== "!" ? i.push(n - i.length) : o.push(a);
     }), { mask: o.join(""), escaped: i };
   }
   process(e, o, i = !0) {
-    if (this.opts.number != null) return ct(e, i, this.opts);
+    if (this.opts.number != null) return ht(e, i, this.opts);
     if (o == null) return e;
-    const s = `v=${e},mr=${o},m=${i ? 1 : 0}`;
-    if (this.memo.has(s)) return this.memo.get(s);
-    const { mask: n, escaped: a } = this.escapeMask(o), g = [], c = this.opts.tokens != null ? this.opts.tokens : {}, m = this.isReversed() ? -1 : 1, l = this.isReversed() ? "unshift" : "push", d = this.isReversed() ? 0 : n.length - 1, w = this.isReversed() ? () => _ > -1 && p > -1 : () => _ < n.length && p < e.length, b = (L) => !this.isReversed() && L <= d || this.isReversed() && L >= d;
+    const a = `v=${e},mr=${o},m=${i ? 1 : 0}`;
+    if (this.memo.has(a)) return this.memo.get(a);
+    const { mask: n, escaped: s } = this.escapeMask(o), g = [], c = this.opts.tokens != null ? this.opts.tokens : {}, m = this.isReversed() ? -1 : 1, l = this.isReversed() ? "unshift" : "push", d = this.isReversed() ? 0 : n.length - 1, w = this.isReversed() ? () => _ > -1 && p > -1 : () => _ < n.length && p < e.length, b = (L) => !this.isReversed() && L <= d || this.isReversed() && L >= d;
     let r, f = -1, _ = this.isReversed() ? n.length - 1 : 0, p = this.isReversed() ? e.length - 1 : 0, y = !1;
     for (; w(); ) {
       const L = n.charAt(_), O = c[L], X = (O == null ? void 0 : O.transform) != null ? O.transform(e.charAt(p)) : e.charAt(p);
-      if (!a.includes(_) && O != null ? (X.match(O.pattern) != null ? (g[l](X), O.repeated ? (f === -1 ? f = _ : _ === d && _ !== f && (_ = f - m), d === f && (_ -= m)) : O.multiple && (y = !0, _ -= m), _ += m) : O.multiple ? y && (_ += m, p -= m, y = !1) : X === r ? r = void 0 : O.optional && (_ += m, p -= m), p += m) : (i && !this.isEager() && g[l](L), X === L && !this.isEager() ? p += m : r = L, this.isEager() || (_ += m)), this.isEager())
-        for (; b(_) && (c[n.charAt(_)] == null || a.includes(_)); ) {
+      if (!s.includes(_) && O != null ? (X.match(O.pattern) != null ? (g[l](X), O.repeated ? (f === -1 ? f = _ : _ === d && _ !== f && (_ = f - m), d === f && (_ -= m)) : O.multiple && (y = !0, _ -= m), _ += m) : O.multiple ? y && (_ += m, p -= m, y = !1) : X === r ? r = void 0 : O.optional && (_ += m, p -= m), p += m) : (i && !this.isEager() && g[l](L), X === L && !this.isEager() ? p += m : r = L, this.isEager() || (_ += m)), this.isEager())
+        for (; b(_) && (c[n.charAt(_)] == null || s.includes(_)); ) {
           if (i) {
             if (g[l](n.charAt(_)), e.charAt(p) === n.charAt(_)) {
               _ += m, p += m;
@@ -509,17 +516,17 @@ class dt {
           _ += m;
         }
     }
-    return this.memo.set(s, g.join("")), this.memo.get(s);
+    return this.memo.set(a, g.join("")), this.memo.get(a);
   }
 }
-const Ae = (t) => JSON.parse(t.replaceAll("'", '"')), ht = (t, e = {}) => {
+const Se = (t) => JSON.parse(t.replaceAll("'", '"')), mt = (t, e = {}) => {
   const o = { ...e };
-  t.dataset.maska != null && t.dataset.maska !== "" && (o.mask = gt(t.dataset.maska)), t.dataset.maskaEager != null && (o.eager = oe(t.dataset.maskaEager)), t.dataset.maskaReversed != null && (o.reversed = oe(t.dataset.maskaReversed)), t.dataset.maskaTokensReplace != null && (o.tokensReplace = oe(t.dataset.maskaTokensReplace)), t.dataset.maskaTokens != null && (o.tokens = mt(t.dataset.maskaTokens));
+  t.dataset.maska != null && t.dataset.maska !== "" && (o.mask = ft(t.dataset.maska)), t.dataset.maskaEager != null && (o.eager = oe(t.dataset.maskaEager)), t.dataset.maskaReversed != null && (o.reversed = oe(t.dataset.maskaReversed)), t.dataset.maskaTokensReplace != null && (o.tokensReplace = oe(t.dataset.maskaTokensReplace)), t.dataset.maskaTokens != null && (o.tokens = pt(t.dataset.maskaTokens));
   const i = {};
   return t.dataset.maskaNumberLocale != null && (i.locale = t.dataset.maskaNumberLocale), t.dataset.maskaNumberFraction != null && (i.fraction = parseInt(t.dataset.maskaNumberFraction)), t.dataset.maskaNumberUnsigned != null && (i.unsigned = oe(t.dataset.maskaNumberUnsigned)), (t.dataset.maskaNumber != null || Object.values(i).length > 0) && (o.number = i), o;
-}, oe = (t) => t !== "" ? !!JSON.parse(t) : !0, gt = (t) => t.startsWith("[") && t.endsWith("]") ? Ae(t) : t, mt = (t) => {
+}, oe = (t) => t !== "" ? !!JSON.parse(t) : !0, ft = (t) => t.startsWith("[") && t.endsWith("]") ? Se(t) : t, pt = (t) => {
   if (t.startsWith("{") && t.endsWith("}"))
-    return Ae(t);
+    return Se(t);
   const e = {};
   return t.split("|").forEach((o) => {
     const i = o.split(":");
@@ -531,15 +538,15 @@ const Ae = (t) => JSON.parse(t.replaceAll("'", '"')), ht = (t, e = {}) => {
     };
   }), e;
 };
-class ft {
+class _t {
   constructor(e, o = {}) {
     Z(this, "items", /* @__PURE__ */ new Map()), Z(this, "eventAbortController"), Z(this, "onInput", (i) => {
       if (i instanceof CustomEvent && i.type === "input" && !i.isTrusted && !i.bubbles)
         return;
-      const s = i.target, n = this.items.get(s);
+      const a = i.target, n = this.items.get(a);
       if (n === void 0) return;
-      const a = "inputType" in i && i.inputType.startsWith("delete"), g = n.isEager(), c = a && g && n.unmasked(s.value) === "" ? "" : s.value;
-      this.fixCursor(s, a, () => this.setValue(s, c));
+      const s = "inputType" in i && i.inputType.startsWith("delete"), g = n.isEager(), c = s && g && n.unmasked(a.value) === "" ? "" : a.value;
+      this.fixCursor(a, s, () => this.setValue(a, c));
     }), this.options = o, this.eventAbortController = new AbortController(), this.init(this.getInputs(e));
   }
   update(e = {}) {
@@ -559,61 +566,61 @@ class ft {
         const { signal: n } = this.eventAbortController;
         i.addEventListener("input", this.onInput, { capture: !0, signal: n });
       }
-      const s = new dt(ht(i, o));
-      this.items.set(i, s), queueMicrotask(() => this.updateValue(i)), i.selectionStart === null && s.isEager() && console.warn("Maska: input of `%s` type is not supported", i.type);
+      const a = new gt(mt(i, o));
+      this.items.set(i, a), queueMicrotask(() => this.updateValue(i)), i.selectionStart === null && a.isEager() && console.warn("Maska: input of `%s` type is not supported", i.type);
     }
   }
   getInputs(e) {
     return typeof e == "string" ? Array.from(document.querySelectorAll(e)) : "length" in e ? Array.from(e) : [e];
   }
   getOptions(e) {
-    const { onMaska: o, preProcess: i, postProcess: s, ...n } = e;
+    const { onMaska: o, preProcess: i, postProcess: a, ...n } = e;
     return n;
   }
   fixCursor(e, o, i) {
-    var s, n;
-    const a = e.selectionStart, g = e.value;
-    if (i(), a === null || a === g.length && !o) return;
-    const c = e.value, m = g.slice(0, a), l = c.slice(0, a), d = (s = this.processInput(e, m)) == null ? void 0 : s.unmasked, w = (n = this.processInput(e, l)) == null ? void 0 : n.unmasked;
+    var a, n;
+    const s = e.selectionStart, g = e.value;
+    if (i(), s === null || s === g.length && !o) return;
+    const c = e.value, m = g.slice(0, s), l = c.slice(0, s), d = (a = this.processInput(e, m)) == null ? void 0 : a.unmasked, w = (n = this.processInput(e, l)) == null ? void 0 : n.unmasked;
     if (d === void 0 || w === void 0) return;
-    let b = a;
+    let b = s;
     m !== l && (b += o ? c.length - g.length : d.length - w.length), e.setSelectionRange(b, b);
   }
   setValue(e, o) {
     const i = this.processInput(e, o);
-    i !== void 0 && (e.value = i.masked, this.options.onMaska != null && (Array.isArray(this.options.onMaska) ? this.options.onMaska.forEach((s) => s(i)) : this.options.onMaska(i)), e.dispatchEvent(new CustomEvent("maska", { detail: i })), e.dispatchEvent(new CustomEvent("input", { detail: i.masked })));
+    i !== void 0 && (e.value = i.masked, this.options.onMaska != null && (Array.isArray(this.options.onMaska) ? this.options.onMaska.forEach((a) => a(i)) : this.options.onMaska(i)), e.dispatchEvent(new CustomEvent("maska", { detail: i })), e.dispatchEvent(new CustomEvent("input", { detail: i.masked })));
   }
   processInput(e, o) {
     const i = this.items.get(e);
     if (i === void 0) return;
-    let s = o ?? e.value;
-    this.options.preProcess != null && (s = this.options.preProcess(s));
-    let n = i.masked(s);
+    let a = o ?? e.value;
+    this.options.preProcess != null && (a = this.options.preProcess(a));
+    let n = i.masked(a);
     return this.options.postProcess != null && (n = this.options.postProcess(n)), {
       masked: n,
-      unmasked: i.unmasked(s),
-      completed: i.completed(s)
+      unmasked: i.unmasked(a),
+      completed: i.completed(a)
     };
   }
 }
-const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
+const se = /* @__PURE__ */ new WeakMap(), vt = (t, e) => {
   if (t.arg == null || t.instance == null) return;
   const o = "setup" in t.instance.$.type;
   t.arg in t.instance ? t.instance[t.arg] = e : o && console.warn("Maska: please expose `%s` using defineExpose", t.arg);
-}, _t = (t, e) => {
+}, bt = (t, e) => {
   var o;
   const i = t instanceof HTMLInputElement ? t : t.querySelector("input");
   if (i == null || (i == null ? void 0 : i.type) === "file") return;
-  let s = {};
-  if (e.value != null && (s = typeof e.value == "string" ? { mask: e.value } : { ...e.value }), e.arg != null) {
-    const n = (a) => {
-      const g = e.modifiers.unmasked ? a.unmasked : e.modifiers.completed ? a.completed : a.masked;
-      pt(e, g);
+  let a = {};
+  if (e.value != null && (a = typeof e.value == "string" ? { mask: e.value } : { ...e.value }), e.arg != null) {
+    const n = (s) => {
+      const g = e.modifiers.unmasked ? s.unmasked : e.modifiers.completed ? s.completed : s.masked;
+      vt(e, g);
     };
-    s.onMaska = s.onMaska == null ? n : Array.isArray(s.onMaska) ? [...s.onMaska, n] : [s.onMaska, n];
+    a.onMaska = a.onMaska == null ? n : Array.isArray(a.onMaska) ? [...a.onMaska, n] : [a.onMaska, n];
   }
-  ae.has(i) ? (o = ae.get(i)) == null || o.update(s) : ae.set(i, new ft(i, s));
-}, vt = {
+  se.has(i) ? (o = se.get(i)) == null || o.update(a) : se.set(i, new _t(i, a));
+}, yt = {
   debug: !1,
   store: null,
   // vuex store
@@ -646,28 +653,28 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
   // require user email to be verified before granting access
   registration: !0
   // allow new user registrations
-}, Pe = () => {
+}, Ee = () => {
   const t = D();
   if (!t.config)
     return;
-  const { firebase: e, debug: o } = t.config, i = $(e), s = (c, m) => {
+  const { firebase: e, debug: o } = t.config, i = $(e), a = (c, m) => {
     o && console.log(`[ auth guard ]: ${m}`, c ? "authenticated" : "not authenticated");
-  }, n = i.currentUser, a = !!n, g = t.isAuthenticated;
-  a !== g && (t.loggedIn = a, t.data = n, o && console.log("[ auth guard ]: Auth state mismatch detected. Updated store:", {
-    firebase: a,
+  }, n = i.currentUser, s = !!n, g = t.isAuthenticated;
+  s !== g && (t.loggedIn = s, t.data = n, o && console.log("[ auth guard ]: Auth state mismatch detected. Updated store:", {
+    firebase: s,
     store: g,
     updated: t.loggedIn
-  })), s(t.loggedIn, "Current auth state:");
-}, se = /* @__PURE__ */ H({
+  })), a(t.loggedIn, "Current auth state:");
+}, ae = /* @__PURE__ */ H({
   __name: "AuthBranding",
   setup(t) {
     const e = D(), o = S(() => e.config);
-    return (i, s) => (v(), A(je, {
+    return (i, a) => (v(), A(Ze, {
       lines: "two",
       dense: ""
     }, {
       default: u(() => [
-        h(Ke, {
+        h(Ye, {
           title: o.value.title,
           subtitle: o.value.subtitle
         }, {
@@ -688,10 +695,10 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
       _: 1
     }));
   }
-}), bt = { class: "text-center pb-4" }, yt = /* @__PURE__ */ H({
+}), kt = { class: "text-center pb-4" }, wt = /* @__PURE__ */ H({
   __name: "LoginCard",
   setup(t) {
-    const e = D(), { loginWithEmail: o, SET_PASSWORD_RESET_SCREEN_SHOWN: i, SET_REGISTER_SCREEN_SHOWN: s, SET_TAB: n } = e, a = S(() => e.config), g = S({
+    const e = D(), { loginWithEmail: o, SET_PASSWORD_RESET_SCREEN_SHOWN: i, SET_REGISTER_SCREEN_SHOWN: a, SET_TAB: n } = e, s = S(() => e.config), g = S({
       get: () => e.error,
       set: (p) => {
         e.error = p;
@@ -715,11 +722,11 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
     }, _ = () => {
       e.is_session_persistant = b.value;
     };
-    return ke(() => {
+    return Ae(() => {
       b.value = e.is_session_persistant;
     }), G(c, (p) => {
       p && setTimeout(r, 5e3);
-    }), (p, y) => (v(), A(M, null, {
+    }), (p, y) => (v(), A(F, null, {
       default: u(() => [
         h(z, { flat: "" }, {
           default: u(() => [
@@ -736,14 +743,14 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
               ])),
               _: 1,
               __: [5]
-            })) : (v(), A(se, {
+            })) : (v(), A(ae, {
               key: 1,
               class: "text-center"
             }))
           ]),
           _: 1
         }),
-        a.value.email ? (v(), A(z, {
+        s.value.email ? (v(), A(z, {
           key: 0,
           flat: ""
         }, {
@@ -753,7 +760,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
             }, [
               h(B, { class: "mb-0 pb-0" }, {
                 default: u(() => [
-                  h(F, {
+                  h(M, {
                     modelValue: d.value,
                     "onUpdate:modelValue": y[0] || (y[0] = (L) => d.value = L),
                     required: "",
@@ -764,7 +771,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                     autocomplete: "email",
                     "prepend-icon": "mdi-account"
                   }, null, 8, ["modelValue"]),
-                  h(F, {
+                  h(M, {
                     modelValue: w.value,
                     "onUpdate:modelValue": y[1] || (y[1] = (L) => w.value = L),
                     required: "",
@@ -775,7 +782,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                     autocomplete: "current-password",
                     "prepend-icon": "mdi-lock"
                   }, null, 8, ["modelValue"]),
-                  h(Je, {
+                  h(Qe, {
                     modelValue: b.value,
                     "onUpdate:modelValue": y[2] || (y[2] = (L) => b.value = L),
                     dense: "",
@@ -787,7 +794,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                 ]),
                 _: 1
               }),
-              C("div", bt, [
+              C("div", kt, [
                 !l.value && m.value ? (v(), A(x, {
                   key: 0,
                   variant: "text",
@@ -805,7 +812,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                   variant: "text",
                   size: "x-small",
                   color: "primary",
-                  onClick: y[4] || (y[4] = (L) => (N(s)(!1), N(n)(1)))
+                  onClick: y[4] || (y[4] = (L) => (N(a)(!1), N(n)(1)))
                 }, {
                   default: u(() => y[7] || (y[7] = [
                     E(" Register as new user ")
@@ -840,34 +847,34 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
       _: 1
     }));
   }
-}), kt = /* @__PURE__ */ H({
+}), At = /* @__PURE__ */ H({
   __name: "RegisterUser",
   setup(t) {
-    const e = D(), { registerUser: o } = e, i = S(() => e.getError), s = S({
+    const e = D(), { registerUser: o } = e, i = S(() => e.getError), a = S({
       get: () => e.error,
       set: (r) => {
         e.error = r;
       }
-    }), n = I(""), a = I(""), g = I(""), c = I(""), m = I(!1), l = I(null), d = S(() => ({
+    }), n = I(""), s = I(""), g = I(""), c = I(""), m = I(!1), l = I(null), d = S(() => ({
       email: n.value ? !0 : "Email cannot be empty",
-      password: a.value ? !0 : "Password cannot be empty",
+      password: s.value ? !0 : "Password cannot be empty",
       displayName: c.value ? !0 : "Name cannot be empty",
-      confirm: a.value !== g.value ? "Passwords do not match" : !0
+      confirm: s.value !== g.value ? "Passwords do not match" : !0
     })), w = () => {
-      s.value = null;
+      a.value = null;
     };
     G(i, (r) => {
       r && setTimeout(w, 5e3);
     });
     const b = () => {
       var r;
-      (r = l.value) != null && r.validate() && o && o(c.value, n.value, a.value);
+      (r = l.value) != null && r.validate() && o && o(c.value, n.value, s.value);
     };
-    return (r, f) => (v(), A(M, null, {
+    return (r, f) => (v(), A(F, null, {
       default: u(() => [
         h(z, { flat: "" }, {
           default: u(() => [
-            h(we, {
+            h(Pe, {
               ref_key: "form",
               ref: l,
               modelValue: m.value,
@@ -875,7 +882,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
               onSubmit: ie(b, ["prevent"])
             }, {
               default: u(() => [
-                s.value ? (v(), A(Y, {
+                a.value ? (v(), A(Y, {
                   key: 0,
                   type: "error",
                   dismissible: "",
@@ -883,16 +890,16 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                   onClick: w
                 }, {
                   default: u(() => [
-                    E(K(s.value.message), 1)
+                    E(K(a.value.message), 1)
                   ]),
                   _: 1
-                })) : (v(), A(se, {
+                })) : (v(), A(ae, {
                   key: 1,
                   class: "text-center"
                 })),
                 h(B, { class: "mb-0 pb-0" }, {
                   default: u(() => [
-                    h(F, {
+                    h(M, {
                       modelValue: c.value,
                       "onUpdate:modelValue": f[0] || (f[0] = (_) => c.value = _),
                       required: "",
@@ -901,7 +908,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                       "prepend-icon": "mdi-account",
                       rules: [d.value.displayName]
                     }, null, 8, ["modelValue", "rules"]),
-                    h(F, {
+                    h(M, {
                       modelValue: n.value,
                       "onUpdate:modelValue": f[1] || (f[1] = (_) => n.value = _),
                       required: "",
@@ -910,9 +917,9 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                       "prepend-icon": "mdi-email",
                       rules: [d.value.email]
                     }, null, 8, ["modelValue", "rules"]),
-                    h(F, {
-                      modelValue: a.value,
-                      "onUpdate:modelValue": f[2] || (f[2] = (_) => a.value = _),
+                    h(M, {
+                      modelValue: s.value,
+                      "onUpdate:modelValue": f[2] || (f[2] = (_) => s.value = _),
                       autocomplete: "off",
                       required: "",
                       class: "mr-2",
@@ -921,7 +928,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                       "prepend-icon": "mdi-lock",
                       rules: [d.value.password]
                     }, null, 8, ["modelValue", "rules"]),
-                    h(F, {
+                    h(M, {
                       modelValue: g.value,
                       "onUpdate:modelValue": f[3] || (f[3] = (_) => g.value = _),
                       autocomplete: "off",
@@ -964,55 +971,55 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
       _: 1
     }));
   }
-}), wt = { key: 2 }, At = /* @__PURE__ */ H({
+}), Pt = { key: 2 }, St = /* @__PURE__ */ H({
   __name: "PasswordReset",
   setup(t) {
-    const e = D(), { emailPasswordResetLink: o, SET_PASSWORD_RESET_SCREEN_SHOWN: i } = e, s = S({
+    const e = D(), { emailPasswordResetLink: o, SET_PASSWORD_RESET_SCREEN_SHOWN: i } = e, a = S({
       get: () => e.error,
       set: (b) => {
         e.error = b;
       }
-    }), n = S(() => e.is_loading), a = S(() => e.getError), g = S(() => e.isEmailResetPasswordLinkSent), c = I(""), m = I(!1), l = S(() => ({
+    }), n = S(() => e.is_loading), s = S(() => e.getError), g = S(() => e.isEmailResetPasswordLinkSent), c = I(""), m = I(!1), l = S(() => ({
       email: c.value === "" ? "Email cannot be empty" : !0
     })), d = () => {
-      s.value = null;
+      a.value = null;
     }, w = () => {
-      c.value ? o(c.value) : (s.value = { message: "Email cannot be empty" }, setTimeout(d, 5e3));
+      c.value ? o(c.value) : (a.value = { message: "Email cannot be empty" }, setTimeout(d, 5e3));
     };
-    return (b, r) => (v(), A(M, null, {
+    return (b, r) => (v(), A(F, null, {
       default: u(() => [
         h(z, { flat: "" }, {
           default: u(() => [
-            h(we, {
+            h(Pe, {
               ref: "form",
               modelValue: m.value,
               "onUpdate:modelValue": r[3] || (r[3] = (f) => m.value = f),
               onSubmit: r[4] || (r[4] = ie((f) => w(c.value), ["prevent"]))
             }, {
               default: u(() => [
-                a.value ? (v(), A(Y, {
+                s.value ? (v(), A(Y, {
                   key: 0,
                   type: "error",
                   dismissible: "",
-                  onClick: r[0] || (r[0] = (f) => s.value = null)
+                  onClick: r[0] || (r[0] = (f) => a.value = null)
                 }, {
                   default: u(() => [
-                    E(K(a.value.message), 1)
+                    E(K(s.value.message), 1)
                   ]),
                   _: 1
-                })) : (v(), A(se, {
+                })) : (v(), A(ae, {
                   key: 1,
                   class: "text-center"
                 })),
-                g.value ? V("", !0) : (v(), U("div", wt, [
+                g.value ? V("", !0) : (v(), U("div", Pt, [
                   h(B, { class: "mb-0 pb-0" }, {
                     default: u(() => [
                       r[5] || (r[5] = C("div", { class: "mb-5" }, " Enter registered user email address and we will send you a link to reset your password. ", -1)),
-                      h(F, {
+                      h(M, {
                         modelValue: c.value,
                         "onUpdate:modelValue": r[1] || (r[1] = (f) => c.value = f),
                         required: "",
-                        error: !!a.value,
+                        error: !!s.value,
                         class: "mr-2",
                         label: "Email",
                         "prepend-icon": "mdi-account",
@@ -1042,7 +1049,7 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
                     _: 1
                   })
                 ])),
-                g.value ? (v(), A(M, {
+                g.value ? (v(), A(F, {
                   key: 3,
                   class: "pa-4 text-center"
                 }, {
@@ -1093,26 +1100,26 @@ const ae = /* @__PURE__ */ new WeakMap(), pt = (t, e) => {
     }));
   }
 });
-function Pt(t) {
+function Et(t) {
   const e = t.app.options, o = [];
   e.authDomain ? !e.authDomain.includes(".firebaseapp.com") && !e.authDomain.includes("localhost") && o.push(`authDomain '${e.authDomain}' might not be valid`) : o.push("authDomain is not configured"), e.projectId || o.push("projectId is not configured"), e.apiKey || o.push("apiKey is not configured");
-  const i = window.location.hostname, s = window.location.protocol;
-  return console.log("[Firebase Phone Auth Check]:"), console.log("- Auth Domain:", e.authDomain), console.log("- Project ID:", e.projectId), console.log("- Current Domain:", i), console.log("- Current Protocol:", s), o.length > 0 && (console.error("[Firebase Phone Auth Check] Configuration issues found:"), o.forEach((n) => console.error(`  - ${n}`))), s !== "https:" && i !== "localhost" && i !== "127.0.0.1" && console.warn("[Firebase Phone Auth Check] Phone auth requires HTTPS (except for localhost)"), o;
+  const i = window.location.hostname, a = window.location.protocol;
+  return console.log("[Firebase Phone Auth Check]:"), console.log("- Auth Domain:", e.authDomain), console.log("- Project ID:", e.projectId), console.log("- Current Domain:", i), console.log("- Current Protocol:", a), o.length > 0 && (console.error("[Firebase Phone Auth Check] Configuration issues found:"), o.forEach((n) => console.error(`  - ${n}`))), a !== "https:" && i !== "localhost" && i !== "127.0.0.1" && console.warn("[Firebase Phone Auth Check] Phone auth requires HTTPS (except for localhost)"), o;
 }
-const St = "#", Et = /* @__PURE__ */ H({
+const Lt = "#", Rt = /* @__PURE__ */ H({
   __name: "LoginWithPhone",
   setup(t) {
     const e = S(() => {
       const k = i.value.replace(/\D/g, ""), P = f.value;
       return k.length >= P.minLength && k.length <= P.maxLength;
-    }), o = I(Array(6).fill("")), i = I(""), s = I("+1");
+    }), o = I(Array(6).fill("")), i = I(""), a = I("+1");
     let n = null;
-    const a = D(), { textPhoneVerificationCode: g, confirmCode: c } = a, m = S({
-      get: () => a.error,
+    const s = D(), { textPhoneVerificationCode: g, confirmCode: c } = s, m = S({
+      get: () => s.error,
       set: (k) => {
-        a.error = k;
+        s.error = k;
       }
-    }), l = S(() => a.sign_by_phone_step), d = S(() => a.getError), w = S(() => a.config), b = I([]), r = [
+    }), l = S(() => s.sign_by_phone_step), d = S(() => s.getError), w = S(() => s.config), b = I([]), r = [
       { value: "+1", label: "🇺🇸 +1 USA/Canada", minLength: 10, maxLength: 10 },
       { value: "+44", label: "🇬🇧 +44 UK", minLength: 10, maxLength: 11 },
       { value: "+33", label: "🇫🇷 +33 France", minLength: 9, maxLength: 9 },
@@ -1157,7 +1164,7 @@ const St = "#", Et = /* @__PURE__ */ H({
       { value: "+51", label: "🇵🇪 +51 Peru", minLength: 9, maxLength: 9 },
       { value: "+58", label: "🇻🇪 +58 Venezuela", minLength: 10, maxLength: 10 }
     ], f = S(
-      () => r.find((k) => k.value === s.value) || r[0]
+      () => r.find((k) => k.value === a.value) || r[0]
     ), _ = S(() => {
       const k = i.value.replace(/\D/g, ""), P = f.value;
       return k.length < P.minLength ? {
@@ -1171,7 +1178,7 @@ const St = "#", Et = /* @__PURE__ */ H({
       try {
         if (n || (console.log("[LoginWithPhone]: Initializing reCAPTCHA..."), await X()), n) {
           const k = {
-            phoneNumber: s.value + i.value.replace(/\D/g, ""),
+            phoneNumber: a.value + i.value.replace(/\D/g, ""),
             recaptchaVerifier: n
           };
           g(k);
@@ -1183,7 +1190,7 @@ const St = "#", Et = /* @__PURE__ */ H({
     }, y = () => {
       c(o.value);
     }, L = () => {
-      switch (s.value) {
+      switch (a.value) {
         case "+1":
           return "(555) 123-4567";
         case "+44":
@@ -1203,7 +1210,7 @@ const St = "#", Et = /* @__PURE__ */ H({
       }
     }, O = () => {
       let k = i.value.replace(/\D/g, "");
-      if (s.value === "+1" && k.length > 0)
+      if (a.value === "+1" && k.length > 0)
         k.length >= 6 ? k = `(${k.slice(0, 3)}) ${k.slice(3, 6)}-${k.slice(6, 10)}` : k.length >= 3 && (k = `(${k.slice(0, 3)}) ${k.slice(3)}`);
       else {
         const P = f.value;
@@ -1220,13 +1227,13 @@ const St = "#", Et = /* @__PURE__ */ H({
             R.id = "recaptcha-container", document.body.appendChild(R);
           }
           const T = $(w.value.firebase);
-          if (Pt(T), await new Promise((R) => setTimeout(R, 100)), !T || !T.app) {
+          if (Et(T), await new Promise((R) => setTimeout(R, 100)), !T || !T.app) {
             console.error("[LoginWithPhone]: Firebase Auth is not properly initialized"), m.value = { message: "Firebase authentication is not properly configured. Please check your Firebase setup." };
             return;
           }
           try {
             const R = document.getElementById("recaptcha-container");
-            R && (R.innerHTML = ""), n = new Ue(T, "recaptcha-container", {
+            R && (R.innerHTML = ""), n = new Oe(T, "recaptcha-container", {
               size: "invisible",
               callback: () => {
                 console.log("[LoginWithPhone]: reCAPTCHA solved");
@@ -1251,7 +1258,7 @@ const St = "#", Et = /* @__PURE__ */ H({
         console.error("[LoginWithPhone]: Error in recaptcha initialization:", P);
       }
     };
-    Oe(() => {
+    ze(() => {
       if (n)
         try {
           n.clear(), n = null;
@@ -1259,21 +1266,21 @@ const St = "#", Et = /* @__PURE__ */ H({
           console.error("[LoginWithPhone]: Error clearing RecaptchaVerifier:", k);
         }
     });
-    const Se = (k) => {
+    const Le = (k) => {
       var R, W, q;
       (((R = k.clipboardData) == null ? void 0 : R.getData("text").substr(0, 6)) ?? "").split("").forEach((ne, ue) => {
         ue < o.value.length && (o.value[ue] = ne);
       });
       const T = o.value.findIndex((ne) => !ne);
       T !== -1 && b.value[T] ? (W = b.value[T]) == null || W.focus() : b.value[o.value.length - 1] && ((q = b.value[o.value.length - 1]) == null || q.focus());
-    }, Ee = (k, P) => {
+    }, Re = (k, P) => {
       var R;
       let T = k;
       if (P.key === "Backspace" || P.key === "ArrowLeft")
         T = k > 0 ? k - 1 : 0, P.key === "Backspace" && k > 0 && (o.value[k] = "");
       else if (/^[0-9]$/.test(P.key) || P.key === "ArrowRight") {
         if (/^[0-9]$/.test(P.key) && k < o.value.length - 1) {
-          He(() => {
+          je(() => {
             var W;
             b.value[k + 1] && ((W = b.value[k + 1]) == null || W.focus());
           });
@@ -1284,8 +1291,8 @@ const St = "#", Et = /* @__PURE__ */ H({
       b.value[T] && ((R = b.value[T]) == null || R.focus());
     };
     return (k, P) => {
-      const T = $e("maska");
-      return v(), A(M, null, {
+      const T = He("maska");
+      return v(), A(F, null, {
         default: u(() => [
           P[8] || (P[8] = C("div", { id: "recaptcha-container" }, null, -1)),
           h(z, { flat: "" }, {
@@ -1302,7 +1309,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                   E(K(d.value.message || d.value), 1)
                 ]),
                 _: 1
-              })) : (v(), A(se, {
+              })) : (v(), A(ae, {
                 key: 1,
                 class: "text-center"
               }))
@@ -1319,9 +1326,9 @@ const St = "#", Et = /* @__PURE__ */ H({
               }, [
                 h(B, { class: "mb-0 pb-0" }, {
                   default: u(() => [
-                    h(Ye, {
-                      modelValue: s.value,
-                      "onUpdate:modelValue": P[1] || (P[1] = (R) => s.value = R),
+                    h(ot, {
+                      modelValue: a.value,
+                      "onUpdate:modelValue": P[1] || (P[1] = (R) => a.value = R),
                       items: r,
                       "item-title": "label",
                       "item-value": "value",
@@ -1329,14 +1336,14 @@ const St = "#", Et = /* @__PURE__ */ H({
                       "prepend-icon": "mdi-earth",
                       class: "mb-4"
                     }, null, 8, ["modelValue"]),
-                    h(F, {
+                    h(M, {
                       modelValue: i.value,
                       "onUpdate:modelValue": P[2] || (P[2] = (R) => i.value = R),
                       required: "",
                       autocomplete: "off",
                       label: "Phone Number",
                       "prepend-icon": "mdi-cellphone",
-                      prefix: s.value,
+                      prefix: a.value,
                       placeholder: L(),
                       rules: [_.value.phoneNumber],
                       onInput: O
@@ -1381,14 +1388,14 @@ const St = "#", Et = /* @__PURE__ */ H({
                     C("br"),
                     E(" sent to your mobile phone ")
                   ], -1)),
-                  h(Xe, { class: "centered-input" }, {
+                  h(et, { class: "centered-input" }, {
                     default: u(() => [
-                      (v(), U(Me, null, Fe(6, (R, W) => h(Ze, {
+                      (v(), U(qe, null, Ge(6, (R, W) => h(tt, {
                         key: W,
                         cols: "2"
                       }, {
                         default: u(() => [
-                          ze((v(), A(F, {
+                          Be((v(), A(M, {
                             ref_for: !0,
                             ref: (q) => b.value[W] = q,
                             key: W,
@@ -1397,10 +1404,10 @@ const St = "#", Et = /* @__PURE__ */ H({
                             variant: "outlined",
                             maxlength: "1",
                             "hide-details": "",
-                            onKeyup: (q) => Ee(W, q),
-                            onPaste: Se
+                            onKeyup: (q) => Re(W, q),
+                            onPaste: Le
                           }, null, 8, ["modelValue", "onUpdate:modelValue", "onKeyup"])), [
-                            [T, St]
+                            [T, Lt]
                           ])
                         ]),
                         _: 2
@@ -1441,39 +1448,39 @@ const St = "#", Et = /* @__PURE__ */ H({
       });
     };
   }
-}), Lt = (t, e) => {
+}), Vt = (t, e) => {
   const o = t.__vccOpts || t;
-  for (const [i, s] of e)
-    o[i] = s;
+  for (const [i, a] of e)
+    o[i] = a;
   return o;
-}, Rt = /* @__PURE__ */ Lt(Et, [["__scopeId", "data-v-e9ad2744"]]), Vt = { key: 0 }, Ct = { key: 1 }, xt = { key: 0 }, It = { key: 1 }, Nt = { key: 2 }, Tt = { key: 3 }, Wt = /* @__PURE__ */ H({
+}, Ct = /* @__PURE__ */ Vt(Rt, [["__scopeId", "data-v-e9ad2744"]]), xt = { key: 0 }, It = { key: 1 }, Nt = { key: 0 }, Tt = { key: 1 }, Wt = { key: 2 }, Ut = { key: 3 }, Dt = /* @__PURE__ */ H({
   __name: "EmailVerification",
   setup(t) {
     const e = D(), {
       is_loading: o,
       signOut: i,
-      sendVerificationEmail: s,
+      sendVerificationEmail: a,
       SET_EMAIL_VERIFICATION_SCREEN_SHOWN: n
-    } = e, a = S({
+    } = e, s = S({
       get: () => e.error,
       set: (b) => {
         e.error = b;
       }
     }), g = S(() => e.getError), c = S(() => e.isAuthenticated), m = S(() => e.isEmailResetPasswordLinkSent), l = S(() => e.isEmailVerificationLinkSent), d = () => {
-      a.value = null;
+      s.value = null;
     }, w = () => {
-      s();
+      a();
     };
     return G(g, (b) => {
       b && setTimeout(d, 5e3);
-    }), (b, r) => (v(), A(M, null, {
+    }), (b, r) => (v(), A(F, null, {
       default: u(() => [
         h(z, {
           flat: "",
           class: "text-center pa-5"
         }, {
           default: u(() => [
-            g.value ? (v(), U("div", Vt, [
+            g.value ? (v(), U("div", xt, [
               r[4] || (r[4] = C("div", { class: "text-h4 text-grey mb-3" }, "Error!", -1)),
               g.value ? (v(), A(Y, {
                 key: 0,
@@ -1501,8 +1508,8 @@ const St = "#", Et = /* @__PURE__ */ H({
                 _: 1,
                 __: [3]
               })
-            ])) : (v(), U("div", Ct, [
-              l.value ? V("", !0) : (v(), U("div", xt, [
+            ])) : (v(), U("div", It, [
+              l.value ? V("", !0) : (v(), U("div", Nt, [
                 r[6] || (r[6] = C("div", { class: "text-h4 text-grey mb-3" }, "Verification Required", -1)),
                 h(j, {
                   size: "100",
@@ -1516,7 +1523,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                   __: [5]
                 })
               ])),
-              l.value ? (v(), U("div", It, [
+              l.value ? (v(), U("div", Tt, [
                 r[8] || (r[8] = C("div", { class: "text-h4 text-grey mb-3" }, "Email Sent!", -1)),
                 h(j, {
                   size: "100",
@@ -1533,7 +1540,7 @@ const St = "#", Et = /* @__PURE__ */ H({
               r[15] || (r[15] = C("div", { class: "text-grey-darken-2 mb-7 body-2" }, [
                 C("p", null, " Please check your email to verify your address. Click the link in the email we've sent you to confirm your account access. ")
               ], -1)),
-              m.value ? V("", !0) : (v(), U("div", Nt, [
+              m.value ? V("", !0) : (v(), U("div", Wt, [
                 r[10] || (r[10] = C("p", { class: "text-grey-darken-2 mb-7 body-2" }, [
                   E(" If you have not received a verification email,"),
                   C("br"),
@@ -1551,7 +1558,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                   __: [9]
                 }, 8, ["disabled"])
               ])),
-              m.value ? (v(), U("div", Tt, [
+              m.value ? (v(), U("div", Ut, [
                 h(x, {
                   color: "primary",
                   onClick: r[1] || (r[1] = (f) => N(n)(!1))
@@ -1563,7 +1570,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                   __: [11]
                 })
               ])) : V("", !0),
-              h(M, null, {
+              h(F, null, {
                 default: u(() => [
                   r[14] || (r[14] = C("div", { class: "caption mb-2" }, "- or -", -1)),
                   c.value ? (v(), A(x, {
@@ -1601,25 +1608,25 @@ const St = "#", Et = /* @__PURE__ */ H({
       _: 1
     }));
   }
-}), Ut = { class: "caption" }, Dt = { key: 0 }, Ot = {
+}), Ot = { class: "caption" }, $t = { key: 0 }, Ft = {
   key: 0,
   class: "ml-2"
-}, $t = /* @__PURE__ */ H({
+}, Mt = /* @__PURE__ */ H({
   __name: "LoginWithProvider",
   setup(t) {
-    const e = D(), { loginWithGoogle: o, loginWithFacebook: i, loginWithSaml: s, SET_SHOW_LOGIN_WITH_PHONE: n } = e, a = S(() => e.config), g = S(() => e.isLoginWithProvidersActive), c = S(() => e.isOnlySingleProvider);
-    return (m, l) => g.value ? (v(), A(M, {
+    const e = D(), { loginWithGoogle: o, loginWithFacebook: i, loginWithSaml: a, SET_SHOW_LOGIN_WITH_PHONE: n } = e, s = S(() => e.config), g = S(() => e.isLoginWithProvidersActive), c = S(() => e.isOnlySingleProvider);
+    return (m, l) => g.value ? (v(), A(F, {
       key: 0,
       class: "text-center ma-0 pa-0"
     }, {
       default: u(() => [
-        C("div", Ut, [
-          a.value.email ? (v(), U("span", Dt, "or ")) : V("", !0),
+        C("div", Ot, [
+          s.value.email ? (v(), U("span", $t, "or ")) : V("", !0),
           l[4] || (l[4] = E("login with"))
         ]),
-        h(M, null, {
+        h(F, null, {
           default: u(() => [
-            a.value.google ? (v(), A(x, {
+            s.value.google ? (v(), A(x, {
               key: 0,
               class: "mr-2",
               color: "#db3236",
@@ -1644,7 +1651,7 @@ const St = "#", Et = /* @__PURE__ */ H({
               ]),
               _: 1
             }, 8, ["icon"])) : V("", !0),
-            a.value.facebook ? (v(), A(x, {
+            s.value.facebook ? (v(), A(x, {
               key: 1,
               class: "mr-2",
               color: "#3b5998",
@@ -1668,7 +1675,7 @@ const St = "#", Et = /* @__PURE__ */ H({
               ]),
               _: 1
             }, 8, ["icon"])) : V("", !0),
-            a.value.phone ? (v(), A(x, {
+            s.value.phone ? (v(), A(x, {
               key: 2,
               class: "mr-2",
               color: "primary",
@@ -1692,12 +1699,12 @@ const St = "#", Et = /* @__PURE__ */ H({
               ]),
               _: 1
             }, 8, ["icon"])) : V("", !0),
-            a.value.saml ? (v(), A(x, {
+            s.value.saml ? (v(), A(x, {
               key: 3,
               color: "secondary",
               variant: "outlined",
               icon: !c.value,
-              onClick: l[3] || (l[3] = (d) => N(s)())
+              onClick: l[3] || (l[3] = (d) => N(a)())
             }, {
               default: u(() => [
                 h(j, null, {
@@ -1707,7 +1714,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                   _: 1,
                   __: [8]
                 }),
-                c.value ? (v(), U("span", Ot, K(a.value.saml_text), 1)) : V("", !0),
+                c.value ? (v(), U("span", Ft, K(s.value.saml_text), 1)) : V("", !0),
                 h(Q, {
                   activator: "parent",
                   location: "bottom",
@@ -1723,7 +1730,7 @@ const St = "#", Et = /* @__PURE__ */ H({
       _: 1
     })) : V("", !0);
   }
-}), Mt = { key: 0 }, Ft = { key: 1 }, zt = /* @__PURE__ */ H({
+}), zt = { key: 0 }, Ht = { key: 1 }, qt = /* @__PURE__ */ H({
   __name: "AuthGuard",
   setup(t) {
     const e = D(), { initializeGuard: o } = e, i = I(e.tab);
@@ -1736,10 +1743,10 @@ const St = "#", Et = /* @__PURE__ */ H({
     }), G(i, (p, y) => {
       console.log("[AuthGuard] Local tab changed from", y, "to:", p), e.tab !== p && e.SET_TAB(p), (p === 0 || p === 1) && (e.isResetPasswordScreenShown && e.SET_PASSWORD_RESET_SCREEN_SHOWN(!1), e.isLoginWithPhoneShown && e.SET_SHOW_LOGIN_WITH_PHONE(!1));
     });
-    const s = i, n = S(() => e.config), a = S(() => e.is_loading), g = S(() => e.isLoginWithPhoneShown), c = S(() => {
+    const a = i, n = S(() => e.config), s = S(() => e.is_loading), g = S(() => e.isLoginWithPhoneShown), c = S(() => {
       const p = e.isUserRegistrationAllowed;
       return console.log("[AuthGuard] isUserRegistrationAllowed:", p), p;
-    }), m = S(() => e.isResetPasswordScreenShown), l = S(() => e.isEmailVerificationScreenShown), d = S(() => e.is_authguard_dialog_persistent), w = Qe(), b = S(() => {
+    }), m = S(() => e.isResetPasswordScreenShown), l = S(() => e.isEmailVerificationScreenShown), d = S(() => e.is_authguard_dialog_persistent), w = Fe(), b = S(() => {
       var p;
       return ((p = n.value) == null ? void 0 : p.debug) ?? !1;
     }), r = S(() => w.path), f = S({
@@ -1751,11 +1758,11 @@ const St = "#", Et = /* @__PURE__ */ H({
     }), _ = () => {
       b.value && console.log("[ auth guard ]: Dialog closed by user"), e.loginState = null;
     };
-    return ke(() => {
+    return Ae(() => {
       o();
     }), G(r, (p, y) => {
-      typeof y > "u" || (b.value && console.log("[ auth guard ]: vue router current route change: [", y, "] -> [", p, "]"), Pe());
-    }), (p, y) => (v(), A(tt, {
+      typeof y > "u" || (b.value && console.log("[ auth guard ]: vue router current route change: [", y, "] -> [", p, "]"), Ee());
+    }), (p, y) => (v(), A(it, {
       modelValue: f.value,
       "onUpdate:modelValue": y[3] || (y[3] = (L) => f.value = L),
       persistent: d.value,
@@ -1764,7 +1771,7 @@ const St = "#", Et = /* @__PURE__ */ H({
       "content-class": "elevation-0"
     }, {
       default: u(() => [
-        h(M, {
+        h(F, {
           style: { "max-width": "500px" },
           class: "mb-5"
         }, {
@@ -1775,13 +1782,13 @@ const St = "#", Et = /* @__PURE__ */ H({
               style: { "min-height": "500px", display: "flex", "flex-direction": "column" }
             }, {
               default: u(() => [
-                h(ot, { indeterminate: a.value }, null, 8, ["indeterminate"]),
-                l.value ? (v(), U("div", Mt, [
-                  h(Wt)
-                ])) : (v(), U("div", Ft, [
-                  h(it, {
-                    modelValue: N(s),
-                    "onUpdate:modelValue": y[1] || (y[1] = (L) => fe(s) ? s.value = L : null),
+                h(at, { indeterminate: s.value }, null, 8, ["indeterminate"]),
+                l.value ? (v(), U("div", zt, [
+                  h(Dt)
+                ])) : (v(), U("div", Ht, [
+                  h(nt, {
+                    modelValue: N(a),
+                    "onUpdate:modelValue": y[1] || (y[1] = (L) => _e(a) ? a.value = L : null),
                     grow: ""
                   }, {
                     default: u(() => [
@@ -1832,8 +1839,8 @@ const St = "#", Et = /* @__PURE__ */ H({
                   h(B, null, {
                     default: u(() => [
                       h(st, {
-                        modelValue: N(s),
-                        "onUpdate:modelValue": y[2] || (y[2] = (L) => fe(s) ? s.value = L : null)
+                        modelValue: N(a),
+                        "onUpdate:modelValue": y[2] || (y[2] = (L) => _e(a) ? a.value = L : null)
                       }, {
                         default: u(() => [
                           (v(), A(te, {
@@ -1842,7 +1849,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                             class: "pt--1"
                           }, {
                             default: u(() => [
-                              h(yt)
+                              h(wt)
                             ]),
                             _: 1
                           })),
@@ -1852,7 +1859,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                             class: "pt-5"
                           }, {
                             default: u(() => [
-                              h(kt)
+                              h(At)
                             ]),
                             _: 1
                           })),
@@ -1861,7 +1868,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                             value: 2
                           }, {
                             default: u(() => [
-                              h(At)
+                              h(St)
                             ]),
                             _: 1
                           })),
@@ -1870,7 +1877,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                             value: 3
                           }, {
                             default: u(() => [
-                              h(Rt)
+                              h(Ct)
                             ]),
                             _: 1
                           }))
@@ -1883,7 +1890,7 @@ const St = "#", Et = /* @__PURE__ */ H({
                 ])),
                 l.value ? V("", !0) : (v(), A(J, { key: 2 }, {
                   default: u(() => [
-                    h($t)
+                    h(Mt)
                   ]),
                   _: 1
                 }))
@@ -1897,33 +1904,33 @@ const St = "#", Et = /* @__PURE__ */ H({
       _: 1
     }, 8, ["modelValue", "persistent"]));
   }
-}), ro = async (t, e, o) => {
+}), uo = async (t, e, o) => {
   var n;
-  const i = D(), s = ((n = i.config) == null ? void 0 : n.debug) ?? !1;
-  if (t.matched.some((a) => a.meta.requiresAuth))
-    if (s && console.log("[ auth guard ]: Route requires authentication. Evaluating..."), i.routesInitialized === !1 && (await i.initializeGuard(), i.routesInitialized = !0), i.isAuthenticated)
-      s && console.log("[ auth guard ]: User is authenticated."), o();
+  const i = D(), a = ((n = i.config) == null ? void 0 : n.debug) ?? !1;
+  if (t.matched.some((s) => s.meta.requiresAuth))
+    if (a && console.log("[ auth guard ]: Route requires authentication. Evaluating..."), i.routesInitialized === !1 && (await i.initializeGuard(), i.routesInitialized = !0), i.isAuthenticated)
+      a && console.log("[ auth guard ]: User is authenticated."), o();
     else {
-      s && console.log("[ auth guard ]: User not authenticated."), i.loginState = t.fullPath, i.SET_PASSWORD_RESET_SCREEN_SHOWN(!1), i.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(!1);
-      const a = !e.name, g = e.name && !e.matched.some((c) => c.meta.requiresAuth);
-      i.is_authguard_dialog_persistent = a || !g, s && console.log("[ auth guard ]: Navigation context:", {
-        isDirectAccess: a,
+      a && console.log("[ auth guard ]: User not authenticated."), i.loginState = t.fullPath, i.SET_PASSWORD_RESET_SCREEN_SHOWN(!1), i.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(!1);
+      const s = !e.name, g = e.name && !e.matched.some((c) => c.meta.requiresAuth);
+      i.is_authguard_dialog_persistent = s || !g, a && console.log("[ auth guard ]: Navigation context:", {
+        isDirectAccess: s,
         hasPublicRoute: g,
         fromRoute: e.name,
         toRoute: t.name,
         dialogPersistent: i.is_authguard_dialog_persistent
-      }), i.toggleAuthDialog(!0), s && console.log("[ auth guard ]: Blocking navigation to protected route"), o(!1);
+      }), i.toggleAuthDialog(!0), a && console.log("[ auth guard ]: Blocking navigation to protected route"), o(!1);
     }
   else
     o();
-}, lo = /* @__PURE__ */ H({
+}, co = /* @__PURE__ */ H({
   __name: "AuthRouterView",
   props: {
     fallbackRoute: { default: "/" }
   },
   setup(t) {
-    const e = D(), o = et(), i = t;
-    let s = null;
+    const e = D(), o = Me(), i = t;
+    let a = null;
     const n = async (c) => {
       var m;
       try {
@@ -1942,7 +1949,7 @@ const St = "#", Et = /* @__PURE__ */ H({
         console.error(`[AuthRouterView] Error loading fallback component from route ${c}:`, l);
       }
       return null;
-    }, a = (c) => {
+    }, s = (c) => {
       try {
         return o.resolve(c).matched.some((l) => l.meta.requiresAuth === !0);
       } catch {
@@ -1950,64 +1957,71 @@ const St = "#", Et = /* @__PURE__ */ H({
       }
     }, g = (c, m) => {
       var d, w;
-      return c ? !m.matched.some((b) => b.meta.requiresAuth) || e.isAuthenticated ? c : i.fallbackRoute && a(i.fallbackRoute) ? ((d = e.config) != null && d.debug && console.log(`[AuthRouterView] Fallback route ${i.fallbackRoute} is also protected, hiding content`), {
+      return c ? !m.matched.some((b) => b.meta.requiresAuth) || e.isAuthenticated ? c : i.fallbackRoute && s(i.fallbackRoute) ? ((d = e.config) != null && d.debug && console.log(`[AuthRouterView] Fallback route ${i.fallbackRoute} is also protected, hiding content`), {
         name: "AuthRouterViewEmpty",
         template: "<div></div>"
-      }) : ((w = e.config) != null && w.debug && console.log(`[AuthRouterView] Showing fallback content for protected route: ${m.path}`), !s && i.fallbackRoute && (s = Be(async () => {
+      }) : ((w = e.config) != null && w.debug && console.log(`[AuthRouterView] Showing fallback content for protected route: ${m.path}`), !a && i.fallbackRoute && (a = Xe(async () => {
         const b = await n(i.fallbackRoute);
         return b || {
           name: "AuthRouterViewFallback",
           template: "<div></div>"
         };
-      })), s || c) : void 0;
+      })), a || c) : void 0;
     };
     return (c, m) => {
-      const l = qe("router-view");
+      const l = Ke("router-view");
       return v(), A(l, null, {
         default: u(({ Component: d, route: w }) => [
-          (v(), A(Ge(g(d, w))))
+          (v(), A(Je(g(d, w))))
         ]),
         _: 1
       });
     };
   }
-}), uo = {
+}), ho = {
   install: (t, e = {}) => {
-    const o = { ...vt, ...e }, { firebase: i, debug: s, verification: n, router: a, session: g } = o, c = $(i);
-    let m = be;
-    g === "browser" || g === "session" ? m = le : g === "none" && (m = le, s && console.log("[ auth guard ]: 'none' persistence is interpreted as browserSessionPersistence for Firebase.")), re(c, m).then(() => {
-      s && console.log(`[ auth guard ]: Firebase session persistence set to ${g}`);
+    const o = { ...yt, ...e }, { firebase: i, debug: a, verification: n, router: s, session: g } = o, c = $(i);
+    let m = ke;
+    g === "browser" || g === "session" ? m = le : g === "none" && (m = le, a && console.log("[ auth guard ]: 'none' persistence is interpreted as browserSessionPersistence for Firebase.")), re(c, m).then(() => {
+      a && console.log(`[ auth guard ]: Firebase session persistence set to ${g}`);
     }).catch((d) => {
-      s && console.error("[ auth guard ]: Error setting Firebase session persistence:", d);
-    }), s && (console.log("[ auth guard ]: wrapper initialization..."), i === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), a === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), t.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), t.use(Re()));
+      a && console.error("[ auth guard ]: Error setting Firebase session persistence:", d);
+    }), a && (console.log("[ auth guard ]: wrapper initialization..."), i === null && console.error("[ auth guard ]: ERROR: firebase instance missing in AuthenticationGuard config!"), s === null && console.error("[ auth guard ]: ERROR: router instance missing in AuthenticationGuard config!")), t.config.globalProperties.$pinia || (console.log("[ auth guard ]: pinia store not detected - creating..."), t.use(Ce()));
     const l = D();
-    l.config = o, ye(c).then((d) => {
-      if (s && console.log("[ auth guard ]: Checking redirect result:", d), d && d.user) {
-        s && console.log("[ auth guard ]: Redirect auth successful");
+    l.config = o, s.isReady().catch((d) => {
+      if (fe(d, pe.aborted))
+        a && console.log("[ auth guard ]: Initial navigation to protected route was blocked (user not authenticated)");
+      else
+        throw d;
+    }), we(c).then((d) => {
+      if (a && console.log("[ auth guard ]: Checking redirect result:", d), d && d.user) {
+        a && console.log("[ auth guard ]: Redirect auth successful");
         const { uid: w, displayName: b, email: r, emailVerified: f, isAnonymous: _, phoneNumber: p, photoURL: y } = d.user;
-        l.current_user = { uid: w, displayName: b, email: r, emailVerified: f, isAnonymous: _, phoneNumber: p, photoURL: y }, l.loggedIn = !0, l.data = d.user, l.is_authguard_dialog_shown && l.toggleAuthDialog(!1), l.loginState && (s && console.log("[ auth guard ]: Clearing loginState after redirect:", l.loginState), l.loginState = null);
+        l.current_user = { uid: w, displayName: b, email: r, emailVerified: f, isAnonymous: _, phoneNumber: p, photoURL: y }, l.loggedIn = !0, l.data = d.user, l.is_authguard_dialog_shown && l.toggleAuthDialog(!1), l.loginState && (a && console.log("[ auth guard ]: Clearing loginState after redirect:", l.loginState), l.loginState = null);
       } else
-        s && console.log("[ auth guard ]: No redirect result or user");
+        a && console.log("[ auth guard ]: No redirect result or user");
     }).catch((d) => {
-      s && console.error("[ auth guard ]: Redirect auth error:", d), l.error = d;
-    }), De(c, (d) => {
+      a && console.error("[ auth guard ]: Redirect auth error:", d), l.error = d;
+    }), $e(c, (d) => {
       const w = l.loggedIn, b = l.init;
-      if (l.init = !0, l.current_user = d, l.loggedIn = !!d, d ? l.data = d : (l.data = null, b && w && a.isReady().then(() => {
-        const r = a.currentRoute.value;
-        r.matched.some((_) => _.meta.requiresAuth) && (s && console.log("[ auth guard ]: User signed out on protected route, showing auth dialog"), l.loginState = r.fullPath, l.SET_PASSWORD_RESET_SCREEN_SHOWN(!1), l.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(!1), l.toggleAuthDialog(!0), l.is_authguard_dialog_persistent = !0, a.replace(r.fullPath).catch((_) => {
-          s && console.log("[ auth guard ]: Route re-evaluation error:", _);
+      if (l.init = !0, l.current_user = d, l.loggedIn = !!d, d ? l.data = d : (l.data = null, b && w && s.isReady().then(() => {
+        const r = s.currentRoute.value;
+        r.matched.some((_) => _.meta.requiresAuth) && (a && console.log("[ auth guard ]: User signed out on protected route, showing auth dialog"), l.loginState = r.fullPath, l.SET_PASSWORD_RESET_SCREEN_SHOWN(!1), l.SET_EMAIL_VERIFICATION_SCREEN_SHOWN(!1), l.toggleAuthDialog(!0), l.is_authguard_dialog_persistent = !0, s.replace(r.fullPath).catch((_) => {
+          a && console.log("[ auth guard ]: Route re-evaluation error:", _);
         }));
-      })), a.isReady().then(() => {
-        Pe();
+      })), s.isReady().then(() => {
+        Ee();
       }), d) {
-        if (s && console.log("[ auth guard ]: auth state changed. User is Authenticated!"), l.is_authguard_dialog_shown && (s && console.log("[ auth guard ]: dialog visibility set to false"), l.toggleAuthDialog(!1)), l.loginState) {
+        if (a && console.log("[ auth guard ]: auth state changed. User is Authenticated!"), l.is_authguard_dialog_shown && (a && console.log("[ auth guard ]: dialog visibility set to false"), l.toggleAuthDialog(!1)), l.loginState) {
           const f = l.loginState;
-          s && console.log("[ auth guard ]: Navigating to stored route:", f), l.loginState = null, a.push(f).catch((_) => {
-            s && console.error("[ auth guard ]: Navigation error:", _);
+          a && console.log("[ auth guard ]: Navigating to stored route:", f), l.loginState = null, s.push(f).catch((_) => {
+            a && console.error("[ auth guard ]: Navigation error:", _);
           });
         } else {
-          const f = a.currentRoute.value;
-          f.matched.some((p) => p.meta.requiresAuth) && (s && console.log("[ auth guard ]: User authenticated on protected route, forcing re-evaluation"), a.replace(f.fullPath));
+          const f = s.currentRoute.value;
+          f.matched.some((p) => p.meta.requiresAuth) && (a && console.log("[ auth guard ]: User authenticated on protected route, forcing re-evaluation"), s.replace(f.fullPath).catch((p) => {
+            fe(p, pe.aborted) ? a && console.log("[ auth guard ]: Route re-evaluation blocked by auth guard") : a && console.error("[ auth guard ]: Route re-evaluation error:", p);
+          }));
         }
         const r = c.currentUser;
         if (n && r && !r.emailVerified) {
@@ -2020,13 +2034,13 @@ const St = "#", Et = /* @__PURE__ */ H({
           }, 3500);
         }
       }
-      s && console.log("[ auth guard ]: auth state changed. User ID: [", (d == null ? void 0 : d.uid) || null, "]");
-    }), t.directive("maska", _t), t.component("AuthenticationGuard", zt);
+      a && console.log("[ auth guard ]: auth state changed. User ID: [", (d == null ? void 0 : d.uid) || null, "]");
+    }), t.directive("maska", bt), t.component("AuthenticationGuard", qt);
   }
 };
 export {
-  ro as AuthMiddleware,
-  lo as AuthRouterView,
-  uo as default,
+  uo as AuthMiddleware,
+  co as AuthRouterView,
+  ho as default,
   D as useAuthStore
 };

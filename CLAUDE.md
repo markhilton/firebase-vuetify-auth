@@ -52,7 +52,8 @@ npm run lint:fix     # Fix ESLint issues automatically
    - `SamlSSO.vue` - SAML authentication
 
 5. **Middleware**: `src/middleware/firebase.ts` (TypeScript)
-   - Firebase initialization with provided config
+   - Imports `firebaseConfig` from `src/firebase.config.ts` (gitignored, copy from `firebase.config.example.ts`)
+   - Validates all required config fields on startup; logs a boxed error and throws if any are missing
    - Auth instance creation with proper typing
 
 ### Build Configuration

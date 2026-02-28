@@ -3,6 +3,7 @@ import { useAuthStore } from "@/store/auth"
 import { vMaska } from "maska/vue"
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, getRedirectResult } from "firebase/auth"
 import type { Auth, Persistence } from "firebase/auth"
+import { isNavigationFailure, NavigationFailureType } from 'vue-router'
 import type { App } from 'vue'
 import type { AuthGuardSettings } from './types'
 
@@ -72,6 +73,18 @@ export default {
 
     // commit npm package config to the store
     authStore.config = globalConfig
+
+    // Catch navigation errors from initial route resolution.
+    // When an unauthenticated user directly loads a protected URL, the auth guard
+    // calls next(false) which causes the initial navigation promise to reject.
+    // Without this catch, it appears as an uncaught promise rejection in the console.
+    router.isReady().catch((error: any) => {
+      if (isNavigationFailure(error, NavigationFailureType.aborted)) {
+        if (debug) console.log("[ auth guard ]: Initial navigation to protected route was blocked (user not authenticated)")
+      } else {
+        throw error
+      }
+    })
 
     // Handle redirect result from social auth (Google, Facebook, etc.)
     getRedirectResult(auth).then((result) => {
@@ -186,7 +199,13 @@ export default {
             if (debug) console.log("[ auth guard ]: User authenticated on protected route, forcing re-evaluation")
             // Force the router to re-evaluate the current route
             // This will make the content visible now that the user is authenticated
-            router.replace(currentRoute.fullPath)
+            router.replace(currentRoute.fullPath).catch((error: any) => {
+              if (isNavigationFailure(error, NavigationFailureType.aborted)) {
+                if (debug) console.log("[ auth guard ]: Route re-evaluation blocked by auth guard")
+              } else {
+                if (debug) console.error("[ auth guard ]: Route re-evaluation error:", error)
+              }
+            })
           }
         }
 
