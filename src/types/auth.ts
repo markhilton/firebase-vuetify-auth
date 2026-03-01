@@ -2,9 +2,8 @@ import type { User as FirebaseUser } from 'firebase/auth'
 import type { RouteLocationRaw, Router } from 'vue-router'
 import type { FirebaseApp } from 'firebase/app'
 
-export interface AuthUser extends FirebaseUser {
-  // Additional custom user properties can be added here
-}
+// Re-export FirebaseUser as AuthUser for potential future extension
+export type AuthUser = FirebaseUser
 
 export interface AuthState {
   loggedIn: boolean

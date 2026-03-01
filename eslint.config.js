@@ -1,95 +1,109 @@
 import js from '@eslint/js';
-import pluginVue from 'eslint-plugin-vue';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
+import tseslint from 'typescript-eslint';
+import vuePlugin from 'eslint-plugin-vue';
+import vueParser from 'vue-eslint-parser';
 import prettier from 'eslint-config-prettier';
-import globals from 'globals';
 
 export default [
-  // Ignore patterns
+  // Global ignores
   {
-    ignores: ['node_modules/**', 'dist/**']
+    ignores: ['node_modules/**', 'dist/**'],
   },
-  
-  // Base JavaScript config
+
+  // Base JS recommended rules
   js.configs.recommended,
-  
-  // TypeScript files
+
+  // TypeScript recommended rules
+  ...tseslint.configs.recommended,
+
+  // Vue flat/recommended rules
+  ...vuePlugin.configs['flat/recommended'],
+
+  // Shared settings for all source files
   {
-    files: ['**/*.ts'],
-    languageOptions: {
-      parser: tsParser,
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        console: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly'
-      }
-    },
-    plugins: {
-      '@typescript-eslint': tseslint
-    },
+    files: ['src/**/*.{js,ts,vue}'],
     rules: {
       'no-console': 'off',
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      'no-unused-vars': 'off', // Disable base rule
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': ['warn', {
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
-        ignoreRestSiblings: true
-      }]
-    }
+        ignoreRestSiblings: true,
+      }],
+    },
   },
-  
+
+  // TypeScript files
+  {
+    files: ['src/**/*.ts'],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
+      },
+    },
+    rules: {
+      'no-undef': 'off',
+    },
+  },
+
   // Special rule for auth-actions.ts to ignore 'this' parameter
   {
     files: ['**/auth-actions.ts'],
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { 
+      '@typescript-eslint/no-unused-vars': ['warn', {
         argsIgnorePattern: '^_|^this$',
-        varsIgnorePattern: '^_'
-      }]
-    }
+        varsIgnorePattern: '^_',
+        ignoreRestSiblings: true,
+      }],
+    },
   },
-  
+
   // Vue files
-  ...pluginVue.configs['flat/recommended'],
   {
-    files: ['**/*.vue'],
+    files: ['src/**/*.vue'],
     languageOptions: {
+      parser: vueParser,
       parserOptions: {
-        parser: tsParser
+        parser: tseslint.parser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
       },
       globals: {
-        ...globals.browser,
-        ...globals.node,
+        process: 'readonly',
         console: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        defineProps: 'readonly',
+        defineEmits: 'readonly',
+        defineExpose: 'readonly',
+        withDefaults: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
         ClipboardEvent: 'readonly',
-        KeyboardEvent: 'readonly'
-      }
-    },
-    plugins: {
-      vue: pluginVue,
-      '@typescript-eslint': tseslint
+        KeyboardEvent: 'readonly',
+      },
     },
     rules: {
+      'no-undef': 'off',
       'vue/multi-word-component-names': 'off',
-      'no-console': 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_'
-      }]
-    }
+    },
   },
-  
+
   // Prettier (should be last)
-  prettier
+  prettier,
 ];
