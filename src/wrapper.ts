@@ -4,7 +4,6 @@ import { vMaska } from "maska/vue"
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, getRedirectResult } from "firebase/auth"
 import type { Auth, Persistence } from "firebase/auth"
 import { isNavigationFailure, NavigationFailureType } from 'vue-router'
-import type { NavigationFailure } from 'vue-router'
 import type { App } from 'vue'
 import type { AuthGuardSettings } from './types'
 
@@ -75,14 +74,27 @@ export default {
     // commit npm package config to the store
     authStore.config = globalConfig as any
 
-    // With the return-based guard API (return false instead of next(false)),
-    // Vue Router resolves with a NavigationFailure instead of rejecting.
-    // We still log the initial block for debug visibility.
-    router.isReady().then((failure?: void | NavigationFailure) => {
-      if (debug && failure) {
-        console.log("[ auth guard ]: Initial navigation to protected route was blocked (user not authenticated)")
+    // When an unauthenticated user directly loads a protected URL, the auth guard
+    // returns false which causes Vue Router to reject the isReady() promise with
+    // a NavigationAborted error. Catch it here to prevent "Uncaught (in promise)".
+    router.isReady().catch((error: any) => {
+      if (isNavigationFailure(error, NavigationFailureType.aborted)) {
+        if (debug) console.log("[ auth guard ]: Initial navigation to protected route was blocked (user not authenticated)")
+      } else {
+        throw error // Re-throw non-navigation errors
       }
     })
+
+    // Belt-and-suspenders: catch any remaining unhandled navigation rejections
+    // that escape the isReady().catch() or router.push().catch() chains.
+    if (typeof window !== 'undefined') {
+      window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+        if (event.reason && isNavigationFailure(event.reason, NavigationFailureType.aborted)) {
+          event.preventDefault()
+          if (debug) console.log("[ auth guard ]: Suppressed unhandled navigation abort")
+        }
+      })
+    }
 
     // Handle redirect result from social auth (Google, Facebook, etc.)
     getRedirectResult(auth).then((result) => {
