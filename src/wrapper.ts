@@ -4,6 +4,7 @@ import { vMaska } from "maska/vue"
 import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence, browserSessionPersistence, getRedirectResult } from "firebase/auth"
 import type { Auth, Persistence } from "firebase/auth"
 import { isNavigationFailure, NavigationFailureType } from 'vue-router'
+import type { NavigationFailure } from 'vue-router'
 import type { App } from 'vue'
 import type { AuthGuardSettings } from './types'
 
@@ -74,24 +75,12 @@ export default {
     // commit npm package config to the store
     authStore.config = globalConfig as any
 
-    // Catch navigation errors from initial route resolution.
-    // When an unauthenticated user directly loads a protected URL, the auth guard
-    // calls next(false) which causes the initial navigation promise to reject.
-    // Without this catch, it appears as an uncaught promise rejection in the console.
-    router.isReady().catch((error: any) => {
-      if (isNavigationFailure(error, NavigationFailureType.aborted)) {
-        if (debug) console.log("[ auth guard ]: Initial navigation to protected route was blocked (user not authenticated)")
-      } else {
-        throw error
-      }
-    })
-
-    // Catch ALL aborted navigations globally (e.g., when onAuthStateChanged triggers
-    // router.replace() on a protected route while user is unauthenticated).
-    // Without this, aborted navigations surface as "Uncaught (in promise)" errors.
-    router.afterEach((_to, _from, failure) => {
-      if (failure && isNavigationFailure(failure, NavigationFailureType.aborted)) {
-        if (debug) console.log("[ auth guard ]: Navigation blocked — user not authenticated")
+    // With the return-based guard API (return false instead of next(false)),
+    // Vue Router resolves with a NavigationFailure instead of rejecting.
+    // We still log the initial block for debug visibility.
+    router.isReady().then((failure?: void | NavigationFailure) => {
+      if (debug && failure) {
+        console.log("[ auth guard ]: Initial navigation to protected route was blocked (user not authenticated)")
       }
     })
 

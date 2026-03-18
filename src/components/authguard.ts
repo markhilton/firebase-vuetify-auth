@@ -1,8 +1,8 @@
-// vue-router auth guard
+// vue-router auth guard (Vue Router 4 return-based API)
 import { useAuthStore } from "@/store/auth"
-import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import type { RouteLocationNormalized } from 'vue-router'
 
-export const authGuard = async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext): Promise<void> => {
+export const authGuard = async (to: RouteLocationNormalized, from: RouteLocationNormalized): Promise<boolean> => {
   const authStore = useAuthStore()
   const debug = authStore.config?.debug ?? false
 
@@ -16,7 +16,7 @@ export const authGuard = async (to: RouteLocationNormalized, from: RouteLocation
 
     if (authStore.isAuthenticated) {
       if (debug) console.log("[ auth guard ]: User is authenticated.")
-      next()
+      return true
     } else {
       if (debug) console.log("[ auth guard ]: User not authenticated.")
       authStore.loginState = to.fullPath
@@ -45,17 +45,15 @@ export const authGuard = async (to: RouteLocationNormalized, from: RouteLocation
       }
 
       authStore.toggleAuthDialog(true)
-      
-      // Always block navigation to protected routes when not authenticated
-      // This prevents protected content from showing behind the auth dialog
+
+      // Block navigation to protected routes when not authenticated.
+      // Using return-based API (Vue Router 4) instead of next(false) to avoid
+      // unhandled promise rejections during initial navigation.
       if (debug) console.log("[ auth guard ]: Blocking navigation to protected route")
-      
-      // Block navigation by calling next(false)
-      // The navigation error will be handled by the router's error handler
-      next(false)
+      return false
     }
   } else {
-    next()
+    return true
   }
 }
 
