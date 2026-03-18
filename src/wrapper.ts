@@ -86,6 +86,15 @@ export default {
       }
     })
 
+    // Catch ALL aborted navigations globally (e.g., when onAuthStateChanged triggers
+    // router.replace() on a protected route while user is unauthenticated).
+    // Without this, aborted navigations surface as "Uncaught (in promise)" errors.
+    router.afterEach((_to, _from, failure) => {
+      if (failure && isNavigationFailure(failure, NavigationFailureType.aborted)) {
+        if (debug) console.log("[ auth guard ]: Navigation blocked — user not authenticated")
+      }
+    })
+
     // Handle redirect result from social auth (Google, Facebook, etc.)
     getRedirectResult(auth).then((result) => {
       if (debug) console.log("[ auth guard ]: Checking redirect result:", result)

@@ -16,14 +16,10 @@
 
           <div v-else>
             <v-tabs v-model="tab" grow>
-              <v-tab :key="0" :value="0"> Sign In </v-tab>
-              <v-tab v-if="isUserRegistrationAllowed" :key="1" :value="1" @click="() => console.log('[AuthGuard] Register tab clicked!')"> Register </v-tab>
-              <v-tab v-if="isResetPasswordScreenShown && config?.email" :key="2" :value="2">
-                Reset Password
-              </v-tab>
-              <v-tab v-if="isLoginWithPhoneShown && config?.phone" :key="3" :value="3">
-                Log in with Phone
-              </v-tab>
+              <v-tab :key="0" :value="0" text="Sign In" />
+              <v-tab v-if="isUserRegistrationAllowed" :key="1" :value="1" text="Register" />
+              <v-tab v-if="isResetPasswordScreenShown && config?.email" :key="2" :value="2" text="Reset Password" />
+              <v-tab v-if="isLoginWithPhoneShown && config?.phone" :key="3" :value="3" text="Log in with Phone" />
             </v-tabs>
 
             <v-card-text>
@@ -75,13 +71,13 @@ const localTab = ref(store.tab)
 
 // Watch for store tab changes and update local ref
 watch(() => store.tab, (newTab) => {
-  console.log('[AuthGuard] Store tab changed to:', newTab)
+  if (debug.value) console.log('[AuthGuard] Store tab changed to:', newTab)
   localTab.value = newTab
 })
 
 // Watch for phone login state changes
 watch(() => store.isLoginWithPhoneShown, (isShown) => {
-  console.log('[AuthGuard] Phone login shown:', isShown)
+  if (debug.value) console.log('[AuthGuard] Phone login shown:', isShown)
   if (isShown) {
     localTab.value = 3
   }
@@ -89,7 +85,7 @@ watch(() => store.isLoginWithPhoneShown, (isShown) => {
 
 // Watch for reset password state changes
 watch(() => store.isResetPasswordScreenShown, (isShown) => {
-  console.log('[AuthGuard] Reset password shown:', isShown)
+  if (debug.value) console.log('[AuthGuard] Reset password shown:', isShown)
   if (isShown) {
     localTab.value = 2
   }
@@ -97,7 +93,7 @@ watch(() => store.isResetPasswordScreenShown, (isShown) => {
 
 // Watch for local tab changes and update store
 watch(localTab, (newTab, oldTab) => {
-  console.log('[AuthGuard] Local tab changed from', oldTab, 'to:', newTab)
+  if (debug.value) console.log('[AuthGuard] Local tab changed from', oldTab, 'to:', newTab)
   
   // Only update store if it's different from current store value
   if (store.tab !== newTab) {
@@ -123,7 +119,7 @@ const is_loading = computed(() => store.is_loading)
 const isLoginWithPhoneShown = computed(() => store.isLoginWithPhoneShown)
 const isUserRegistrationAllowed = computed(() => {
   const allowed = store.isUserRegistrationAllowed
-  console.log('[AuthGuard] isUserRegistrationAllowed:', allowed)
+  if (debug.value) console.log('[AuthGuard] isUserRegistrationAllowed:', allowed)
   return allowed
 })
 const isResetPasswordScreenShown = computed(() => store.isResetPasswordScreenShown)
