@@ -8,6 +8,11 @@ const defaultSettings: Partial<AuthGuardSettings> = {
   saml_text: "Login with SAML", // saml button text
   saml_provider_id: "saml.okta", // saml provider id
 
+  oidc: false, // allow authentication with OIDC provider
+  oidc_text: "Login with SSO", // oidc button text
+  oidc_provider_id: "oidc.okta", // oidc provider id
+  oidc_scopes: ['openid', 'profile', 'email'], // oidc scopes
+
   email: true, // allow authentication with email
   phone: false, // allow authentication with phone
   google: false, // allow authentication with gmail account

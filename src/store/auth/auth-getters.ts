@@ -129,7 +129,8 @@ export const getters = {
       config.facebook,
       config.email,
       config.phone,
-      config.saml
+      config.saml,
+      config.oidc
     ].filter(Boolean)
     
     return providers.length === 1
@@ -162,9 +163,10 @@ export const getters = {
     if (!config) return false
     
     return Boolean(
-      config.google || 
-      config.facebook || 
-      config.saml || 
+      config.google ||
+      config.facebook ||
+      config.saml ||
+      config.oidc ||
       config.phone
     )
   },

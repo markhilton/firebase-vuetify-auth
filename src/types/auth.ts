@@ -63,6 +63,11 @@ export interface AuthGuardSettings {
   saml_text?: string
   saml_provider_id?: string
   samlTenantId?: string
+  oidc?: boolean
+  oidc_provider_id?: string      // e.g. 'oidc.okta-prod'
+  oidc_text?: string             // Button label, e.g. 'Okta SSO'
+  oidc_scopes?: string[]         // Default: ['openid', 'profile', 'email']
+  oidc_custom_parameters?: Record<string, string>  // e.g. { prompt: 'none' }
   
   // Icons
   successIcon?: string

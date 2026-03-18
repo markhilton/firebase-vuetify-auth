@@ -51,6 +51,18 @@
         <span v-if="isOnlySingleProvider" class="ml-2">{{ config?.saml_text }}</span>
         <v-tooltip activator="parent" location="bottom" text="Authenticate with SAML provider" />
       </v-btn>
+
+      <v-btn
+        v-if="config?.oidc"
+        color="secondary"
+        variant="outlined"
+        :icon="!isOnlySingleProvider"
+        @click="store.loginWithOidc()"
+      >
+        <v-icon>mdi-shield-key</v-icon>
+        <span v-if="isOnlySingleProvider" class="ml-2">{{ config?.oidc_text }}</span>
+        <v-tooltip activator="parent" location="bottom" :text="config?.oidc_text || 'Login with SSO'" />
+      </v-btn>
     </v-container>
   </v-container>
 </template>

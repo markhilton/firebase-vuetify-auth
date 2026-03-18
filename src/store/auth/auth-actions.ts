@@ -16,6 +16,7 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
   SAMLAuthProvider,
+  OAuthProvider,
   RecaptchaVerifier
 } from "firebase/auth"
 import type { UserCredential, Auth, ConfirmationResult } from "firebase/auth"
@@ -76,7 +77,7 @@ interface AuthActionContext {
   // Action methods called via this
   _handlePostAuthRedirect(): void
   _signInWithProvider(
-    provider: GoogleAuthProvider | FacebookAuthProvider | SAMLAuthProvider,
+    provider: GoogleAuthProvider | FacebookAuthProvider | SAMLAuthProvider | OAuthProvider,
     providerName: string
   ): Promise<UserCredential>
   _isMobileDevice(): boolean
@@ -236,7 +237,7 @@ export const actions = {
   // Helper function to sign in with provider using the configured method
   async _signInWithProvider(
     this: AuthActionContext, 
-    provider: GoogleAuthProvider | FacebookAuthProvider | SAMLAuthProvider,
+    provider: GoogleAuthProvider | FacebookAuthProvider | SAMLAuthProvider | OAuthProvider,
     providerName: string
   ): Promise<UserCredential> {
     const auth: Auth = getAuth(this.config.firebase)
@@ -386,6 +387,43 @@ export const actions = {
 
   loginWithPhone(this: AuthActionContext): void {
     // Placeholder - actual implementation in textPhoneVerificationCode and confirmCode
+  },
+
+  async loginWithOidc(this: AuthActionContext): Promise<UserCredential> {
+    try {
+      this.is_loading = true
+      const provider = new OAuthProvider(this.config.oidc_provider_id)
+
+      // Add OIDC scopes
+      for (const scope of (this.config.oidc_scopes || ['openid', 'profile', 'email'])) {
+        provider.addScope(scope)
+      }
+
+      // Add custom parameters if configured
+      if (this.config.oidc_custom_parameters) {
+        provider.setCustomParameters(this.config.oidc_custom_parameters)
+      }
+
+      const result = await this._signInWithProvider(provider, 'OIDC')
+
+      if (result.user) {
+        const { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } = result.user
+        this.current_user = { uid, displayName, email, emailVerified, isAnonymous, phoneNumber, photoURL } as AuthUser
+        this.loggedIn = true
+        this.data = result.user
+        this.is_authguard_dialog_shown = false
+
+        // Handle post-auth redirect
+        this._handlePostAuthRedirect()
+      }
+
+      this.is_loading = false
+      return Promise.resolve(result)
+    } catch (error: any) {
+      this.error = error
+      this.is_loading = false
+      return Promise.reject(error)
+    }
   },
 
   async loginWithSaml(this: AuthActionContext): Promise<UserCredential> {
